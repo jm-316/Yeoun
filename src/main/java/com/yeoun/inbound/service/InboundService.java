@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.yeoun.aop.annotation.InventoryDashboard;
 import com.yeoun.common.dto.DisposeDTO;
 import com.yeoun.common.e_num.AlarmDestination;
 import com.yeoun.common.service.AlarmService;
@@ -80,6 +81,7 @@ public class InboundService {
 	private final OutboundRepository outboundRepository;
 	
 	// 입고대기 등록
+	@InventoryDashboard("inbound")
 	@Transactional
 	public void saveInbound(MaterialOrder materialOrder) {
 		String date = LocalDate.now().toString().replace("-", "");
@@ -159,6 +161,7 @@ public class InboundService {
 	}
 	
 	// 완제품 입고 대기
+	@InventoryDashboard("inbound")
 	@Transactional
 	public void saveProductInbound(String wopId) {
 		// 작업지시 공정 정보 가져오기
@@ -236,6 +239,7 @@ public class InboundService {
 	}
 
 	// 입고완료 처리(원재료)
+	@InventoryDashboard("inbound")
 	@Transactional
 	public void updateInbound(ReceiptDTO receiptDTO, String empId) {
 		// 입고 조회
@@ -428,7 +432,7 @@ public class InboundService {
 		
 	}
 	
-	
+	@InventoryDashboard("inbound")
 	@Transactional
 	public void saveReInbound(String workOrderId) {
 		// 작업지시서 ID 파라미터로 받아옴
@@ -517,6 +521,7 @@ public class InboundService {
 	}
 
 	// 재입고 등록
+	@InventoryDashboard("inbound")
 	@Transactional
 	public void updateReInbound(ReceiptDTO receiptDTO, String empId) {
 		// 입고 조회
