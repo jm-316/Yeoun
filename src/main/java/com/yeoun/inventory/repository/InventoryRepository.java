@@ -154,6 +154,9 @@ public interface InventoryRepository
 	boolean existsByWarehouseLocation_LocationId(String locationId);
 
 	List<Inventory> findByIvStatusNot(String status);
+	
+	// 같은 로트번호의 재고 리스트
+	List<Inventory> findByLotNoAndIvIdNot(String lotNo, Long ivId);
 
 
 }

@@ -8,6 +8,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -57,7 +61,7 @@ public class InventoryService {
 	private final AlarmService alarmService;
 	
 	// 검색조건을 통해 재고리스트 조회
-	public List<InventoryDTO> getInventoryInfo(InventoryDTO inventoryDTO) {
+	public Page<InventoryDTO> getInventoryInfo(InventoryDTO inventoryDTO) {
 		
 		Specification<Inventory> spec =
 		        InventorySpecs.lotNoContains(inventoryDTO.getLotNo());
@@ -75,11 +79,16 @@ public class InventoryService {
 		        InventorySpecs.expirationDateLoe(inventoryDTO.getExpDateTo())
 		);
 		
-	    List<Inventory> list = inventoryRepository.findAll(spec);
-
-	    return list.stream()
-	               .map(InventoryDTO::fromEntity)
-	               .toList();
+	    //page, perPage 설정
+	    int page     = (inventoryDTO.getPage()    != null ? inventoryDTO.getPage()    : 1) - 1;
+	    int perPage  = (inventoryDTO.getPerPage() != null ? inventoryDTO.getPerPage() : 20);
+	    
+	    Pageable pageable = PageRequest.of(page, perPage, Sort.by(Sort.Direction.DESC, "ibDate")); 
+		
+//	    List<Inventory> list = inventoryRepository.findAll(spec);
+	    Page<Inventory> resultPage = inventoryRepository.findAll(spec, pageable);
+	    
+	    return resultPage.map(InventoryDTO::fromEntity);
 	}
 	
 	//창고 로케이션 정보 불러오기 로직
@@ -478,6 +487,17 @@ public class InventoryService {
 		}
 		
 		warehouseLocationRepository.deleteAllByZoneAndRack(zone, rack);
+	}
+	
+	
+	// 재고조회 - 상세모달의 같은 로트번호 목록 조회하기
+	public List<InventoryDTO> getSameLotList(String lotNo, Long ivId) {
+		
+		List<Inventory> list = inventoryRepository.findByLotNoAndIvIdNot(lotNo, ivId);
+		
+		return list.stream()
+	               .map(InventoryDTO::fromEntity)
+	               .toList();
 	}
 	
 

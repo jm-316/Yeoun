@@ -70,15 +70,17 @@ document.addEventListener('DOMContentLoaded', async function () {
 	inputLocationInfo(locationInfo);
 
 	initGrid();
+	// 최초로딩(1페이지)
+	await loadInventoryPage(1);
 	//최초로딩
-	const firstSearchData = getSearchData();
-	const firstData = await fetchInventoryData(firstSearchData);
+//	const firstSearchData = getSearchData();
+//	const firstData = await fetchInventoryData(firstSearchData);
 	
 	// 받아온 데이터로 그리드 생성
-	inventoryGrid.resetData(firstData);
-	inventoryGrid.sort('ibDate', false);
+//	inventoryGrid.resetData(firstData);
+//	inventoryGrid.sort('ibDate', false);
 	// 그리드생성한 재고데이터를 저장
-	inventoryData = firstData;	
+//	inventoryData = firstData;	
 	hideSpinner();
 });
 
@@ -123,8 +125,14 @@ async function getSearchData() {
 }
 
 // 검색데이터에 기반하여 재고 데이터 정보 가져오기
-async function fetchInventoryData(searchData) {
-	console.log(searchData);
+async function fetchInventoryData(searchData, page = 1, perPage = 20) {
+	
+	const requestBody = {
+		...searchData,
+		page: page,
+		perPage: perPage
+	};
+	
 	const response = 
 		await fetch('/api/inventories', {
 			method: 'POST',
@@ -132,7 +140,7 @@ async function fetchInventoryData(searchData) {
 				[csrfHeader]: csrfToken,
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(searchData)
+			body: JSON.stringify(requestBody)
 			
 		});
 //	console.log(response);
@@ -142,22 +150,48 @@ async function fetchInventoryData(searchData) {
 	return await response.json();
 } 
 
+// 공통 로딩 함수
+async function loadInventoryPage(page = 1) {
+	showSpinner();
+
+	const searchData = await getSearchData();        // 기존 함수 그대로 사용
+	const resJson    = await fetchInventoryData(searchData, page, 20);
+
+	const contents   = resJson.data.contents;
+	const pagination = resJson.data.pagination;      // { page, totalCount }
+
+	// 그리드에 데이터 반영 + 전체 건수 반영
+	inventoryGrid.resetData(contents, {
+		pageState: {
+			page: pagination.page,
+			totalCount: pagination.totalCount,
+			perPage: 20
+		}
+	});
+
+	// 상세 모달에서 쓸 전체 데이터(현재 페이지 기준) 저장
+	inventoryData = contents;
+
+	hideSpinner();
+}
+
 // 검색버튼 이벤트함수
 const btnSearch = document.getElementById('btnSearch');
 
-btnSearch.addEventListener('click', async () => {
+btnSearch.addEventListener('click', async (event) => {
 	event.preventDefault(); // 폼제출 막기
 	
-	showSpinner();
+//	showSpinner();
 	
-	const searchData = await getSearchData();
-	const gridData = await fetchInventoryData(searchData)
+//	const searchData = await getSearchData();
+//	const gridData = await fetchInventoryData(searchData)
 	// 받아온 데이터로 그리드 생성
-	inventoryGrid.resetData(gridData);
+//	inventoryGrid.resetData(gridData);
 	// 그리드생성한 재고데이터를 저장
-	inventoryData = gridData;	
+//	inventoryData = gridData;	
 	
-	hideSpinner();
+	await loadInventoryPage(1);
+//	hideSpinner();
 
 });
 
@@ -211,7 +245,7 @@ function initGrid() {
 		bodyHeight: 'auto',
 //		rowHeaders:['rowNum'],
 		pageOptions: {
-		    useClient: true,  // 클라이언트 사이드 페이징
+		    useClient: false,  // 클라이언트 사이드 페이징
 		    perPage: 20       // 페이지당 20개 행
 		},
 		columnOptions: {
@@ -261,25 +295,52 @@ function initGrid() {
 		  }
 		]
 	});
+	
 	// 상세보기 버튼 이벤트
-	inventoryGrid.on("click", (event) => {
+	inventoryGrid.on("click", async (event) => {
 		if(event.columnName == "btn") {
 			const target = event.nativeEvent.target;
 			if (target && target.tagName === "BUTTON") {
 				
 				const rowData = inventoryGrid.getRow(event.rowKey);
 				
+				// 서버에서 같은 LOT + itemId 목록 조회
+				const params = new URLSearchParams({
+				  lotNo: rowData.lotNo,
+				  ivId: rowData.ivId
+				});
+				
+				const response = await fetch(`/api/inventories/detail?${params.toString()}`, {
+				  method: 'GET',
+				  headers: {
+				    [csrfHeader]: csrfToken
+				  }
+				});
+				
+				if (!response.ok) {
+				  alert('상세 재고 정보를 가져올 수 없습니다.');
+				  return;
+				}
+				
 				// 같은 LOT, 같은 상품(itemId)만 필터
-				const sameLotList = inventoryData.filter(item =>
-					item.lotNo === rowData.lotNo &&
-					item.itemId === rowData.itemId &&
-					// 현재 행은 제외
-					item.ivId !== rowData.ivId
-				);
+//				const sameLotList = inventoryData.filter(item =>
+//					item.lotNo === rowData.lotNo &&
+//					item.itemId === rowData.itemId &&
+//					// 현재 행은 제외
+//					item.ivId !== rowData.ivId
+//				);
+
+				const sameLotList = await response.json();
 
 				openDetailModal(rowData, sameLotList);
 			}
 		}
+	});
+	
+	// 페이지 이동 이벤트
+	inventoryGrid.on('beforePageMove', async (ev) => {
+	  const nextPage = ev.page || ev.nextPage;
+	  await loadInventoryPage(nextPage);
 	});
 
 }

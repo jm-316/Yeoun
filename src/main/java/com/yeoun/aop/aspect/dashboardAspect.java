@@ -26,7 +26,7 @@ public class dashboardAspect {
 		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 			@Override
 			public void afterCommit() {
-				System.out.println("어노테이션시작");
+//				System.out.println("어노테이션시작");
 				messagingTemplate.convertAndSend("/dashboard/inventory", inventoryDashboard.value());
 			}
 		
