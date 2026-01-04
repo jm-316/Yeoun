@@ -10,7 +10,6 @@
 //const contextPath = window.location.pathname.split('/')[1];
 let stompClient  = null;
 let connected = false;
-const contextPath = document.getElementById('contextPath').getAttribute('content') || '';
 
 
 //===============================

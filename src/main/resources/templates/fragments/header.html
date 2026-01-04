@@ -96,7 +96,15 @@
 		<!-- 상단바 (내 정보, 개인정보 수정, 로그아웃) -->
 		<script src="/js/auth/myInfo.js"></script>
 		
-		  <script>
+		<script>
+			const contextPath = document.getElementById('contextPath').getAttribute('content') || '';
+			
+			window.apiUrl = function(path) {
+			    if (!path.startsWith('/')) path = '/' + path;
+			    return window.contextPath === '/' ? path : window.contextPath + path;
+			};
+			
+			
 			//Resources
 		  
 //          	const payment = document.getElementById("payment");
@@ -161,12 +169,7 @@
    			    document.querySelector("iframe[src='/messenger/popup']")?.remove();
    			  }
    			});
-          </script>
-          
-		<script>
-		 
 		</script>
-
-
+          
           
 </th:block>
