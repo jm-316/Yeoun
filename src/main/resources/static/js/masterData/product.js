@@ -313,7 +313,7 @@ function productGridAllSearch() {
 	};
 	
 	const queryString = new URLSearchParams(params).toString();
-	fetch(`/masterData/product/list?${queryString}`, {
+	fetch(`${contextPath}/masterData/product/list?${queryString}`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -370,7 +370,7 @@ function materialGridAllSearch() {
 	};
 	
 	const queryString = new URLSearchParams(params).toString();
-	fetch(`/material/list?${queryString}`, {
+	fetch(`${contextPath}/material/list?${queryString}`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -443,7 +443,7 @@ const transformKeys = (data) => {
 
 //완제품 품목명(향수타입) 드롭다운
 function prdItemNameList() {
-	fetch('/masterData/product/prdItemNameList', {
+	fetch(`${contextPath}/masterData/product/prdItemNameList`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -475,7 +475,7 @@ function prdItemNameList() {
 
 //완제품 제품유형 드롭다운 조회
 function prdItemTypeList() {
-	fetch('/masterData/product/prdItemTypeList', {
+	fetch(`${contextPath}/masterData/product/prdItemTypeList`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -501,7 +501,7 @@ function prdItemTypeList() {
 }
 //완제품 단위 드롭다운 조회
 function prdUnitList() {
-	fetch('/masterData/product/prdUnitList', {
+	fetch(`${contextPath}/masterData/product/prdUnitList`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -527,7 +527,7 @@ function prdUnitList() {
 
 //완제품 제품상태 드롭다운
 function prdStatusList() {
-	fetch('/masterData/product/prdStatusList', {
+	fetch(`${contextPath}/masterData/product/prdStatusList`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -553,7 +553,7 @@ function prdStatusList() {
 
 //원재료 원재료 유형 드롭다운
 function matTypeList() {
-	fetch('/material/matTypeList', {
+	fetch(`${contextPath}/material/matTypeList`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -579,7 +579,7 @@ function matTypeList() {
 
 //원재료 단위 드롭다운
 function matUnitList() {
-	fetch('/material/matUnitList', {
+	fetch(`${contextPath}/material/matUnitList`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -691,7 +691,7 @@ saveProductRowBtn.addEventListener('click', function() {
 		}
 	}
 
-	fetch('/masterData/product/save', {
+	fetch(`${contextPath}/masterData/product/save`, {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: {
@@ -796,7 +796,7 @@ saveMaterialRowBtn.addEventListener('click', function() {
 		}
 	}
 
-	fetch('/material/save', {
+	fetch(`${contextPath}/material/save`, {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: {

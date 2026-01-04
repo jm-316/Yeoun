@@ -59,7 +59,7 @@ disposalBtn.addEventListener('click', async () => {
 	
 	// 재고이동 요청
 	const response = 
-		await fetch(`/api/inventories/${currentIvid}/dispose`, {
+		await fetch(`${contextPath}/api/inventories/${currentIvid}/dispose`, {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,

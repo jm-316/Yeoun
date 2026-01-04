@@ -85,7 +85,7 @@ function checkBusinessNo() {
         return;
     }
 
-    fetch(`/sales/client/check-business?businessNo=` + num)
+    fetch(`${contextPath}/sales/client/check-business?businessNo=` + num)
         .then(res => res.json())
         .then(valid => {
             if (valid) {
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // 🔥 등록 전에 중복 체크를 다시 요청
-        fetch(`/sales/client/check-business?businessNo=${bizNo}`)
+        fetch(`${contextPath}/sales/client/check-business?businessNo=${bizNo}`)
             .then(res => res.json())
             .then(valid => {
 

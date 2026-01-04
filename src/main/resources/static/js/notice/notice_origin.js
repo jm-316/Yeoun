@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		selectedNoticeId = noticeId;
 		
-		fetch('/api/notices/' + noticeId)
+		fetch(`${contextPath}/api/notices/${noticeId}`)
 			.then(response => { // response가 200이 아닐때
 				if (!response.ok) throw new Error('공지사항을 불러올 수 없습니다.');
 		    	
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	showNoticeForm.addEventListener('submit', function(event) {
 		event.preventDefault(); //기본제출 막기
 		
-		fetch('/notices/' + selectedNoticeId, {
+		fetch(`${contextPath}/notices/${selectedNoticeId}`, {
 			method: 'PATCH'
 			, headers: {
 				[csrfHeader]: csrfToken
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		alert("정말 삭제하시겠습니까?");
 		
-		fetch('/notices/' + selectedNoticeId, {
+		fetch(`${contextPath}/notices/${selectedNoticeId}`, {
 			method: 'DELETE'
 			, headers: {
 				[csrfHeader]: csrfToken
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	createNoticeForm.addEventListener('submit', function(event) {
 		event.preventDefault(); //기본제출 막기
 		
-		fetch('/notices', {
+		fetch(`${contextPath}/notices`, {
 			method: 'POST'
 			, headers: {
 				[csrfHeader]: csrfToken

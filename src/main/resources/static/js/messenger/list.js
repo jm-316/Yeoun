@@ -61,7 +61,7 @@ function subscribeEvent() {
 async function loadChatList() {
 
     try {
-        const res = await fetch("/messenger/list/chat", {
+        const res = await fetch(`${contextPath}/messenger/list/chat`, {
             method: "POST",
             headers: {
                 "Accept": "application/json",
@@ -335,7 +335,7 @@ function filterChats() {
     const keyword = searchInput.value.trim();
     if (!keyword) return;
     
-    fetch(`/messenger/rooms/search?keyword=${encodeURIComponent(keyword)}`)
+    fetch(`${contextPath}/messenger/rooms/search?keyword=${encodeURIComponent(keyword)}`)
     .then(response => response.json())
     .then(rooms => {
     	renderRoomList(rooms);
@@ -490,7 +490,7 @@ async function sendStatusToServer(presence, reason, isUnload = false) {
     }
 	
     try {
-        const res = await fetch('/messenger/status', {
+        const res = await fetch(`${contextPath}/messenger/status`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -737,7 +737,7 @@ document.addEventListener("click", (event) => {
   // 3. 서버에 즐겨찾기 상태 전송
   
   const id = starBtn.dataset.id;
-  fetch(`/messenger/favorite/${id}`, {
+  fetch(`${contextPath}/messenger/favorite/${id}`, {
     method: "PATCH",
     headers: {
     	[csrfHeader] : csrfToken

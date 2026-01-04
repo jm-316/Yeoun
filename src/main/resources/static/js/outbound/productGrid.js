@@ -69,7 +69,7 @@ function formatDate(isoDate) {
 // 출고 정보 불러오기
 async function loadProductOutbound(startDate, endDate, keyword) {
 	const MATERIAL_OUTBOUND_LIST = 
-		`/inventory/outbound/list/data` +
+		`${contextPath}/inventory/outbound/list/data` +
 		`?startDate=${startDate}` +
 		`&endDate=${endDate}` +
 		`&keyword=${keyword}`;
@@ -202,7 +202,7 @@ async function loadShipmentList() {
 	try {
 		
 		// 출하지시서 데이터 가져오는 API 작성하기
-		const res = await fetch("/api/shipment/list");
+		const res = await fetch(`${contextPath}/api/shipment/list`);
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");
@@ -361,7 +361,7 @@ const submitPrdOutbound = async () => {
 		items
 	};
 	
-	const res = await fetch("/inventory/outbound/fg/regist", {
+	const res = await fetch(`${contextPath}/inventory/outbound/fg/regist`, {
 		method: "POST",
 		headers: {
 			[csrfHeader]: csrfToken,

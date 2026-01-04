@@ -494,7 +494,7 @@ function updateHtmlCellColor(locationId, count) {
 // 창고 데이터 가져오기
 async function getLocationData() {
     try {
-        const response = await fetch('/api/inventories/locations');
+        const response = await fetch(`${contextPath}/api/inventories/locations`);
         if (!response.ok) throw new Error("서버 통신 실패");
         return await response.json();
     } catch (error) {
@@ -506,7 +506,7 @@ async function getLocationData() {
 // 창고 위치에 해당하는 재고 가져오기
 async function getLocationInventory(locationId) {
 	try {
-		const response = await fetch(`/api/inventories/${locationId}`);
+		const response = await fetch(`${contextPath}/api/inventories/${locationId}`);
 		if (!response.ok) throw new Error("서버 통신 실패");
 		return await response.json();
 	} catch (error) {

@@ -216,7 +216,7 @@ btnMove.addEventListener('click', async () => {
 	
 	// 재고이동 요청
 	const response = 
-		await fetch(`/api/inventories/${currentIvid}/move`, {
+		await fetch(`${contextPath}/api/inventories/${currentIvid}/move`, {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,

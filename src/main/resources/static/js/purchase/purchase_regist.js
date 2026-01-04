@@ -8,7 +8,7 @@ const hiddenId = document.querySelector("#clientId");
 // 공급업체 데이터 가져오기
 const supplierList = async () => {
 	try {
-		const res = await fetch("/purchase/supplier/data", {method: "GET"});
+		const res = await fetch(`${contextPath}/purchase/supplier/data`, {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");
@@ -334,7 +334,7 @@ const submitOrder = async () => {
 		supplierItemList: items
 	};
 	
-	const res = await fetch("/purchase/purchaseOrder", {
+	const res = await fetch(`${contextPath}/purchase/purchaseOrder`, {
 		method: "POST",
 		headers: {
 			[csrfHeader]: csrfToken, 

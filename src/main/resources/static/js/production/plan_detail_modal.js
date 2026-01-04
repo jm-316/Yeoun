@@ -9,7 +9,7 @@ let orderItemMap = {};
 ================================= */
 function openPlanDetail(planId) {
 
-    fetch(`/production/plan/detail/${planId}`)
+    fetch(`${contextPath}/production/plan/detail/${planId}`)
         .then(res => res.json())
         .then(data => {
             console.log("받은 데이터:", data);

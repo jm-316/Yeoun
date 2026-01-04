@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 // 창고 ZONE, RACK, ROW, COL 가져오기
 async function getLocationInfo() {
 	const response = 
-		await fetch('/api/inventories/locations', {
+		await fetch(`${contextPath}/api/inventories/locations`, {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -264,7 +264,7 @@ function loadStockTakeData(locationIvInfo) {
 // locationId로 해당위치의 재고리스트 정보 가져오기
 async function getLocationInventory(locationId) {
 	const response = 
-		await fetch(`/api/inventories/${locationId}`, {
+		await fetch(`${contextPath}/api/inventories/${locationId}`, {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -462,7 +462,7 @@ async function applyStockTakeRow(rowKey) {
         return false;
     }
 	// 단건 수량 조정 실행
-    const response = await fetch(`/api/inventories/${req.ivId}/adjustQty`, {
+    const response = await fetch(`${contextPath}/api/inventories/${req.ivId}/adjustQty`, {
         method: 'POST',
         headers: { [csrfHeader]: csrfToken, 'Content-Type': 'application/json' },
         body: JSON.stringify(req)

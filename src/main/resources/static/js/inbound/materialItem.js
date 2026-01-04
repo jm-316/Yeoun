@@ -1,7 +1,7 @@
 // 창고 ZONE, RACK, ROW, COL 가져오기
 async function getLocationInfo() {
 	const response = 
-		await fetch('/api/inventories/locations', {
+		await fetch(`${contextPath}/api/inventories/locations`, {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -299,7 +299,7 @@ document.getElementById("completeInboundBtn").addEventListener("click", async ()
 	showSpinner();
 	
 	try {
-		const res = await fetch("/inventory/inbound/mat/complete", {
+		const res = await fetch(`${contextPath}/inventory/inbound/mat/complete`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

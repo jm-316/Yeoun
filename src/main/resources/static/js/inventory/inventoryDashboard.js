@@ -1099,7 +1099,7 @@ async function renderExpireDisposalGrid() {
 // 재고정보 가져오기
 async function fetchNotNormalInventoryData() {
 	const response = 
-		await fetch('/api/inventories/expiration', {
+		await fetch(`${contextPath}/api/inventories/expiration`, {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -1116,7 +1116,7 @@ async function fetchNotNormalInventoryData() {
 // 안전재고/재고 비교 정보 데이터
 async function fetchInventorySafetyStockData() {
 	const response = 
-		await fetch('/api/inventories/inventorySafetyStockCheckInfo', {
+		await fetch(`${contextPath}/api/inventories/inventorySafetyStockCheckInfo`, {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -1139,7 +1139,7 @@ async function fetchTodayInboundData() {
 //	const startDate = today.toISOString().slice(0, 10);
 //	const endDate = today.toISOString().slice(0, 10);
 	const MATERIAL_INBOUND_LIST = 
-		`/inventory/inbound/materialList/data` +
+		`${contextPath}/inventory/inbound/materialList/data` +
 		`?startDate=${startDate}` +
 		`&endDate=${endDate}` + 
 		`&searchType=` +
@@ -1170,7 +1170,7 @@ async function fetchTodayOutboundData() {
 	console.log("startDate : ", startDate);
 //	 console.log(startDate, endDate);
 	const MATERIAL_OUTBOUND_LIST = 
-		`/inventory/outbound/list/data` +
+		`${contextPath}/inventory/outbound/list/data` +
 		`?startDate=${startDate}` +
 		`&endDate=${endDate}` +
 		`&keyword=`;
@@ -1193,7 +1193,7 @@ async function fetchTodayOutboundData() {
 
 // 재고내역 조회
 async function fetchIvHistoryData() {
-	const response = await fetch('/api/inventories/ivHistoryGroup', {
+	const response = await fetch(`${contextPath}/api/inventories/ivHistoryGroup`, {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1211,7 +1211,7 @@ async function fetchIvHistoryData() {
 // 작업지시서 리스트 가져오기
 // 작업지시 정보 가져오기
 async function fetchOrderListData() {
-		const response = await fetch("/api/inventories/orderData", {
+		const response = await fetch(`${contextPath}/api/inventories/orderData`, {
 			method: "GET",
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -1229,7 +1229,7 @@ async function fetchOrderListData() {
 
 // 발주 필요 수량 체크
 async function fetchIvOrderCheckData() {
-	const response = await fetch("/api/inventories/inventoryOrderCheck", {
+	const response = await fetch(`${contextPath}/api/inventories/inventoryOrderCheck`, {
 		method: "GET",
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1292,9 +1292,8 @@ function gridLangSet(grid) {
 
 connectWebSocket(() => {
 	// 1) 메시지 수신 구독
-	stompClient.subscribe(`/dashboard/inventory`, (message) => {
+	stompClient.subscribe(`${contextPath}/dashboard/inventory`, (message) => {
 	    if(message.body == 'inbound') {
-			console.log("@@@@@@@@@@@@@@@@@@@@@@@인바운드")
 			updateIbCard();
 		}
 	    if(message.body == 'outbound') {

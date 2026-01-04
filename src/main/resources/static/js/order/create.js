@@ -220,7 +220,7 @@
   async function validateBeforeSubmit() {
     const payload = collectValidatePayload();
 
-    const res = await fetch("/order/validate", {
+    const res = await fetch(`${contextPath}/order/validate`, {
   	  method: "POST",
   	  headers: {
   		  "Content-Type": "application/json",
@@ -324,7 +324,7 @@
       };
 
 
-      const res = await fetch("/order/create", {
+      const res = await fetch(`${contextPath}/order/create`, {
           method: "POST",
           headers: {
               "Content-Type": "application/json",

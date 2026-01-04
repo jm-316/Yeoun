@@ -5,7 +5,7 @@ async function deleteZone(zoneName) {
 	if (!deleteZoneConfirm) return;
 	
 	try {
-		const res = await fetch(`/api/inventories/zones/${zoneName}`, {
+		const res = await fetch(`${contextPath}/api/inventories/zones/${zoneName}`, {
 			method: "DELETE", 
 			headers : {
 				[csrfHeader]: csrfToken,
@@ -34,7 +34,7 @@ async function deleteRack(zone, rack) {
 	if (!deleteRackConfirm) return;
 	
 	try {
-		const res = await fetch(`/api/inventories/racks?zone=${zone}&rack=${rack}`, {
+		const res = await fetch(`${contextPath}/api/inventories/racks?zone=${zone}&rack=${rack}`, {
 			method: "DELETE",
 			headers : {
 				[csrfHeader]: csrfToken,

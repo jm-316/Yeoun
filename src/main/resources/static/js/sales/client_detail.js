@@ -87,7 +87,7 @@ function saveClient() {
         headers[csrfHeader] = csrfToken;
     }
 
-    fetch("/sales/client/update", {
+    fetch(`${contextPath}/sales/client/update`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify(client)

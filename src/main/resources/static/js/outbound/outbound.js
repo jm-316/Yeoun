@@ -13,7 +13,7 @@ let outboundDate;
 // 작업지시 정보 가져오기
 async function loadOrderList() {
 	try {
-		const res = await fetch("/order/orderList/data", {method: "GET"});
+		const res = await fetch(`${contextPath}/order/orderList/data`, {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");
@@ -80,7 +80,7 @@ workOrderSelect.addEventListener("change", async () => {
 // BOM 조회
 async function loadBomList(productId, planQty) {
 	try {
-		const res = await fetch(`/bom/list/data/${productId}`);
+		const res = await fetch(`${contextPath}/bom/list/data/${productId}`);
 		const bomList = await res.json();
 		
 		// bom 목록 초기화
@@ -91,7 +91,7 @@ async function loadBomList(productId, planQty) {
 			// 필요수량 구하기 (bom에 등록된 원재료 사용량 * 작업지시서 수량)
 			const needQty = bom.matQty * planQty;
 			
-			const stockRes = await fetch(`/api/inventories/stock/${bom.matId}`);
+			const stockRes = await fetch(`${contextPath}/api/inventories/stock/${bom.matId}`);
 			const stock = await stockRes.json();
 			
 			const row = `
@@ -139,7 +139,7 @@ const submitOutbound = async () => {
 		items
 	};
 	
-	const res = await fetch("/inventory/outbound/mat/regist", {
+	const res = await fetch(`${contextPath}/inventory/outbound/mat/regist`, {
 		method: "POST",
 		headers: {
 			[csrfHeader]: csrfToken, 

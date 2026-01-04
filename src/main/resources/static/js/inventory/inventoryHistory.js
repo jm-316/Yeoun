@@ -88,7 +88,7 @@ async function fetchInventoryHistoryData() {
 	const searchData = buildSearchData();
 	
 	const response = 
-		await fetch('/api/inventories/historys', {
+		await fetch(`${contextPath}/api/inventories/historys`, {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,

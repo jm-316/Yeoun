@@ -106,7 +106,7 @@ function onSuggestProductSelected() {
     const selectedProducts = suggestGridApi.getSelectedRows();
 
     selectedProducts.forEach(prod => {
-        fetch(`/production/order-items/${prod.prdId}`)
+        fetch(`${contextPath}/production/order-items/${prod.prdId}`)
             .then(res => res.json())
             .then(items => {
                 items.forEach(oi => {
@@ -127,7 +127,7 @@ function onSuggestProductSelected() {
 function loadSuggestList() {
     const group = document.getElementById("productGroup").value;
 
-    fetch(`/production/suggest?group=${group}`)
+    fetch(`${contextPath}/production/suggest?group=${group}`)
         .then(res => res.json())
         .then(data => {
             suggestGridApi.setGridOption("rowData", data);
@@ -171,7 +171,7 @@ function initOrderItemGrid() {
 ======================================================== */
 function showOrderItems(prdId) {
 
-    fetch(`/production/order-items/${prdId}`)
+    fetch(`${contextPath}/production/order-items/${prdId}`)
         .then(res => res.json())
         .then(data => {
 
@@ -241,7 +241,7 @@ function createProductionPlan() {
         items: finalSelectedOrders
     };
 
-    fetch("/production/create/submit", {
+    fetch(`${contextPath}/production/create/submit`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

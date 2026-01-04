@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             keyword: document.getElementById("keyword").value
         };
 
-        fetch(`/sales/orders/list?` + new URLSearchParams(params))
+        fetch(`${contextPath}/sales/orders/list?` + new URLSearchParams(params))
             .then(r => r.json())
             .then(data => gridApi.setGridOption("rowData", data));
     }

@@ -1,8 +1,8 @@
 <th:block xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:fragment="nav">
+	<meta id="contextPath" th:content="@{/}"/>
 	<head>
-		
 	</head>
 		<nav
             class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
@@ -93,7 +93,6 @@
 		<form th:action="@{/logout}" method="post" id="hiddenLogoutForm" style="display:none">
 		  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 		</form>
-		
 		<!-- 상단바 (내 정보, 개인정보 수정, 로그아웃) -->
 		<script src="/js/auth/myInfo.js"></script>
 		

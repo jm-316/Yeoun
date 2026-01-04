@@ -179,7 +179,7 @@ function loadClientList() {
         params.append("itemKeyword", itemKeyword);
     }
 
-    fetch(`/sales/client/data?${params.toString()}`)
+    fetch(`${contextPath}/sales/client/data?${params.toString()}`)
         .then(res => {
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);
@@ -205,7 +205,7 @@ function loadClientList() {
 
 function showClientDetail(clientId) {
 
-    fetch(`/sales/client/${clientId}`)
+    fetch(`${contextPath}/sales/client/${clientId}`)
         .then(res => {
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);

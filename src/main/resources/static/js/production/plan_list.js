@@ -152,7 +152,7 @@ function initPlanGrid() {
    목록 조회
 ===================================================== */
 function loadPlanList() {
-    fetch("/production/list")
+    fetch(`${contextPath}/production/list`)
         .then(res => res.json())
         .then(data => {
             if (!planGridApi) return;
@@ -176,7 +176,7 @@ function cancelPlan(planId) {
 
     if (!confirm("해당 생산계획을 취소하시겠습니까?")) return;
 
-    fetch(`/production/plan/${planId}/cancel`, {
+    fetch(`${contextPath}/production/plan/${planId}/cancel`, {
         method: "POST",
         headers: {
             "X-CSRF-TOKEN": csrfToken

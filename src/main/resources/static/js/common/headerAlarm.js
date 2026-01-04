@@ -152,7 +152,7 @@ function showNewAlarmAtDropdown() {
 // 읽지않은 알림 데이터 가져오기
 async function getAlarmReadStatus() {
     try {
-        const response = await fetch(`/alarm/status`, {
+        const response = await fetch(`${contextPath}/alarm/status`, {
             method: "GET",
             headers: {
                 [csrfHeader]: csrfToken,

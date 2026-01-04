@@ -33,7 +33,7 @@ const grid = new tui.Grid({
 
 // 데이터 가져오기
 async function loadOutworkList(startDate, endDate) {
-	const OUTWORK_LIST = `/attendance/outwork/data?startDate=${startDate}&endDate=${endDate}`;
+	const OUTWORK_LIST = `${contextPath}/attendance/outwork/data?startDate=${startDate}&endDate=${endDate}`;
 	try {
 		const res = await fetch(OUTWORK_LIST, {method: "GET"});
 		
