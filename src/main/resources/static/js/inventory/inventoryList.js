@@ -134,7 +134,7 @@ async function fetchInventoryData(searchData, page = 1, perPage = 20) {
 	};
 	
 	const response = 
-		await fetch(`${contextPath}/api/inventories`, {
+		await fetch(apiUrl(`api/inventories`), {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -310,7 +310,7 @@ function initGrid() {
 				  ivId: rowData.ivId
 				});
 				
-				const response = await fetch(`${contextPath}/api/inventories/detail?${params.toString()}`, {
+				const response = await fetch(apiUrl(`api/inventories/detail?${params.toString()}`), {
 				  method: 'GET',
 				  headers: {
 				    [csrfHeader]: csrfToken
@@ -349,7 +349,7 @@ function initGrid() {
 // 창고 ZONE, RACK, ROW, COL 가져오기
 async function getLocationInfo() {
 	const response = 
-		await fetch(`${contextPath}/api/inventories/locations`, {
+		await fetch(apiUrl(`api/inventories/locations`), {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,

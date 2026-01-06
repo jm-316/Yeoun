@@ -680,7 +680,7 @@ async function checkSharers(scheduleType, scheduleId) {
 	// 스케줄타입이 공유가 아니면 리턴
 	if(scheduleType != 'share') return;
 	try {
-		const response = await fetch(`/api/schedules/sharerList/${scheduleId}`, {method: 'GET'});
+		const response = await fetch(apiUrl(`/api/schedules/sharerList/${scheduleId}`), {method: 'GET'});
 		if(!response.ok) throw new Error(await response.text());
 		
 		const data = await response.json();

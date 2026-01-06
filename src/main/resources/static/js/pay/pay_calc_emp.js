@@ -12,7 +12,7 @@ function loadEmpInfo() {
 
     if (!empId) return alert("사원을 선택하세요.");
 
-    fetch(`${contextPath}/pay/calc/emp/info?empId=${empId}&yyyymm=${yyyymm}`)
+    fetch(apiUrl(`pay/calc/emp/info?empId=${empId}&yyyymm=${yyyymm}`))
         .then(res => res.json())
         .then(data => {
             if (!data) {
@@ -83,7 +83,7 @@ function simulateOne() {
 
     if (!empId) return alert("사원을 선택하세요.");
 
-    fetch(`${contextPath}/pay/calc/emp/simulate`, {
+    fetch(apiUrl(`pay/calc/emp/simulate`), {
         method: "POST",
         headers: { 
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -113,7 +113,7 @@ function confirmOne() {
 
     if (!empId) return alert("사원을 선택하세요.");
 
-    fetch(`${contextPath}/pay/calc/emp/confirm`, {
+    fetch(apiUrl(`pay/calc/emp/confirm`), {
         method: "POST",
         headers: { 
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -183,7 +183,7 @@ empKeyword?.addEventListener("input", function () {
         return;
     }
 
-    fetch(`${contextPath}/pay/calc/searchEmployee?keyword=` + encodeURIComponent(keyword))
+    fetch(apiUrl(`pay/calc/searchEmployee?keyword=`) + encodeURIComponent(keyword))
         .then(res => res.json())
         .then(list => {
 

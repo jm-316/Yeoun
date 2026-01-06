@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	showNoticeForm.addEventListener('submit', function(event) {
 		event.preventDefault(); //기본제출 막기
 		
-		fetch(`${contextPath}/notice/${selectedNoticeId}`, {
+		fetch(apiUrl(`notice/${selectedNoticeId}`), {
 			method: 'PATCH'
 			, headers: {
 				[csrfHeader]: csrfToken
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		alert("정말 삭제하시겠습니까?");
 		
-		fetch(`${contextPath}/notice/${selectedNoticeId}`, {
+		fetch(apiUrl(`notice/${selectedNoticeId}`), {
 			method: 'DELETE'
 			, headers: {
 				[csrfHeader]: csrfToken
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	createNoticeForm.addEventListener('submit', function(event) {
 		event.preventDefault(); //기본제출 막기
 		
-		fetch(`${contextPath}/notice`, {
+		fetch(apiUrl(`notice`), {
 			method: 'POST'
 			, headers: {
 				[csrfHeader]: csrfToken
@@ -134,7 +134,7 @@ function NoticeDetailFormatDate(date) {
 
 // 조회할 공지 데이터 불러오기
 async function getNoticeData(noticeId) {
-	await fetch(`${contextPath}/api/notices/${noticeId}`)
+	await fetch(apiUrl(`api/notices/${noticeId}`))
 	.then(response => { // response가 200이 아닐때
 		if (!response.ok) throw new Error('공지사항을 불러올 수 없습니다.');
     	
@@ -186,7 +186,7 @@ async function inputReadData(data){
 
 // 조회할 공지 파일 데이터 가져오기
 async function getNoticeFileData(noticeId) {
-	await fetch(`${contextPath}/api/notices/file/${noticeId}`)
+	await fetch(apiUrl(`api/notices/file/${noticeId}`))
 	.then(response => { // response가 200이 아닐때
 		if (!response.ok) throw new Error('공지사항을 불러올 수 없습니다.');
     	
@@ -276,7 +276,7 @@ async function deleteFile(elem) {
 	
 	await $.ajax({
 		// RESTful API 형식으로 주소를 지정할 경우 삭제는 DELETE 방식의 메서드 활용하며, URL 뒤에 삭제할 번호를 경로 변수 형태로 포함
-		url: `${contextPath}/files/${fileId}`,
+		url: apiUrl(`files/${fileId}`),
 		type: "delete",
 		// data 속성에 변수값 전달 시 속성명과 변수명이 동일하면 하나만 기술해도 됨
 		dataType: "json",

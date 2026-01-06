@@ -65,7 +65,7 @@ document.getElementById("completeReInboundBtn").addEventListener("click", async 
 	showSpinner();
 	
 	try {
-		const res = await fetch(`${contextPath}/inventory/inbound/re/complete`, {
+		const res = await fetch(apiUrl(`inventory/inbound/re/complete`), {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

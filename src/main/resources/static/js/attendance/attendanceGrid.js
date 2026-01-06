@@ -46,7 +46,7 @@ const grid = new tui.Grid({
 
 // 데이터 가져오기
 async function loadAttendanceList(startDate, endDate) {
-	const ATTENDANCE_LIST = `${contextPath}/attendance/my/data?startDate=${startDate}&endDate=${endDate}`;
+	const ATTENDANCE_LIST = apiUrl(`attendance/my/data?startDate=${startDate}&endDate=${endDate}`);
 	try {
 		const res = await fetch(ATTENDANCE_LIST, {method: "GET"});
 		

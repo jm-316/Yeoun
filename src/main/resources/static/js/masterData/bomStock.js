@@ -697,7 +697,7 @@ grid3.on('beforeChange', (ev) => {
 
 //bom상세 그리드 전체조회
 function bomDetailGridAllSearch() {
-	fetch(`${contextPath}/bom/bomDetail/list`, {
+	fetch(apiUrl(`bom/bomDetail/list`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -732,7 +732,7 @@ function bomDetailGridAllSearch() {
 //bom 상세 그리드 - 완제품
 function bomDetailPrdGridAllSearch(bomId) {
 
-	fetch(`${contextPath}/bom/bomDetail/prdList/${bomId}`, {
+	fetch(apiUrl(`bom/bomDetail/prdList/${bomId}`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -768,7 +768,7 @@ function bomDetailPrdGridAllSearch(bomId) {
 };
 //bom 상세 그리드 - 원재료
 function bomDetailMatGridAllSearch(bomId) {
-	fetch(`${contextPath}/bom/bomDetail/matList/${bomId}`, {
+	fetch(apiUrl(`bom/bomDetail/matList/${bomId}`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -805,7 +805,7 @@ function bomDetailMatGridAllSearch(bomId) {
 
 //bom 상세 그리드 - 원재료 포장재별	
 function bomDetailMatTypeGridAllSearch(bomId) {
-	fetch(`${contextPath}/bom/bomDetail/matTypeList/${bomId}`, {
+	fetch(apiUrl(`bom/bomDetail/matTypeList/${bomId}`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -849,7 +849,7 @@ function bomGridAllSearch() {
 		matId: document.getElementById("matId").value ?? ""
 	};
 	const queryString = new URLSearchParams(params).toString();
-	fetch(`${contextPath}/bom/list?${queryString}`, {
+	fetch(apiUrl(`bom/list?${queryString}`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -898,7 +898,7 @@ function bomHdrGridAllSearch(){
 			bomHdrType: document.getElementById("bomHdrType").value ?? ""
 		};
 		const queryString = new URLSearchParams(params).toString();
-		fetch(`${contextPath}/bom/bomHdrList?${queryString}`, {
+		fetch(apiUrl(`bom/bomHdrList?${queryString}`), {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -947,7 +947,7 @@ function safetyStockGridAllSearch() {
 		itemName: document.getElementById("itemName").value ?? ""
 	};
 	const queryString = new URLSearchParams(params).toString();
-	fetch(`${contextPath}/safetyStock/list?${queryString}`, {
+	fetch(apiUrl(`safetyStock/list?${queryString}`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -990,7 +990,7 @@ function safetyStockGridAllSearch() {
 
 //BOM 원재료 조회 모달 matGridAllSearch
 function matGridAllSearch(){
-	fetch(`${contextPath}/bom/matList`, {
+	fetch(apiUrl(`bom/matList`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1063,7 +1063,7 @@ grid1.on("click", async (ev) => {
 
 //BOM 완제품id 드롭다운
 function prdItemList() {
-	fetch(`${contextPath}/bom/prdList`, {
+	fetch(apiUrl(`bom/prdList`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1101,7 +1101,7 @@ function prdItemList() {
 
 //Bom 단위 드롭다운
 function bomUnitList(){
-	fetch(`${contextPath}/bom/UnitList`, {
+	fetch(apiUrl(`bom/UnitList`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1137,7 +1137,7 @@ function bomUnitList(){
 // Bom 그룹 드롭다운
 function bomHdrTypeList() {
 	
-	fetch(`${contextPath}/bom/hdrTypeList`, {
+	fetch(apiUrl(`bom/hdrTypeList`), {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -1171,7 +1171,7 @@ function bomHdrTypeList() {
 
 //안전재고 품목종류 드롭다운
 function safetyStockMatTypeList(){
-	fetch(`${contextPath}/safetyStock/matTypeList`, {
+	fetch(apiUrl(`safetyStock/matTypeList`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1208,7 +1208,7 @@ function safetyStockMatTypeList(){
 
 //안전재고 단위 드롭다운
 function safetyStockUnitList(){
-	fetch(`${contextPath}/safetyStock/unitList`, {
+	fetch(apiUrl(`safetyStock/unitList`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1242,7 +1242,7 @@ function safetyStockUnitList(){
 }
 //안전재고 정책방식 드롭다운
 function safetyStockPolicyTypeList(){
-	fetch(`${contextPath}/safetyStock/policyTypeList`, {
+	fetch(apiUrl(`safetyStock/policyTypeList`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1278,7 +1278,7 @@ function safetyStockPolicyTypeList(){
 
 //안전재고 상태 드롭다운
 function safetyStockStatusList(){
-	fetch(`${contextPath}/safetyStock/statusList`, {
+	fetch(apiUrl(`safetyStock/statusList`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1431,7 +1431,7 @@ function saveBomRow(type) {
 	}
 	console.log('sending /bom/save payload:', modifiedData);
 	console.log('csrf header:', csrfHeader, csrfToken);
-	fetch(`${contextPath}/bom/save`, {
+	fetch(apiUrl(`bom/save`), {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: {
@@ -1489,7 +1489,7 @@ saveBomGroupRowBtn.addEventListener('click', function() {
 		return;
 	}
 	
-	fetch(`${contextPath}/bom/bomHdrSave`, {
+	fetch(apiUrl(`bom/bomHdrSave`), {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: {
@@ -1616,7 +1616,7 @@ saveSafetyStockRowBtn.addEventListener('click', function() {
 
 	console.log('sending /safetyStock/save payload:', modifiedData);
 	console.log('csrf header:', csrfHeader, csrfToken);
-	fetch(`${contextPath}/safetyStock/save`, {
+	fetch(apiUrl(`safetyStock/save`), {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: {
@@ -1854,7 +1854,7 @@ deleteSafetyStockRowBtn.addEventListener('click', async function() {
 		try {
 			console.log('sending /safetyStock/delete payload:', serverItemIds);
 			console.log('csrf header:', csrfHeader, csrfToken);
-			const res = await fetch(`${contextPath}/safetyStock/delete`, {
+			const res = await fetch(apiUrl(`safetyStock/delete`), {
 				method: 'POST',
 				credentials: 'same-origin',
 				headers: {

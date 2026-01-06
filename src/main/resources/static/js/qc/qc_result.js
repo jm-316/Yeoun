@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // 목록 조회
 function loadQcResultGrid() {
 	const params = new URLSearchParams(location.search);
-	fetch(`${contextPath}/qc/result/data?${params.toString()}`)
+	fetch(apiUrl(`qc/result/data?${params.toString()}`))
 	    .then(res => res.json())
 	    .then(data => qcResultGrid.resetData(data));
 }
@@ -189,7 +189,7 @@ function openQcViewModal(qcResultId) {
     return;
   }
 
-  fetch(`${contextPath}/qc/result/${qcResultId}`)
+  fetch(apiUrl(`qc/result/${qcResultId}`))
     .then(res => {
       if (!res.ok) {
         console.error("QC 결과 조회 HTTP 에러:", res.status, res.statusText);
@@ -329,7 +329,7 @@ function openQcViewModal(qcResultId) {
 function loadQcDetailFileList(qcResultDtlId) {
   if (!qcResultDtlId) return;
 
-  fetch(`${contextPath}/qc/detail/${qcResultDtlId}/files`)
+  fetch(apiUrl(`qc/detail/${qcResultDtlId}/files`))
     .then(res => {
       if (!res.ok) {
         throw new Error("HTTP " + res.status);

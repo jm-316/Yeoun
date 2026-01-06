@@ -1,7 +1,9 @@
 <th:block xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:fragment="nav">
+	
 	<meta id="contextPath" th:content="@{/}"/>
+	
 	<head>
 	</head>
 		<nav
@@ -100,8 +102,11 @@
 			const contextPath = document.getElementById('contextPath').getAttribute('content') || '';
 			
 			window.apiUrl = function(path) {
-			    if (!path.startsWith('/')) path = '/' + path;
-			    return window.contextPath === '/' ? path : window.contextPath + path;
+// 			    if (!path.startsWith('/')) path = '/' + path;
+// 			    return contextPath === '/' ? path : contextPath + path;
+			    const url = contextPath.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+			    console.log('Generated URL:', url);  // 여기에 로그 추가
+			    return url;
 			};
 			
 			

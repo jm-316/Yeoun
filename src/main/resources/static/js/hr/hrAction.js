@@ -81,7 +81,7 @@ function loadEmpListForHrAction() {
 	if (status)  params.append('status', status);
 	if (keyword) params.append('keyword', keyword);
 
-	const url = `${contextPath}/api/hr/employees` + (params.toString() ? ('?' + params.toString()) : '');
+	const url = apiUrl(`api/hr/employees`) + (params.toString() ? ('?' + params.toString()) : '');
 
 	fetch(url)
 		.then(res => {
@@ -218,7 +218,7 @@ function handleSubmitAction(e) {
 	
 	
 	// REST API POST
-	fetch(`${contextPath}/api/hr/actions`, {
+	fetch(apiUrl(`api/hr/actions`), {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -261,7 +261,7 @@ function loadApproverOptions(empId) {
     return;
   }
 
-  fetch(`${contextPath}/api/hr/approvers?formName=인사발령신청서&empId=${encodeURIComponent(empId)}`)
+  fetch(apiUrl(`api/hr/approvers?formName=인사발령신청서&empId=${encodeURIComponent(empId)}`))
     .then(res => {
       if (!res.ok) {
         throw new Error("결재자 API 호출 실패");

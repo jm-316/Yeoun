@@ -162,7 +162,7 @@ function loadPayHistory(page) {
 	});
 
 
-    fetch(`${contextPath}/pay/history/search?${params.toString()}`)
+    fetch(apiUrl(`pay/history/search?${params.toString()}`))
         .then(res => res.json())
         .then(data => {
             if (!gridApi) {
@@ -237,7 +237,7 @@ async function openDetailModal(payYymm, empId) {
 
     try {
         // 🔥 상세 데이터 조회 API 호출
-        const res = await fetch(`${contextPath}/pay/history/detail?payYymm=${payYymm}&empId=${empId}`);
+        const res = await fetch(apiUrl(`pay/history/detail?payYymm=${payYymm}&empId=${empId}`));
         const data = await res.json();
 
         // ===========================

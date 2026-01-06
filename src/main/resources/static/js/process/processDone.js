@@ -131,7 +131,7 @@ function loadDoneGrid() {
   if (searchKeyword) params.append("searchKeyword", searchKeyword);
   if (status)   params.append("doneStatus", status);
 
-  fetch(`${contextPath}/process/status/done/data?${params.toString()}`)
+  fetch(apiUrl(`process/status/done/data?${params.toString()}`))
     .then(res => {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();

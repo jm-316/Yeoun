@@ -77,7 +77,7 @@ function loadEmpList() {
     	deptId: deptId
   	});
 
-  	fetch(`${contextPath}/emp/data?` + params.toString())
+  	fetch(apiUrl(`emp/data?`) + params.toString())
     	.then(res => res.json())
     	.then(data => {
      	 	// data = List<EmpListDTO>
@@ -181,7 +181,7 @@ function showEmpDetail(empId) {
   const editBtn = document.getElementById('editBtn');
   if (editBtn) editBtn.style.display = '';
 
-  fetch(`${contextPath}/emp/detail/${empId}`)
+  fetch(apiUrl(`emp/detail/${empId}`))
     .then(res => res.json())
     .then(d => {
       document.getElementById('empDetailModalTitle').innerText = '사원 상세';

@@ -1,6 +1,6 @@
 // 출/퇴근 버튼 클릭 시 사원번호를 전달해서 출/퇴근 기록 요청
 async function attendance(empId) {
-	const PROCESS_ATTENDANCE = `${contextPath}/attendance/toggle/${empId}`;
+	const PROCESS_ATTENDANCE = apiUrl(`attendance/toggle/${empId}`);
 	const response = await fetch(PROCESS_ATTENDANCE, { 
 		method: "POST",
 		headers: {
@@ -56,7 +56,7 @@ const searchEmp = async () => {
 	const empId = document.querySelector("#nameWithTitle").value;
 	const empName = document.querySelector("#empName");
 	
-	const SEARCH_EMP = `${contextPath}/attendance/search?empId=${empId}`;
+	const SEARCH_EMP = apiUrl(`attendance/search?empId=${empId}`);
 	
 	try {
 		const response = await fetch(SEARCH_EMP, {method: "GET"});
@@ -95,7 +95,7 @@ const openModalAttendance = async (mode, attendanceId = null) => {
 	currentMode = mode; // 현재 모드 저장
 	currentAttendanceId = attendanceId; // 수정 모드일 경우 id가 들어와서 저장
 	
-	const ATTENDANCE_DETAIL_URL = `${contextPath}/attendance/${attendanceId}`;
+	const ATTENDANCE_DETAIL_URL = apiUrl(`attendance/${attendanceId}`);
 	
 	if (mode === "edit" && attendanceId) { 	// 수정 버튼 클릭 시 동작
 		modalTitle.textContent = "출/퇴근 수정";
@@ -147,7 +147,7 @@ const saveAttendance = async () => {
 	const workOut = document.querySelector("#endTime").value;
 	const statusCode = document.querySelector("select[name='statusCode']").value;
 	
-	const url = currentMode === "edit" ? `${contextPath}/attendance/${currentAttendanceId}` : "/attendance";
+	const url = currentMode === "edit" ? apiUrl(`attendance/${currentAttendanceId}`) : "/attendance";
 	const method = currentMode === "edit" ? "PATCH" : "POST";
 	
 	// 근무정책의 출퇴근 데이터 가져오기
@@ -238,7 +238,7 @@ function resetModal() {
 
 // 근무정책에서 출근시간과 퇴근시간 정보 가져오기
 async function loadWorkPolicy() {
-	const res = await fetch(`${contextPath}/attendance/policy/data`);
+	const res = await fetch(apiUrl(`attendance/policy/data`));
 	const data = await res.json();
 	
 	return data;

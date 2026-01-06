@@ -33,7 +33,7 @@ function openShipmentDetail(orderId, shipmentId, status) {
         `<tr><td colspan="3" class="text-center text-muted">로딩 중...</td></tr>`;
     completedTbody.innerHTML = "";
 
-    let url = `${contextPath}/sales/shipment/detail?orderId=${encodeURIComponent(orderId)}`;
+    let url = apiUrl(`sales/shipment/detail?orderId=${encodeURIComponent(orderId)}`);
     if (status === "SHIPPED" && shipmentId) {
         url += `&shipmentId=${encodeURIComponent(shipmentId)}`;
     }

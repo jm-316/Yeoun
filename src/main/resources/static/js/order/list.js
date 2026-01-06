@@ -99,7 +99,7 @@ function loadWorkOrderGrid(){
   startDateFrom
   });
 
-  fetch(`${contextPath}/order/list/data?${query.toString()}`)
+  fetch(apiUrl(`order/list/data?${query.toString()}`))
           .then(res => {
             if (!res.ok) throw new Error("HTTP " + res.status);
             return res.json();

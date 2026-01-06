@@ -55,7 +55,7 @@ let approvalStampIsReject = false;
 // 필요하면 서버에 업로드된 이미지 경로로 변경 가능합니다.
 // Spring Boot의 정적 리소스는 기본적으로 classpath:/static 아래가 루트 URL이 됩니다.
 // 정적 파일을 `src/main/resources/static/img/reject_stamp.png`에 두었다면 접근 URL은 `/img/reject_stamp.png` 입니다.
-let DEFAULT_REJECT_STAMP_URL = `${contextPath}/img/reject_stamp.png`;
+let DEFAULT_REJECT_STAMP_URL = apiUrl(`img/reject_stamp.png`);
 
 // URL 또는 파일을 DataURL(Base64)로 변환 (필요 시 사용)
 async function urlToDataURL(url) {
@@ -78,7 +78,7 @@ async function urlToDataURL(url) {
 // f- 저장된 도장 이미지 불러오기 함수
 async function loadApprovalStamps(approvalId) {
 	try {
-		const response = await fetch(`${contextPath}/api/approvals/stamps/${approvalId}`);
+		const response = await fetch(apiUrl(`api/approvals/stamps/${approvalId}`));
 		if (!response.ok) {
 			console.debug('도장 이미지 조회 실패');
 			return {};
@@ -314,7 +314,7 @@ function sendApprovalRequest(btn, stampBase64) {
 		// 필요한 경우, 결재 상태나 기타 데이터를 추가합니다.
 		action: btn
 	};
-	fetch(`${contextPath}/api/approvals/${approvalId}`, {
+	fetch(apiUrl(`api/approvals/${approvalId}`, {
 		method: 'PATCH'
 		, headers: {
 			[csrfHeader]: csrfToken
@@ -1457,7 +1457,7 @@ function getBase64Image(imgEl) {
 // 서버에서 이미지 파일을 가져와 DataURL로 변환 (인증 포함 가능)
 async function fetchImageAsDataURL(fileId) {
 	try {
-		const resp = await fetch(`${contextPath}/files/download/${fileId}`, { credentials: 'include' });
+		const resp = await fetch(apiUrl(`files/download/${fileId}`), { credentials: 'include' });
 		if (!resp.ok) throw new Error(`이미지 응답 상태: ${resp.status}`);
 		const blob = await resp.blob();
 		return await new Promise((resolve, reject) => {
@@ -1611,7 +1611,7 @@ document.getElementById('modal-doc').addEventListener('submit', async function (
 	// FormData를 일반 JavaScript 객체로 변환
 	//const dataObject = Object.fromEntries(formData.entries());
 
-	await fetch(`${contextPath}/approval/approval_doc`, {
+	await fetch(apiUrl(`approval/approval_doc`), {
 		method: 'POST',
 		headers: {
 			[csrfHeader]: csrfToken
@@ -2028,7 +2028,7 @@ function AllGridSearch() {
 		approvalTitle: document.getElementById("searchEmpIdAndformType").value ?? ""
 	};
 
-	fetch(`${contextPath}/approval/searchAllGrids`, {
+	fetch(apiUrl(`approval/searchAllGrids`), {
 		method: 'POST',
 		headers: {
 			[csrfHeader]: csrfToken,

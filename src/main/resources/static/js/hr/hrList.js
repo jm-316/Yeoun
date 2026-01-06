@@ -90,7 +90,7 @@ function loadHrActionList() {
     endDate
   });
 
-  fetch(`${contextPath}/api/hr/actions?` + params.toString())
+  fetch(apiUrl(`api/hr/actions?`) + params.toString())
     .then(res => {
       console.log('응답 상태:', res.status, res);
       if (!res.ok) {

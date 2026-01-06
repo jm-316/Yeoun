@@ -225,7 +225,7 @@ document.getElementById("registerBtn").addEventListener("click", async () => {
 	}
 	
 	try { 
-		const res = await fetch(`${contextPath}/api/inventories/locations/add`, {
+		const res = await fetch(apiUrl(`api/inventories/locations/add`), {
 			method: "POST",
 			headers : {
 				[csrfHeader]: csrfToken,

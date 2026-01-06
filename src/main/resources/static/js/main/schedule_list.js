@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			, endDate: formatLocalDateTime(endDate)
 		});
 				
-		fetch(`${contextPath}/api/schedules?${params.toString()}`, {method: 'GET'})
+		fetch(apiUrl(`api/schedules?${params.toString()}`), {method: 'GET'})
 		.then(response => {
 			if (!response.ok) throw new Error(response.text());
 			return response.json();  //JSON 파싱
@@ -219,7 +219,7 @@ function initGrid(data) {
 				const rowData = grid.getRow(event.rowKey);
 				const scheduleId = rowData.scheduleId;
 				
-				fetch(`${contextPath}/api/schedules/${scheduleId}`, {method: 'GET'})
+				fetch(apiUrl(`api/schedules/${scheduleId}`), {method: 'GET'})
 				.then(response => {
 					if (!response.ok) throw new Error(response.text());
 					return response.json();  //JSON 파싱

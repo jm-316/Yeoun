@@ -77,7 +77,7 @@ async function fetchDisposeData() {
 	const searchData = buildSearchData();
 	
 	const response = 
-		await fetch(`${contextPath}/dispose/list`, {
+		await fetch(apiUrl(`dispose/list`), {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,

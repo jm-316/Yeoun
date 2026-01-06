@@ -144,7 +144,7 @@ function normalizeSeries(range, rawData) {
 // 5) 데이터 로딩
 // =========================
 async function loadTrendData(range) {
-    const response = await fetch(`${contextPath}/production/orderChart/data?range=${range}`);
+    const response = await fetch(apiUrl(`production/orderChart/data?range=${range}`));
     if (!response.ok) return [];
     return await response.json();
 }
@@ -250,7 +250,7 @@ function setRange(range) {
 // =========================
 
 async function loadItemQtyData() {
-    const res = await fetch(`${contextPath}/production/itemOrderChart/data`);
+    const res = await fetch(apiUrl(`production/itemOrderChart/data`));
     if (!res.ok) {
         console.error('품목별 수량 데이터 로딩 실패');
         return [];
@@ -418,7 +418,7 @@ async function loadItemTrend(itemId, range = 'DAY') {
     selectedItemId = itemId;
 
     const response = await fetch(
-        `${contextPath}/production/itemChart/data?itemId=${itemId}&range=${range}`
+        apiUrl(`production/itemChart/data?itemId=${itemId}&range=${range}`)
     );
 
     if (!response.ok) {

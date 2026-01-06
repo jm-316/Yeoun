@@ -138,7 +138,7 @@ function renderStatusBadge(v) {
 async function openDetail(empId) {
   const mm = document.getElementById("calc_month").value;
 
-  const res = await fetch(`${contextPath}/pay/calc/detail?yyyymm=${mm}&empId=${empId}`);
+  const res = await fetch(apiUrl(`pay/calc/detail?yyyymm=${mm}&empId=${empId}`));
   const data = await res.json();
 
   // 기본정보
@@ -176,7 +176,7 @@ function renderItemTable(target, list) {
    상태 갱신 AJAX
 ================================ */
 async function refreshStatus(mm) {
-  const res = await fetch(`${contextPath}/pay/calc/status?yyyymm=${mm}`);
+  const res = await fetch(apiUrl(`pay/calc/status?yyyymm=${mm}`));
   if (!res.ok) return;
 
   const s = await res.json();
@@ -216,7 +216,7 @@ document.getElementById("btnSimulateAll")?.addEventListener("click", () => {
 
     showLoader();
 
-    fetch(`${contextPath}/pay/calc/simulateJson`, {
+    fetch(apiUrl(`pay/calc/simulateJson`), {
         method: "POST",
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -252,7 +252,7 @@ document.getElementById("btnConfirmAll")?.addEventListener("click", () => {
 
     showLoader();
 
-    fetch(`${contextPath}/pay/calc/confirmJson`, {
+    fetch(apiUrl(`pay/calc/confirmJson`), {
         method: "POST",
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -282,7 +282,7 @@ document.getElementById("btnConfirmAll")?.addEventListener("click", () => {
 /* AG-Grid 데이터를 다시 로드 */
 /* AG-Grid 데이터를 다시 로드 */
 function loadGridData(yyyymm) {
-    fetch(`${contextPath}/pay/calc/list?yyyymm=${yyyymm}`)
+    fetch(apiUrl(`pay/calc/list?yyyymm=${yyyymm}`))
         .then(res => res.json())
         .then(list => {
             if (gridApi) {

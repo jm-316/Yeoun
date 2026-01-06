@@ -32,7 +32,7 @@ async function createRoom ({
 	
 	  try {
 		  
-	    const res = await fetch(`${contextPath}/messenger/chat`, {
+	    const res = await fetch(apiUrl(`messenger/chat`), {
 			  method: 'POST',
 			  headers: {
 				  		'Content-Type': 'application/json',

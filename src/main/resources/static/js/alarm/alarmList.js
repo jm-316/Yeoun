@@ -65,7 +65,7 @@ async function getAlarmData() {
 	});
 	
     try {
-        const response = await fetch(`${contextPath}/alarm/list?${params}`, {
+        const response = await fetch(apiUrl(`alarm/list?${params}`), {
             method: "GET",
             headers: {
                 [csrfHeader]: csrfToken,
@@ -103,7 +103,7 @@ async function updateAlarmData() {
 	});
 	
     try {
-        const response = await fetch(`${contextPath}/alarm/list?${params}`, {
+        const response = await fetch(apiUrl(`alarm/list?${params}`), {
             method: "POST",
             headers: {
                 [csrfHeader]: csrfToken,

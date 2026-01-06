@@ -307,7 +307,7 @@ function saveItemChanges(item) {
     };
 
     // API 호출
-    fetch(`${contextPath}/sales/client/${clientId}/items/${item.itemId}/update`, {
+    fetch(apiUrl(`sales/client/${clientId}/items/${item.itemId}/update`), {
         method: "PUT",
         headers: headers,
         body: JSON.stringify(payload)
@@ -437,7 +437,7 @@ function saveClient() {
         headers[csrfHeader] = csrfToken;
     }
 
-    fetch(`${contextPath}/sales/client/update`, {
+    fetch(apiUrl(`sales/client/update`), {
         method: "POST",
         headers: headers,
         body: JSON.stringify(client)

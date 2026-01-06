@@ -58,7 +58,7 @@ grid.sort('accessDate', true);
 
 // 데이터 가져오기
 async function loadAttendanceList(startDate, endDate) {
-	const ACCESS_LOG_LIST = `${contextPath}/attendance/accessList/data?startDate=${startDate}&endDate=${endDate}`;
+	const ACCESS_LOG_LIST = apiUrl(`attendance/accessList/data?startDate=${startDate}&endDate=${endDate}`);
 	try {
 		const res = await fetch(ACCESS_LOG_LIST, {method: "GET"});
 		

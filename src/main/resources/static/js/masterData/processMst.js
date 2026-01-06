@@ -349,7 +349,7 @@ function productRouteSearch(){
 	};
 	
 	const queryString = new URLSearchParams(params).toString();
-	fetch(`${contextPath}/masterData/process/list?${queryString}`, {
+	fetch(apiUrl(`masterData/process/list?${queryString}`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -400,7 +400,7 @@ function processCodeGridAllSearch() {
 	};
 	const queryString = new URLSearchParams(params).toString();
 	
-	fetch(`${contextPath}/masterData/processCode/list?${queryString}`, {
+	fetch(apiUrl(`masterData/processCode/list?${queryString}`), {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -440,7 +440,7 @@ function processCodeGridAllSearch() {
 //grid3 신규라우트 모달 그리드 - 공정단계 조회
 function processStepSearch(routeId) {
 	
-	fetch(`${contextPath}/masterData/processStep/list?routeId=${routeId}`, {
+	fetch(apiUrl(`masterData/processStep/list?routeId=${routeId}`), {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -682,7 +682,7 @@ saveProcessCodeRowBtn.addEventListener('click', function() {
 		return;
 		
 	}
-	fetch(`${contextPath}/masterData/processCode/save`, {
+	fetch(apiUrl(`masterData/processCode/save`), {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: {
@@ -855,7 +855,7 @@ saveRouteBtn.addEventListener('click', function() {
 	});
 
 	console.log('수정된 데이터:', modifiedData);
-	fetch(`${contextPath}/masterData/process/save`, {
+	fetch(apiUrl(`masterData/process/save`), {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: {
@@ -921,7 +921,7 @@ modifyProcessRowBtn.addEventListener('click', async function() {
 		return;
 	}
 	try {
-		const response = await fetch(`${contextPath}/masterData/process/modify`, {
+		const response = await fetch(apiUrl(`masterData/process/modify`), {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: {
@@ -1146,7 +1146,7 @@ deleteRouteStepRowBtn.addEventListener('click', async function() {
 
 	try {
 		if (!confirm(`${routeStepIdsToDelete.length}개의 공정단계를 삭제하시겠습니까?`)) return;
-		const response = await fetch(`${contextPath}/masterData/processStep/delete`, {
+		const response = await fetch(apiUrl(`masterData/processStep/delete`), {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: {
