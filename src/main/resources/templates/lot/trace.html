@@ -215,7 +215,7 @@
 		            th:each="lot : ${lotList}">
 		
 		          <!-- ROOT LOT 한 줄 -->
-		          <a href="#"
+		          <a th:href="@{#}" href="#"
 				     class="d-block mb-1 lot-root-link text-body text-decoration-none"
 				     th:data-lot-no="${lot.lotNo}">
 				
@@ -250,7 +250,7 @@
 		            
 		            <!-- 공정 그룹 -->
 					<li class="mb-1">
-					  <a href="#"
+					  <a th:href="@{#}" href="#"
 					     class="lot-group-toggle text-body text-decoration-none small"
 					     data-group="process"
 					     th:data-lot-no="${lot.lotNo}">
@@ -267,7 +267,7 @@
 					
 		            <!-- 자재 그룹 -->
 					<li class="mb-1">
-					  <a href="#"
+					  <a th:href="@{#}" href="#"
 					     class="lot-group-toggle text-body text-decoration-none small"
 					     data-group="material"
 					     th:data-lot-no="${lot.lotNo}">
@@ -289,7 +289,7 @@
 					
 					    <!-- Forward: 사용된 완제품 LOT 그룹 -->
 					    <li class="mb-1">
-					      <a href="#"
+					      <a th:href="@{#}" href="#"
 					         class="lot-group-toggle text-body text-decoration-none small"
 					         data-group="usedProducts"
 					         th:data-lot-no="${lot.lotNo}">

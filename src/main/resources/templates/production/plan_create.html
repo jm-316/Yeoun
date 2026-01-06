@@ -8,7 +8,7 @@
 <th:block layout:fragment="head">
     <!-- AG Grid Quartz 테마 -->
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" />
+ th:href="@{https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css}" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css" />
 </th:block>
 
 
@@ -60,7 +60,7 @@
                 조회
             </button>
             
-            <a href="/production/plan" class="btn btn-outline-secondary">
+            <a th:href="@{/production/plan}" href="/production/plan" class="btn btn-outline-secondary">
             ← 목록으로
         </a>
             

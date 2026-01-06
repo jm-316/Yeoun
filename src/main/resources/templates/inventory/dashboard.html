@@ -322,11 +322,11 @@
 
 <th:block layout:fragment="myScript">
     <script th:src="@{/js/inventory/inventoryDashboard.js}"></script>
-	<script src="/js/purchase/purchase_regist.js"></script>
-	<script src="/js/inventory/inventoryDashboardOutboundMat.js"></script>
-	<script src="/js/inventory/util.js"></script>
+	<script th:src="@{/js/purchase/purchase_regist.js}"></script>
+	<script th:src="@{/js/inventory/inventoryDashboardOutboundMat.js}"></script>
+	<script th:src="@{/js/inventory/util.js}"></script>
 	<th:block th:replace="~{inventory/warehouse :: warehouseScripts}"></th:block>
-	<script src="/js/inventory/inventoryDashboardOutboundPrd.js"></script>
+	<script th:src="@{/js/inventory/inventoryDashboardOutboundPrd.js}"></script>
 
 </th:block>
 

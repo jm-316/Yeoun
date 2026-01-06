@@ -173,12 +173,12 @@
 
 
 <!-- AG-Grid CSS & JS -->
-<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" /> -->
-<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" /> -->
+<!-- <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css}" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" /> -->
+<!-- <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css}" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" /> -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script> -->
 
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32/styles/ag-grid.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32/styles/ag-theme-quartz.css">     <
+ <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/ag-grid-community@32/styles/ag-grid.css}" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32/styles/ag-grid.css">
+    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/ag-grid-community@32/styles/ag-theme-quartz.css}" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32/styles/ag-theme-quartz.css">     <
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@32/dist/ag-grid-community.min.js"></script>
 
 <!-- Grid 컨테이너 -->
@@ -191,7 +191,7 @@
 </script>
 
 <!-- External JS -->
-<script src="/js/pay/pay_calc_all.js"></script>
+<script th:src="@{/js/pay/pay_calc_all.js}"></script>
 
   </th:block>
 </th:block>
