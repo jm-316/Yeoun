@@ -1,5 +1,5 @@
-const API_BASE = `/api/warehouse`;
-const INVENTORY_API = '/api/inventories';
+const API_BASE = apiUrl(`/api/warehouse`);
+const INVENTORY_API = apiUrl('/api/inventories');
 
 let warehouseData = [];
 let currentZone = null;
