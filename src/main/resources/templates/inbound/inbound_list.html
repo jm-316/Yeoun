@@ -174,11 +174,11 @@
 		<th:block layout:fragment="myScript">
 			<script type="text/javascript" src="https://uicdn.toast.com/tui.pagination/v3.4.0/tui-pagination.js"></script>
 			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-			<script src="/js/inventory/util.js"></script>
-			<script src="/js/purchase/purchase_regist.js"></script>
-			<script src="/js/inbound/materialGrid.js"></script>
-			<script src="/js/inbound/rematerialGrid.js"></script>
-			<script src="/js/inbound/productGrid.js"></script>
+			<script th:src="@{/js/inventory/util.js}"></script>
+			<script th:src="@{/js/purchase/purchase_regist.js}"></script>
+			<script th:src="@{/js/inbound/materialGrid.js}"></script>
+			<script th:src="@{/js/inbound/rematerialGrid.js}"></script>
+			<script th:src="@{/js/inbound/productGrid.js}"></script>
 		</th:block>
 	</body>
 </th:block>

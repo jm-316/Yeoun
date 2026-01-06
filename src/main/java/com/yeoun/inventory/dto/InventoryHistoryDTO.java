@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.modelmapper.ModelMapper;
 
 import com.yeoun.inventory.entity.InventoryHistory;
-import com.yeoun.inventory.entity.WarehouseLocation;
+import com.yeoun.warehouse.entity.WarehouseLocation;
 
 import lombok.Builder;
 import lombok.Getter;

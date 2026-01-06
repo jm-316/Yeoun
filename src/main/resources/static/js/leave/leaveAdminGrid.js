@@ -1,4 +1,4 @@
-const LEAVE_API_BASE = "/leave"
+const LEAVE_API_BASE = apiUrl(`leave`)
 
 const grid = new tui.Grid({
 	el: document.getElementById("grid"),
@@ -58,8 +58,8 @@ const grid = new tui.Grid({
 async function loadLeaveList(empId = null) {
 	// 사원번호 검색 여부에 따라 쿼리파라미터 다르게 보냄
 	const LEAVE_LIST = empId
-	    ? `/leave/list/data?empId=${empId}`
-	    : `/leave/list/data`;
+	    ? apiUrl(`leave/list/data?empId=${empId}`)
+	    : apiUrl(`leave/list/data`);
 		
 	try {
 		const res = await fetch(LEAVE_LIST, {method: "GET"});

@@ -438,7 +438,7 @@ async function sendMessageWithFiles() {
 	}
 
 	try {
-		const res = await fetch(`/messenger/chat/${roomId}`, {
+		const res = await fetch(apiUrl(`messenger/chat/${roomId}`), {
 			method: "POST",
 			headers: {
 				[csrfHeader]: csrfToken
@@ -489,7 +489,7 @@ async function sendChatMessage() {
 
 		if (!text) return;
 
-		const res = await fetch("/messenger/chat", {
+		const res = await fetch(apiUrl(`messenger/chat`), {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

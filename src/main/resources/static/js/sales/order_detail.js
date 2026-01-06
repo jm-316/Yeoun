@@ -50,7 +50,7 @@
 
    const csrf = getCsrf();
 
-   fetch(`/sales/orders/${orderId}/confirm`, {
+   fetch(apiUrl(`sales/orders/${orderId}/confirm`), {
      method: "POST",
      headers: {
        [csrf.header]: csrf.token
@@ -84,7 +84,7 @@
 
    const csrf = getCsrf();
 
-   fetch(`/sales/orders/${orderId}/cancel`, {
+   fetch(apiUrl(`sales/orders/${orderId}/cancel`), {
      method: "POST",
      headers: {
        [csrf.header]: csrf.token

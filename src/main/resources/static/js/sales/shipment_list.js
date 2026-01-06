@@ -266,7 +266,7 @@ function loadShipmentList(status) {
         headers[csrfHeader] = csrfToken;
     }
 
-    fetch("/sales/shipment/list", {
+    fetch(apiUrl(`sales/shipment/list`), {
         method: "POST",
         headers,
         body: JSON.stringify(param)
@@ -304,7 +304,7 @@ function reserveShipment(orderId) {
     const headers = {};
     if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
 
-    fetch(`/sales/shipment/reserve?orderId=${orderId}`, {
+    fetch(apiUrl(`sales/shipment/reserve?orderId=${orderId}`), {
         method: "POST",
         headers
     })
@@ -345,7 +345,7 @@ function cancelShipment(orderId) {
     const headers = {};
     if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
 
-    fetch(`/sales/shipment/cancel?orderId=${orderId}`, {
+    fetch(apiUrl(`sales/shipment/cancel?orderId=${orderId}`), {
         method: "POST",
         headers
     })

@@ -58,7 +58,7 @@ function qcItemGridAllSearch(){
 		qcItemId: document.getElementById("qcItemId").value ?? "",
 	};
 	const queryString = new URLSearchParams(params).toString();
-	fetch(`/masterData/qc_item/list?${queryString}`, {
+	fetch(apiUrl(`masterData/qc_item/list?${queryString}`), {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -203,7 +203,7 @@ if (qcItemForm) {
         const params = new URLSearchParams(formData);
         console.log('최종 params:', params.toString());
 
-        fetch(form.action, {
+        fetch(apiUrl(`${form.action}`), {
             method: form.method || 'POST',
             credentials: 'same-origin',
             headers: {
@@ -309,7 +309,7 @@ deleteQcRowBtn.addEventListener('click', async function() {
 	}).filter(Boolean);
 
 	if (!confirm('선택한 항목을 삭제하시겠습니까?')) return;
-	fetch('/masterData/qcItem/delete', {
+	fetch(apiUrl(`masterData/qcItem/delete`), {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: {

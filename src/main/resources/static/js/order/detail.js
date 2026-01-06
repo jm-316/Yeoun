@@ -10,7 +10,7 @@
     const modal = new bootstrap.Modal(document.getElementById("workDetailModal"));
 
     // 1) 기본 정보 로드
-    fetch(`/order/detail/${workId}`)
+    fetch(apiUrl(`order/detail/${workId}`))
             .then(res => res.json())
             .then(data => {
                 console.log("정보:::: " , data);
@@ -152,7 +152,7 @@
   
   // 작업지시서 상태변경 공통 함수
   async function updateStatus (orderId, status, alertContent){
-	  return fetch (`/order/status/${orderId}?status=${status}`, {
+	  return fetch (apiUrl(`order/status/${orderId}?status=${status}`), {
 		  method: "PATCH",
 		  headers: {
 		      "Content-Type": "application/json",
@@ -197,7 +197,7 @@
 		"remark": remark
 	  };
 
-	  fetch (`/order/modify/${orderId}`, {
+	  fetch (apiUrl(`order/modify/${orderId}`), {
 		  method: "PATCH",
 		  headers: {
 			  "Content-Type": "application/json",

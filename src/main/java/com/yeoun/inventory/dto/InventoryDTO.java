@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.yeoun.inventory.entity.Inventory;
-import com.yeoun.inventory.entity.WarehouseLocation;
+import com.yeoun.warehouse.entity.WarehouseLocation;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -66,6 +66,9 @@ public class InventoryDTO {
 	private String rackCol;
 	
 	private String status; // 상태
+	
+    private Integer page;    
+    private Integer perPage; 
 	
 	// 조회를 위해 추가
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

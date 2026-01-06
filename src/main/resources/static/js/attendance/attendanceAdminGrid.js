@@ -91,7 +91,7 @@ grid.on("click", (ev) => {
 
 // 데이터 가져오기
 async function loadAttendanceList(startDate, endDate) {
-	const ATTENDANCE_ADMIN_LIST = `/attendance/list/data?startDate=${startDate}&endDate=${endDate}`;
+	const ATTENDANCE_ADMIN_LIST = apiUrl(`attendance/list/data?startDate=${startDate}&endDate=${endDate}`);
 	try {
 		const res = await fetch(ATTENDANCE_ADMIN_LIST, {method: "GET"});
 		

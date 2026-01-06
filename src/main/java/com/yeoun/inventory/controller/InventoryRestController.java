@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,10 +30,10 @@ import com.yeoun.inventory.dto.InventoryHistoryGroupDTO;
 import com.yeoun.inventory.dto.InventoryHistorySearchDTO;
 import com.yeoun.inventory.dto.WarehouseLocationDTO;
 import com.yeoun.inventory.dto.InventorySafetyCheckDTO;
-import com.yeoun.inventory.dto.WarehouseLocationCreateRequest;
-import com.yeoun.inventory.entity.WarehouseLocation;
 import com.yeoun.inventory.service.InventoryService;
 import com.yeoun.order.dto.WorkOrderDTO;
+import com.yeoun.warehouse.dto.WarehouseLocationCreateRequest;
+import com.yeoun.warehouse.entity.WarehouseLocation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -47,13 +48,39 @@ public class InventoryRestController {
 	
 	// 재고리스트 조회
 	@PostMapping("")
-	public ResponseEntity<List<InventoryDTO>> inventories(@RequestBody(required = false) InventoryDTO inventoryDTO) {
+	public ResponseEntity<Map<String, Object>> inventories(@RequestBody(required = false) InventoryDTO inventoryDTO) {
 //				System.out.println(inventoryDTO);
-		List<InventoryDTO> inventoryDTOList = 
+		Page<InventoryDTO> pageResult  = 
 				inventoryService.getInventoryInfo(inventoryDTO != null ? inventoryDTO : new InventoryDTO());
 		
-		return ResponseEntity.ok(inventoryDTOList);
+	    int currentPage = inventoryDTO.getPage() != null ? inventoryDTO.getPage() : 1;   // 1부터
+	    int perPage     = inventoryDTO.getPerPage() != null ? inventoryDTO.getPerPage() : 20;
+	    long totalCount = pageResult.getTotalElements(); // 전체 건수
+		
+	    // TUI Grid에서 기대하는 포맷 만들기
+	    Map<String, Object> data = new HashMap<>();
+	    data.put("contents", pageResult.getContent());  // 실제 데이터 리스트
+	    data.put("pagination", Map.of(
+	            "page", currentPage,
+	            "perPage", perPage,
+	            "totalCount", totalCount
+	    ));
+
+	    Map<String, Object> body = new HashMap<>();
+	    body.put("data", data);
+	    
+		return ResponseEntity.ok(body);
 	}
+	
+	@GetMapping("/detail")
+	public ResponseEntity<List<InventoryDTO>> inventoryDetails(        
+	        @RequestParam("lotNo") String lotNo,
+	        @RequestParam("ivId") Long ivId) {
+	    List<InventoryDTO> list = inventoryService.getSameLotList(lotNo, ivId);
+	    
+	    return ResponseEntity.ok(list);
+	}
+	
 	
 	//창고 정보 조회
 	@GetMapping("/locations")
@@ -193,49 +220,6 @@ public class InventoryRestController {
 		
 		return ResponseEntity.ok(inventoryOrderCheckDTOList);
 	}
-	
-	// =========================================
-	// 창고 등록
-//	@PostMapping("/locations/add")
-//	public ResponseEntity<String> createLocations(@RequestBody WarehouseLocationCreateRequest req) {
-//		inventoryService.createLocations(req);
-//		
-//		 return ResponseEntity.ok().build();
-//	}
-	
-	// zone 삭제
-//	@DeleteMapping("/zones/{zoneName}")
-//	public ResponseEntity<?> deleteZone(@PathVariable("zoneName") String zoneName) {
-//		try {
-//			inventoryService.deleteLocationZone(zoneName);
-//			return ResponseEntity.ok().build();
-//		} catch (IllegalStateException e) {
-//			return ResponseEntity
-//					.status(HttpStatus.CONFLICT)
-//					.body(e.getMessage());
-//		} catch (Exception e) {
-//			return ResponseEntity
-//					.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//					.body("서버 오류가 발생했습니다.");
-//		}
-//	}
-	
-	// rack 삭제
-//	@DeleteMapping("/racks")
-//	public ResponseEntity<?> deleteRack(@RequestParam(name = "zone") String zone, @RequestParam(name = "rack") String rack) {
-//		try {
-//			inventoryService.deleteLocationRack(zone, rack);
-//			return ResponseEntity.ok().build();
-//		} catch (IllegalStateException e) {
-//			return ResponseEntity
-//					.status(HttpStatus.CONFLICT)
-//					.body(e.getMessage());
-//		} catch (Exception e) {
-//			return ResponseEntity
-//					.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//					.body("서버 오류가 발생했습니다.");
-//		}
-//	}
 }
 
 

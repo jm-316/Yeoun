@@ -62,7 +62,7 @@ const prdEndDateInput = document.querySelector("#prdEndDate");
 // 원재료 정보 불러오기
 async function loadProductInbound(startDate, endDate, keyword, searchType) {
 	const MATERIAL_INBOUND_LIST = 
-		`/inventory/inbound/materialList/data` +
+		apiUrl(`inventory/inbound/materialList/data`) +
 		`?startDate=${startDate}` +
 		`&endDate=${endDate}` +
 		`&searchType=${searchType}` +

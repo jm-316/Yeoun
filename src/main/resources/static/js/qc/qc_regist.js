@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	  const csrfToken      = csrfTokenMeta ? csrfTokenMeta.content : null;
 	  const csrfHeaderName = csrfHeaderMeta ? csrfHeaderMeta.content : null;
 
-	  fetch(`/qc/start?orderId=${encodeURIComponent(orderId)}`, {
+	  fetch(apiUrl(`qc/start?orderId=${encodeURIComponent(orderId)}`), {
 	    method: "POST",
 	    headers: {
 	      ...(csrfToken && csrfHeaderName ? { [csrfHeaderName]: csrfToken } : {})
@@ -200,7 +200,7 @@ function updateFailReasonState() {
 
 // 목록 조회
 function loadQcRegistGrid() {
-    fetch("/qc/regist/data")
+    fetch(apiUrl(`qc/regist/data`))
         .then(res => res.json())
         .then(data => {
             allRegistRows = Array.isArray(data) ? data : [];
@@ -270,7 +270,7 @@ function openQcRegModal(rowData) {
 // QC 항목 상세 리스트 가져오기
 function loadQcDetailRows(qcResultId) {
 
-  fetch(`/qc/${qcResultId}/details`)
+  fetch(apiUrl(`qc/${qcResultId}/details`))
     .then((res) => {
       if (!res.ok) {
         throw new Error("HTTP " + res.status);
@@ -547,7 +547,7 @@ function onClickSaveQcResult() {
     const csrfHeaderName = csrfHeaderMeta ? csrfHeaderMeta.content : null;
 
 	// 5) fetch 호출
-	fetch(`/qc/${qcResultId}/save`, {
+	fetch(apiUrl(`qc/${qcResultId}/save`), {
 	  method: "POST",
 	  headers: {
 	    "Content-Type": "application/json",
@@ -604,7 +604,7 @@ function onClickSaveQcResult() {
 	const csrfToken      = csrfTokenMeta ? csrfTokenMeta.content : null;
 	const csrfHeaderName = csrfHeaderMeta ? csrfHeaderMeta.content : null;
 
-    fetch(`/qc/detail/${qcResultDtlId}/files`, {
+    fetch(apiUrl(`qc/detail/${qcResultDtlId}/files`), {
       method: "POST",
 	  headers: {
 	      ...(csrfToken && csrfHeaderName ? { [csrfHeaderName]: csrfToken } : {})
@@ -634,7 +634,7 @@ function onClickSaveQcResult() {
     const csrfToken      = csrfTokenMeta ? csrfTokenMeta.content : null;
     const csrfHeaderName = csrfHeaderMeta ? csrfHeaderMeta.content : null;
 
-	fetch(`/qc/cancel?orderId=${encodeURIComponent(orderId)}`, {
+	fetch(apiUrl(`qc/cancel?orderId=${encodeURIComponent(orderId)}`), {
 	  method: "POST",
 	  headers: {
 	    ...(csrfToken && csrfHeaderName ? { [csrfHeaderName]: csrfToken } : {})
@@ -766,7 +766,7 @@ function onClickSaveQcResult() {
     const csrfToken      = csrfTokenMeta ? csrfTokenMeta.content : null;
     const csrfHeaderName = csrfHeaderMeta ? csrfHeaderMeta.content : null;
 
-    return fetch(`/qc/detail/${qcResultDtlId}/files`, {
+    return fetch(apiUrl(`qc/detail/${qcResultDtlId}/files`), {
       method: "POST",
       headers: {
         ...(csrfToken && csrfHeaderName ? { [csrfHeaderName]: csrfToken } : {})

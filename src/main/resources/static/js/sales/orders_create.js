@@ -533,7 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      fetch(`/sales/orders/search-customer?keyword=${encodeURIComponent(keyword)}`)
+      fetch(apiUrl(`sales/orders/search-customer?keyword=${encodeURIComponent(keyword)}`))
         .then(r => r.json())
         .then(list => {
           if (!list || list.length === 0) {
@@ -576,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     autoList.classList.add("d-none");
 
-    fetch(`/sales/client/detail/${clientId}`)
+    fetch(apiUrl(`sales/client/detail/${clientId}`))
       .then(res => res.json())
       .then(data => {
         document.getElementById("clientInfoBox")?.classList.remove("d-none");

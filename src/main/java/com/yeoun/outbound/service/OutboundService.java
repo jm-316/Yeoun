@@ -14,7 +14,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-
+import com.yeoun.aop.annotation.InventoryDashboard;
 import com.yeoun.common.e_num.AlarmDestination;
 import com.yeoun.common.service.AlarmService;
 import com.yeoun.inventory.dto.InventoryHistoryDTO;
@@ -69,6 +69,7 @@ public class OutboundService {
 	}
 
 	// 출고 등록
+	@InventoryDashboard("outbound")
 	@Transactional
 	public void saveOutbound(OutboundOrderDTO outboundOrderDTO, String empId) {
 		String date = LocalDate.now().toString().replace("-", "");
@@ -215,6 +216,7 @@ public class OutboundService {
 	}
 
 	// 출고 완료
+	@InventoryDashboard("outbound")
 	@Transactional
 	public void updateOutbound(OutboundOrderDTO outboundOrderDTO, String empId) {
 		// 출고 조회
@@ -352,7 +354,8 @@ public class OutboundService {
 //	}
 	
 	
-	// 완제품 출고 등록 취소 (수정내용) 
+	// 완제품 출고 등록 취소 (수정내용)
+	@InventoryDashboard("outbound")
 	@Transactional
 	public void canceledProductOutbound(String shipmentId) {
 

@@ -82,7 +82,7 @@ async function validateCalcRule(form) {
     // 수정모달이면 ruleId 있음
     const ruleId = form.dataset.ruleId || null;
 
-    const url = `/pay/rule_calc/checkPriority?itemCode=${itemCode}&priority=${priority}`
+    const url = apiUrl(`pay/rule_calc/checkPriority?itemCode=${itemCode}&priority=${priority}`)
               + (ruleId ? `&ruleId=${ruleId}` : "");
 
     try {
@@ -364,7 +364,7 @@ function bindEmpAutocomplete(input) {
         }
 
         try {
-            const res = await fetch(`/pay/rule_calc/searchEmployee?keyword=${encodeURIComponent(keyword)}`);
+            const res = await fetch(apiUrl(`pay/rule_calc/searchEmployee?keyword=${encodeURIComponent(keyword)}`));
             const arr = await res.json();
 
             listUI.innerHTML = ""; // 초기화

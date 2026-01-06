@@ -67,7 +67,7 @@ function formatDate(isoDate) {
 // 원재료 정보 불러오기
 async function loadMaterialInbound(startDate, endDate, searchType, keyword) {
 	const MATERIAL_INBOUND_LIST = 
-		`/inventory/inbound/materialList/data` +
+		apiUrl(`inventory/inbound/materialList/data`) +
 		`?startDate=${startDate}` +
 		`&endDate=${endDate}` +
 		`&searchType=${searchType}` +

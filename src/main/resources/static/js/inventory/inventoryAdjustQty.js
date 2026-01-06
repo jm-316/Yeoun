@@ -112,7 +112,7 @@ saveBtn.addEventListener('click', async () => {
 	const adjustData = getAdjustData();
 	
 	const response = 
-	await fetch(`/api/inventories/${currentIvid}/adjustQty`, {
+	await fetch(apiUrl(`api/inventories/${currentIvid}/adjustQty`), {
 		method: 'POST',
 		headers: {
 			[csrfHeader]: csrfToken,

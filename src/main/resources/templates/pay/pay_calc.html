@@ -363,7 +363,7 @@
             
             <!-- 변수 목록 안내 -->
 				 <div class="mt-2">
-				  <a data-bs-toggle="collapse" href="#formulaHelper" role="button">
+				  <a data-bs-toggle="collapse" th:href="@{#formulaHelper}" href="#formulaHelper" role="button">
 				    사용 가능한 변수 목록 보기
 				  </a>
 				
@@ -606,7 +606,7 @@
               </div>
               <!-- 변수 목록 안내 -->
 				 <div class="mt-2">
-				  <a data-bs-toggle="collapse" href="#formulaHelper" role="button">
+				  <a data-bs-toggle="collapse" th:href="@{#formulaHelper}" href="#formulaHelper" role="button">
 				    사용 가능한 변수 목록 보기
 				  </a>
 				
@@ -743,7 +743,7 @@
 <input type="hidden" id="openCreateModal" th:value="${openCreateModal}">
 <input type="hidden" id="openEditModalId" th:value="${openEditModalId}">
 <!-- JS 파일 분리 -->
-<script src="/js/pay/pay_calc.js"></script>
+<script th:src="@{/js/pay/pay_calc.js}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {

@@ -68,7 +68,7 @@ function patchApproval(btn) {
 	// 결재권한자와 사용자가 동일인물일 때
 	if(confirm(msg)) {
 		//결재 확인 동작함수
-		fetch(`/api/approvals/${approvalId}?btn=${btn}` , {
+		fetch(apiUrl(`api/approvals/${approvalId}?btn=${btn}`) , {
 			method: 'PATCH'
 			, headers: {
 				[csrfHeader]: csrfToken
@@ -108,7 +108,7 @@ function toDateStr(value) {
 //결제상세보기 => 결제권자 정보 불러오기함수
 async function getApproverList(approvalId) {
 	try {
-		const response = await fetch(`/api/approvals/approvers/${approvalId}`, {method: 'GET'});
+		const response = await fetch(apiUrl(`api/approvals/approvers/${approvalId}`), {method: 'GET'});
 		
 		if(!response.ok) {
 			const errorData = await response.json();
@@ -462,7 +462,7 @@ function initCalendar() {
 			const scheduleId = event.id;
 			showCalendarLoading();
 			// 등록된 일정정보 조회
-			fetch(`/api/schedules/${scheduleId}`, {method: 'GET'})
+			fetch(apiUrl(`api/schedules/${scheduleId}`), {method: 'GET'})
 			.then(response => {
 				if (!response.ok) throw new Error(response.text());
 				return response.json();  //JSON 파싱
@@ -572,7 +572,7 @@ async function loadMonthSchedule() {
 
 // 현재 달력이 선택한 월의 일정 정보 불러오기
 async function getScheduleData(params) {
-	await fetch(`/api/schedules?${params.toString()}`, {method: 'GET'})
+	await fetch(apiUrl(`api/schedules?${params.toString()}`), {method: 'GET'})
 	.then(response => {
 		if (!response.ok) throw new Error(response.text());
 		return response.json();  //JSON 파싱
@@ -608,7 +608,7 @@ function convertScheduleDataToSchedules(monthScheduleData) {
 
 // 현재 달력이 선택한 월의 연차 정보 불러오기
 async function getLeaveData(params) {
-	await fetch(`/api/schedules/leaves?${params.toString()}`, {method: 'GET'})
+	await fetch(apiUrl(`api/schedules/leaves?${params.toString()}`), {method: 'GET'})
 	.then(response => {
 		if (!response.ok) throw new Error(response.text());
 		return response.json();  //JSON 파싱
@@ -728,7 +728,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // 최근 공지사항 목록 데이터조회
 async function getLastNoticeList() {
-	await fetch(`/api/notices/last-notice`, {method: 'GET'})
+	await fetch(apiUrl(`api/notices/last-notice`), {method: 'GET'})
 	.then(response => {
 		if (!response.ok) throw new Error(response.text());
 		return response.json();  //JSON 파싱
@@ -820,7 +820,7 @@ async function initNoticeGrid(data) {
 
 // 최근 결제 문서 목록 데이터
 async function getApprovalList() {
-	await fetch(`/api/approvals`, {method: 'GET'})
+	await fetch(apiUrl(`api/approvals`), {method: 'GET'})
 	.then(response => {
 		if (!response.ok) throw new Error(response.text());
 		return response.json();  //JSON 파싱
@@ -860,7 +860,7 @@ async function initApprovalGrid(data) {
 	});
 	approvalGrid.resetData(data);
 	
-	const response = await fetch("/approval/empList");
+	const response = await fetch(apiUrl(`approval/empList`));
 	const selectData = await response.json();
 	let itemData  = [];
 	let obj ={};

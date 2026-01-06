@@ -165,7 +165,7 @@ async function loadProductRootDetail(lotNo) {
   detailEl.innerHTML = "<div class='text-muted'>로딩 중...</div>";
 
   try {
-    const html = await fetchText(`/lot/trace/detail?lotNo=${encodeURIComponent(lotNo)}`);
+    const html = await fetchText(apiUrl(`lot/trace/detail?lotNo=${encodeURIComponent(lotNo)}`));
     detailEl.innerHTML = html;
     // ROOT 상세 로딩 시 패널은 기본 숨김(선택한 공정/자재 없으니까)
     showPanel(null);
@@ -182,7 +182,7 @@ function loadMaterialRootDetail(lotNo) {
 
   detailEl.innerHTML = "<div class='text-muted'>로딩 중...</div>";
 
-  fetch(`/lot/trace/material-root-detail?lotNo=${encodeURIComponent(lotNo)}`)
+  fetch(apiUrl(`lot/trace/material-root-detail?lotNo=${encodeURIComponent(lotNo)}`))
     .then(res => {
       // 404/500이면 여기서 잡아서 화면에 표시
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -206,7 +206,7 @@ async function loadProcessList(container, lotNo) {
   if (!container) return;
 
   try {
-    const list = await fetchJson(`/lot/trace/process-list?lotNo=${encodeURIComponent(lotNo)}`);
+    const list = await fetchJson(apiUrl(`lot/trace/process-list?lotNo=${encodeURIComponent(lotNo)}`));
     container.innerHTML = "";
 
     if (!list || list.length === 0) {
@@ -238,7 +238,7 @@ async function loadMaterialList(container, lotNo) {
   if (!container) return;
 
   try {
-    const list = await fetchJson(`/lot/trace/material-list?lotNo=${encodeURIComponent(lotNo)}`);
+    const list = await fetchJson(apiUrl(`lot/trace/material-list?lotNo=${encodeURIComponent(lotNo)}`));
     container.innerHTML = "";
 
     if (!list || list.length === 0) {
@@ -270,7 +270,7 @@ async function loadUsedProductList(container, inputLotNo) {
   if (!container) return;
 
   try {
-    const list = await fetchJson(`/lot/trace/material/used-products?inputLotNo=${encodeURIComponent(inputLotNo)}`);
+    const list = await fetchJson(apiUrl(`lot/trace/material/used-products?inputLotNo=${encodeURIComponent(inputLotNo)}`));
     container.innerHTML = "";
 
     if (!list || list.length === 0) {
@@ -304,7 +304,7 @@ async function loadUsedProductList(container, inputLotNo) {
 async function loadProcessDetail(orderId, stepSeq) {
   try {
     const detail = await fetchJson(
-      `/lot/trace/process-detail?orderId=${encodeURIComponent(orderId)}&stepSeq=${encodeURIComponent(stepSeq)}`
+      apiUrl(`lot/trace/process-detail?orderId=${encodeURIComponent(orderId)}&stepSeq=${encodeURIComponent(stepSeq)}`)
     );
     renderProcessDetail(detail);
   } catch (e) {
@@ -398,7 +398,7 @@ function renderProcessDetail(detail) {
 async function loadMaterialDetail(outputLotNo, inputLotNo) {
   try {
     const detail = await fetchJson(
-      `/lot/trace/material-detail?outputLotNo=${encodeURIComponent(outputLotNo)}&inputLotNo=${encodeURIComponent(inputLotNo)}`
+      apiUrl(`lot/trace/material-detail?outputLotNo=${encodeURIComponent(outputLotNo)}&inputLotNo=${encodeURIComponent(inputLotNo)}`)
     );
     renderMaterialDetail(detail);
   } catch (e) {

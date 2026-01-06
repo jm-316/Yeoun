@@ -7,9 +7,9 @@
 // ===============================
 //  전역 변수
 // ===============================
+//const contextPath = window.location.pathname.split('/')[1];
 let stompClient  = null;
 let connected = false;
-
 
 
 //===============================

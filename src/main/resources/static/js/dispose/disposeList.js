@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 	
 	//최초로딩
 	const disposeData = await fetchDisposeData();
-	console.log(disposeData);
 	// 받아온 데이터로 그리드 생성
 	disposeGrid.resetData(disposeData);
 	disposeGrid.sort('createdDate', false);
@@ -78,7 +77,7 @@ async function fetchDisposeData() {
 	const searchData = buildSearchData();
 	
 	const response = 
-		await fetch('/dispose/list', {
+		await fetch(apiUrl(`dispose/list`), {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,

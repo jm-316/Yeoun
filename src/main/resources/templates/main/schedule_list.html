@@ -9,10 +9,10 @@
 				z-index: 100 !important; 
 			}
 	    </style>
-	    <link rel="stylesheet" href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css">
-		<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
-		<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
-	    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	    <link rel="stylesheet" th:href="@{https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css}" href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css">
+		<link rel="stylesheet" th:href="@{https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css}" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
+		<link rel="stylesheet" th:href="@{https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css}" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
+	    <link rel="stylesheet" th:href="@{https://uicdn.toast.com/grid/latest/tui-grid.css}" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	    
 	</head>
 	<body>
@@ -70,9 +70,9 @@
 			<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
 			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 			
-<!-- 			<script src="/js/main/schedule_list_origin.js"></script> -->
-			<script src="/js/main/schedule_list.js"></script>
-<!-- 			<script src="/js/main/schedule_modal.js"></script> -->
+<!-- 			<script th:src="@{/js/main/schedule_list_origin.js}"></script> -->
+			<script th:src="@{/js/main/schedule_list.js}"></script>
+<!-- 			<script th:src="@{/js/main/schedule_modal.js}"></script> -->
 			
 	</th:block>
 		</body>

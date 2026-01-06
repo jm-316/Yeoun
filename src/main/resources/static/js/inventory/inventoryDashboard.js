@@ -19,7 +19,13 @@ let expireDisposalGrid; // 유통기한관리그리드객체
 
 let islistOn = false;
 
-const today = new Date();
+const now = new Date();
+const kstOffset = 9 * 60; // KST UTC+9 (분)
+const utc = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+const kstTime = utc + (kstOffset * 60 * 1000);
+const today = new Date(kstTime);
+
+console.log("today : ", today);
 
 // 스피너 보이기 끄기
 function showSpinner() {
@@ -38,15 +44,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 //	console.log("@@@@@@",inventoryInfo);
 	// 안전재고 수량정보
 	inventorySafetyStockInfo = await fetchInventorySafetyStockData();
-	// 오늘 입고 정보
-	todayInboundData = await fetchTodayInboundData();
-	// 오늘 출고 정보
-	todayOutboundData = await fetchTodayOutboundData();
-	// 차트데이터
-	const RawChartData = await fetchIvHistoryData();
-//	console.log(RawChartData);
-	// 차트데이터 가공
-	chartData = normalizeIvHistory(RawChartData);
+
+
 //	console.log(chartData);
 	// 작업지시서 데이터
 	orderData = await fetchOrderListData();
@@ -61,30 +60,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 	});
 
 // -----------------------------------------------------------------------
-// 상단 카드 
-	// 금일 입고 예정양
-	const todayInboundTotalEl = document.getElementById('todayInboundTotal');
-	todayInboundTotalEl.innerHTML = todayInboundData.length;
-	// 금일입고 처리완료 수 조회
-	let IbCompleteCnt = 0;
-	todayInboundData.forEach(inbound => {
-		if(inbound.inboundStatus ==='COMPLETED') IbCompleteCnt++;
-	});
-	// 금일입고처리완료수 보이기 
-	const todayInboundCompleteEl = document.getElementById('todayInboundComplete');
-	todayInboundCompleteEl.innerHTML = `<i class='bx bx-up-arrow-alt'></i>처리 : ${IbCompleteCnt}`;
-	
-	// 금일 출고 예정양
-	const todayOutboundTotalEl = document.getElementById('todayOutboundTotal');
-	todayOutboundTotalEl.innerHTML = todayOutboundData.length;
-	// 금일 출고 처리 완료 수 조회
-	let ObCompleteCnt = 0;
-	todayOutboundData.forEach(outbound => {
-		if(outbound.status === 'COMPLETED') ObCompleteCnt++;
-	})
-	// 금일 출고 처리완료수 보이기
-	const todayOutboundCompleteEl = document.getElementById('todayOutboundComplete');
-	todayOutboundCompleteEl.innerHTML = `<i class='bx bx-down-arrow-alt'></i> 처리 : ${ObCompleteCnt}`
+// 상단 카드
+	await updateIbCard();
+	await updateObCard();
 
 	// 출고등록 필요한 작업지시서 표시
 	await renderOrderGrid();
@@ -152,6 +130,55 @@ document.addEventListener('DOMContentLoaded', async function () {
 	
 // -------------------------------------------------------------------------------
 // 입출고 차트 데이터 입력
+	await makeChart();
+	
+	//스피너  off
+	hideSpinner();	
+});
+// ----------------------------------------------------------------------------
+// 입고카드 업데이트함수
+async function updateIbCard() {
+	// 오늘 입고 정보
+	todayInboundData = await fetchTodayInboundData();
+	// 금일 입고 예정양
+	const todayInboundTotalEl = document.getElementById('todayInboundTotal');
+	todayInboundTotalEl.innerHTML = todayInboundData.length;
+	// 금일입고 처리완료 수 조회
+	let IbCompleteCnt = 0;
+	todayInboundData.forEach(inbound => {
+		if(inbound.inboundStatus ==='COMPLETED') IbCompleteCnt++;
+	});
+	// 금일입고처리완료수 보이기 
+	const todayInboundCompleteEl = document.getElementById('todayInboundComplete');
+	todayInboundCompleteEl.innerHTML = `<i class='bx bx-up-arrow-alt'></i>처리 : ${IbCompleteCnt}`;
+}
+//출고카드 업데이트함수
+async function updateObCard() {
+	// 오늘 출고 정보
+	todayOutboundData = await fetchTodayOutboundData();
+	// 금일 출고 예정양
+	const todayOutboundTotalEl = document.getElementById('todayOutboundTotal');
+	todayOutboundTotalEl.innerHTML = todayOutboundData.length;
+	// 금일 출고 처리 완료 수 조회
+	let ObCompleteCnt = 0;
+	todayOutboundData.forEach(outbound => {
+		if(outbound.status === 'COMPLETED') ObCompleteCnt++;
+	})
+	// 금일 출고 처리완료수 보이기
+	const todayOutboundCompleteEl = document.getElementById('todayOutboundComplete');
+	todayOutboundCompleteEl.innerHTML = `<i class='bx bx-down-arrow-alt'></i> 처리 : ${ObCompleteCnt}`
+}
+
+// ----------------------------------------------------------------------------
+// 차트생성 함수
+async function makeChart() {
+	// 차트데이터
+	const RawChartData = await fetchIvHistoryData();
+	// 차트데이터 가공
+	chartData = normalizeIvHistory(RawChartData);
+	
+	if (trendChart != null) trendChart.destroy();
+	
 	// 차트옵션설정, 차트생성
 	trendChart = new ApexCharts(document.querySelector("#trendChart"), trendOptions);
 	trendChart.render();
@@ -161,11 +188,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 	const { labels, series } = await buildChartSeries(aggregated);
 	
 	updateChartOptions(labels, series)
-	
-	
-	//스피너  off
-	hideSpinner();	
-});
+}
 
 // 차트 옵션 세팅
 async function updateChartOptions(labels, series) {
@@ -430,12 +453,10 @@ async function buildChartSeries(aggregatedData) {
         }
         map.set(key, value);
 
-		console.log("이전 맥스 amount : ", chartMaxAmount);
 		// 차트에서 가장 큰 수 찾기
 		if (chartMaxAmount < value ) {
 			chartMaxAmount = value;
 		}
-		console.log("바뀐 맥스 amount : ", chartMaxAmount);
     });
 	// 차트에 입력할 입고,출고,폐기 데이터리스트 객체
     const inboundData = [];
@@ -1078,7 +1099,7 @@ async function renderExpireDisposalGrid() {
 // 재고정보 가져오기
 async function fetchNotNormalInventoryData() {
 	const response = 
-		await fetch('/api/inventories/expiration', {
+		await fetch(apiUrl(`api/inventories/expiration`), {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -1095,7 +1116,7 @@ async function fetchNotNormalInventoryData() {
 // 안전재고/재고 비교 정보 데이터
 async function fetchInventorySafetyStockData() {
 	const response = 
-		await fetch('/api/inventories/inventorySafetyStockCheckInfo', {
+		await fetch(apiUrl(`api/inventories/inventorySafetyStockCheckInfo`), {
 			method: 'GET',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -1111,12 +1132,14 @@ async function fetchInventorySafetyStockData() {
 
 // 오늘 입고정보 조회함수
 async function fetchTodayInboundData() {
-	
-	const startDate = today.toISOString().slice(0, 10);
-	const endDate = today.toISOString().slice(0, 10);
-	 
+	const today = new Date();
+	const kstToday = new Date(today.toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }));
+	const startDate = kstToday.toISOString().slice(0, 10);
+	const endDate = startDate;
+//	const startDate = today.toISOString().slice(0, 10);
+//	const endDate = today.toISOString().slice(0, 10);
 	const MATERIAL_INBOUND_LIST = 
-		`/inventory/inbound/materialList/data` +
+		apiUrl(`inventory/inbound/materialList/data`) +
 		`?startDate=${startDate}` +
 		`&endDate=${endDate}` + 
 		`&searchType=` +
@@ -1143,9 +1166,11 @@ async function fetchTodayOutboundData() {
 	
 	const startDate = today.toISOString().slice(0, 10);
 	const endDate = today.toISOString().slice(0, 10);
+	
+	console.log("startDate : ", startDate);
 //	 console.log(startDate, endDate);
 	const MATERIAL_OUTBOUND_LIST = 
-		`/inventory/outbound/list/data` +
+		apiUrl(`inventory/outbound/list/data`) +
 		`?startDate=${startDate}` +
 		`&endDate=${endDate}` +
 		`&keyword=`;
@@ -1168,7 +1193,7 @@ async function fetchTodayOutboundData() {
 
 // 재고내역 조회
 async function fetchIvHistoryData() {
-	const response = await fetch('/api/inventories/ivHistoryGroup', {
+	const response = await fetch(apiUrl(`api/inventories/ivHistoryGroup`), {
 		method: 'GET',
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1186,7 +1211,7 @@ async function fetchIvHistoryData() {
 // 작업지시서 리스트 가져오기
 // 작업지시 정보 가져오기
 async function fetchOrderListData() {
-		const response = await fetch("/api/inventories/orderData", {
+		const response = await fetch(apiUrl(`api/inventories/orderData`), {
 			method: "GET",
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -1204,7 +1229,7 @@ async function fetchOrderListData() {
 
 // 발주 필요 수량 체크
 async function fetchIvOrderCheckData() {
-	const response = await fetch("/api/inventories/inventoryOrderCheck", {
+	const response = await fetch(apiUrl(`api/inventories/inventoryOrderCheck`), {
 		method: "GET",
 		headers: {
 			[csrfHeader]: csrfToken,
@@ -1265,7 +1290,18 @@ function gridLangSet(grid) {
 }
 
 
-
+connectWebSocket(() => {
+	// 1) 메시지 수신 구독
+	stompClient.subscribe(apiUrl(`dashboard/inventory`), (message) => {
+	    if(message.body == 'inbound') {
+			updateIbCard();
+		}
+	    if(message.body == 'outbound') {
+			updateObCard();
+		}
+		makeChart();
+	});
+});
 
 
 

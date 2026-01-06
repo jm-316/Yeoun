@@ -40,7 +40,7 @@
 	
 	  <!-- 오른쪽: 발령 등록 버튼 -->
 	  <div class="col-12 col-lg d-flex justify-content-lg-end">
-	    <a href="/hr/actions/regist" class="btn btn-primary"
+	    <a th:href="@{/hr/actions/regist}" href="/hr/actions/regist" class="btn btn-primary"
 	       th:if="${#authorization.expression('hasRole(''HR_ADMIN'') or hasRole(''SYS_ADMIN'')')}">
 	      발령 등록
 	    </a>
@@ -63,7 +63,7 @@
 	
 	</div>
 
-<script src="/js/hr/hrList.js"></script>		
+<script th:src="@{/js/hr/hrList.js}"></script>		
 	
 </th:block>
 </body>

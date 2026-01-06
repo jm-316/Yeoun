@@ -2,7 +2,7 @@ package com.yeoun.inventory.dto;
 
 import org.modelmapper.ModelMapper;
 
-import com.yeoun.inventory.entity.WarehouseLocation;
+import com.yeoun.warehouse.entity.WarehouseLocation;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +21,10 @@ public class WarehouseLocationDTO {
     private String rackRow;     // 로우
     
     private String rackCol;     // 컬럼
+    
+    private String useYn;      // 사용 여부
+    
+    private Integer stockCount;  // 창고 사용하는 재고 카운트
     
 	// ----------------------------------------------------------
 	private static ModelMapper modelMapper = new ModelMapper();

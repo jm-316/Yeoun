@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
     btnSaveRole.disabled = false;
 
     // 사원별 역할 Ajax로 가져오기
-    fetch('/auth/manage/' + empId + '/roles')
+    fetch(apiUrl(`auth/manage/`) + empId + '/roles')
       .then(res => res.json())
       .then(roleCodes => {
         roleCheckboxes.forEach(cb => {
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 비밀번호 재확인 API 호출
-    fetch('/auth/manage/verify', {
+    fetch(apiUrl(`auth/manage/verify`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

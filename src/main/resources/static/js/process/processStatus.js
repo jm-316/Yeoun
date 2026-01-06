@@ -200,7 +200,7 @@ function loadProcessGrid() {
   if (searchHStatus) params.append("searchHStatus", searchHStatus);   // String status
   if (searchKeyword) params.append("searchKeyword", searchKeyword);   // String keyword
 
-  fetch("/process/status/data?" + params.toString())
+  fetch(apiUrl(`process/status/data?${params.toString()}`))
     .then(async (res) => {
       if (!res.ok) {
         const text = await res.text();
@@ -394,7 +394,7 @@ function openDetailModal(orderId) {
 
   showDetailOverlay("상세 불러오는 중...");
 
-  fetch(`/process/status/detail/${orderId}`)
+  fetch(apiUrl(`process/status/detail/${orderId}`))
     .then((res) => {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
@@ -499,7 +499,7 @@ function handleStartStep(orderId, stepSeq) {
     headers[csrfHeader] = csrfToken;
   }
 
-  fetch('/process/status/step/start', {
+  fetch(apiUrl(`process/status/step/start`), {
     method: 'POST',
     headers,
     body: JSON.stringify({ orderId, stepSeq })
@@ -553,7 +553,7 @@ function finishStepWithQty(orderId, stepSeq, goodQty, defectQty) {
   const headers = { 'Content-Type': 'application/json' };
   if (typeof csrfHeader !== 'undefined') headers[csrfHeader] = csrfToken;
 
-  fetch('/process/status/step/finish', {
+  fetch(apiUrl(`process/status/step/finish`), {
     method: 'POST',
     headers: headers,
     body: JSON.stringify({
@@ -596,7 +596,7 @@ function handleSaveStepMemo(orderId, stepSeq, memo, inputEl) {
     headers[csrfHeader] = csrfToken;
   }
 
-  fetch('/process/status/step/memo', {
+  fetch(apiUrl(`process/status/step/memo`), {
     method: 'POST',
     headers: headers,
     body: JSON.stringify({ orderId, stepSeq, memo })

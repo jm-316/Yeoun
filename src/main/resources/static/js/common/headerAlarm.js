@@ -20,7 +20,7 @@ function subscribeEvent() {
     }
 
     // 1) 메시지 수신 구독
-    stompClient.subscribe(`/user/queue/messenger`, (message) => {
+    stompClient.subscribe(apiUrl(`user/queue/messenger`), (message) => {
         receiveNewMessage(JSON.parse(message.body));
     });
 	
@@ -152,7 +152,8 @@ function showNewAlarmAtDropdown() {
 // 읽지않은 알림 데이터 가져오기
 async function getAlarmReadStatus() {
     try {
-        const response = await fetch(`/alarm/status`, {
+		console.log(contextPath,"컨텍스트페스");
+        const response = await fetch(apiUrl(`alarm/status`), {
             method: "GET",
             headers: {
                 [csrfHeader]: csrfToken,

@@ -331,15 +331,15 @@
 		</div>	
 	    <!-- 버튼 -->
 	    <div class="d-flex justify-content-end gap-2">
-			<a th:if="${isMyPage}" href="/main" class="btn btn-outline-secondary">취소</a>
-			<a th:unless="${isMyPage}" href="/emp" class="btn btn-outline-secondary">취소</a>
+			<a th:if="${isMyPage}" th:href="@{/main}" href="/main" class="btn btn-outline-secondary">취소</a>
+			<a th:unless="${isMyPage}" th:href="@{/emp}" href="/emp" class="btn btn-outline-secondary">취소</a>
 	      <button type="submit" class="btn btn-primary" th:text="${mode == 'edit'} ? '수정 완료' : '저장'">저장</button>
 	    </div>
 	  </form>
 	</div>
 	
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>	
-<script src="/js/emp/emp.js"></script>
+<script th:src="@{/js/emp/emp.js}"></script>
 
 </th:block>
 </body>

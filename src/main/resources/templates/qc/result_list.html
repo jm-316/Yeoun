@@ -46,7 +46,7 @@
 		    <!-- 버튼 -->
 		    <div class="col-md-3 d-flex gap-2">
 		      <button type="submit" class="btn btn-outline-primary flex-fill">검색</button>
-		      <a href="/qc/result" class="btn btn-outline-secondary flex-fill">초기화</a>
+		      <a th:href="@{/qc/result}" href="/qc/result" class="btn btn-outline-secondary flex-fill">초기화</a>
 		    </div>
 		
 		  </div>
@@ -63,7 +63,7 @@
 
     </div>
 
-    <script src="/js/qc/qc_result.js"></script>
+    <script th:src="@{/js/qc/qc_result.js}"></script>
 
   </th:block>
 

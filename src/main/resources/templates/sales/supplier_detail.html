@@ -116,10 +116,10 @@
     <!-- 탭 네비게이션 -->
     <ul class="nav nav-tabs" id="supplierTabs">
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#basicTab">기본 정보</a>
+            <a class="nav-link active" data-bs-toggle="tab" th:href="@{#basicTab}" href="#basicTab">기본 정보</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#itemTab">취급 품목</a>
+            <a class="nav-link" data-bs-toggle="tab" th:href="@{#itemTab}" href="#itemTab">취급 품목</a>
         </li>
     </ul>
 
@@ -298,7 +298,7 @@
 					    <button id="btnSave" class="btn btn-success d-none" onclick="saveClient()">저장</button>
 					    <button id="btnCancel" class="btn btn-secondary d-none" onclick="cancelEdit()">취소</button>
 					
-					    <a href="/sales/client?type=SUPPLIER"
+					    <a th:href="@{/sales/client?type=SUPPLIER}" href="/sales/client?type=SUPPLIER"
 					       class="btn btn-outline-secondary">
 					        목록으로
 					    </a>
@@ -340,14 +340,14 @@
 
 <!-- AG Grid -->
 <link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css"/>
+ th:href="@{https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css}" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-quartz.css"/>
 <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
 
 <!-- Daum 주소 검색 API -->
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <!-- 상세 JS  -->
-<script src="/js/sales/supplierDetail.js"></script>
+<script th:src="@{/js/sales/supplierDetail.js}"></script>
 
 
 

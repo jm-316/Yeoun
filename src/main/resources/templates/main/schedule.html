@@ -2,12 +2,12 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{/layouts/layout.html}">
 <head>
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css">
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@toast-ui/calendar@2.1.3/dist/toastui-calendar.min.css" />
-   	<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
-	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-    <link rel="stylesheet" href="https://uicdn.toast.com/select-box/latest/toastui-select-box.css">
+	<link rel="stylesheet" th:href="@{https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css}" href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css">
+	<link rel="stylesheet" th:href="@{https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css}" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/@toast-ui/calendar@2.1.3/dist/toastui-calendar.min.css}" href="https://cdn.jsdelivr.net/npm/@toast-ui/calendar@2.1.3/dist/toastui-calendar.min.css" />
+   	<link rel="stylesheet" th:href="@{https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css}" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
+	<link rel="stylesheet" th:href="@{https://uicdn.toast.com/grid/latest/tui-grid.css}" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <link rel="stylesheet" th:href="@{https://uicdn.toast.com/select-box/latest/toastui-select-box.css}" href="https://uicdn.toast.com/select-box/latest/toastui-select-box.css">
     
 	<style type="text/css">
 	.calendar-filter-company:checked, .calendar-filter-company[type=checkbox]:indeterminate {
@@ -206,7 +206,7 @@
 						</div>
 						<div class="table-responsive text-nowrap" id="noticeGrid"></div>
 							<p style="font-size:10px; text-align: right; vertical-align: bottom;">
-							<a href="/notice">더보기</a>
+							<a th:href="@{/notice}" href="/notice">더보기</a>
 							</p>
 					</div>
 					<div class="card">
@@ -215,7 +215,7 @@
 						</div>
 						<div class="table-responsive text-nowrap" id="approvalGrid"></div>
 							<p style="font-size:10px; text-align: right; vertical-align: bottom;">
-							<a href="/approval/approval_doc">더보기</a>
+							<a th:href="@{/approval/approval_doc}" href="/approval/approval_doc">더보기</a>
 							</p>
 					</div>
 
@@ -415,8 +415,8 @@
 	
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	
-	<script src="/js/main/schedule.js"></script>
-	<script src="/js/attendance/attendance.js"></script>
+	<script th:src="@{/js/main/schedule.js}"></script>
+	<script th:src="@{/js/attendance/attendance.js}"></script>
 	<script th:inline="javascript">
 	    const userRoles = /*[[${#authentication.authorities.?[true].![authority]}]]*/ [];
 	</script>

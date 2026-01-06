@@ -1,4 +1,4 @@
-package com.yeoun.inventory.entity;
+package com.yeoun.warehouse.entity;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -36,6 +36,8 @@ public class WarehouseLocation {
 	
 	@Column(nullable = false)
 	private String rackCol; // 컬럼
+	
+	private String useYn; // 활성 / 비활성
 
     public String getLocationName() {
         return String.format("%s-%s-%s-%s", 
@@ -44,5 +46,10 @@ public class WarehouseLocation {
             rackRow != null ? rackRow : "", 
             rackCol != null ? rackCol : ""
         ).replaceAll("-+", "-").replaceAll("-$", ""); // 연속된 하이픈 제거 및 끝 하이픈 제거
+    }
+    
+    // 활성/비활성 변경 메서드
+    public void changeStatus(String status) {
+    	this.useYn = status;
     }
 }

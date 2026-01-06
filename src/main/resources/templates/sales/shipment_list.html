@@ -52,11 +52,11 @@
          상태 탭
     ================================= -->
     <ul class="nav nav-tabs mb-3" id="shipmentTabs">
-        <li class="nav-item"><a class="nav-link active" href="#" data-status="ALL">전체</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-status="WAITING">대기</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-status="RESERVED_GROUP">예약</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-status="LACK">부족</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-status="SHIPPED">출하완료</a></li>
+        <li class="nav-item"><a class="nav-link active" th:href="@{#}" href="#" data-status="ALL">전체</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{#}" href="#" data-status="WAITING">대기</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{#}" href="#" data-status="RESERVED_GROUP">예약</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{#}" href="#" data-status="LACK">부족</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{#}" href="#" data-status="SHIPPED">출하완료</a></li>
     </ul>
 
     <!-- ================================
@@ -191,7 +191,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
 <script th:src="@{/js/sales/shipment_list.js}"></script>
-<script src="/js/sales/shipment_detail.js"></script>
+<script th:src="@{/js/sales/shipment_detail.js}"></script>
 
 </th:block>
 
