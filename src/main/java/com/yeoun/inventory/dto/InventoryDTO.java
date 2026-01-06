@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.yeoun.inventory.entity.Inventory;
-import com.yeoun.inventory.entity.WarehouseLocation;
+import com.yeoun.warehouse.entity.WarehouseLocation;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.yeoun.inventory.dto;
+package com.yeoun.warehouse.dto;
 
 import lombok.Getter;
 import lombok.Setter;

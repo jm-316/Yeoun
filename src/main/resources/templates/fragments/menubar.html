@@ -245,6 +245,11 @@
                             <div data-i18n="Menu4" class="menu-link-sub">출고관리</div>
                         </a>
                     </li>
+                    <li class="menu-item" sec:authorize="hasAnyRole('SYS_ADMIN', 'LOG_USER')">
+                        <a th:href="@{/inventory/warehouse}" class="menu-link">
+                            <div data-i18n="Menu4" class="menu-link-sub">창고관리</div>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="menu-item" sec:authorize="hasAnyRole('MES_USER','MES_MANAGER','SYS_ADMIN')">

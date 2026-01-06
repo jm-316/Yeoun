@@ -112,15 +112,42 @@ function applyRackSelection(selectedZone, selectedRack) {
     }
 
     const byZoneRack = locationInfo.filter(
-        loc => loc.zone === selectedZone && loc.rack === selectedRack
+        loc => loc.zone === selectedZone && loc.rack === selectedRack && loc.useYn === "Y" 
     );
 	
 	// 숫자 문자열 오름차순 정렬 (01,02,03)
 	const rows = sortNumericStrings(getUniqueValuesMove(byZoneRack, 'rackRow'));
-	const cols = sortNumericStrings(getUniqueValuesMove(byZoneRack, 'rackCol'));
 	
     fillSelectMove(moveRow, rows);
-    fillSelectMove(moveColumn, cols);
+	
+	// 모달 열릴 때 자동으로 첫번재 row 선택 및 col 채움
+	if (rows.length > 0) {
+		const firstRow = rows[0];
+		moveRow.value = firstRow;
+		applyRowSelection(selectedZone, selectedRack, firstRow);
+	}
+}
+
+// row 선택 시 col 채우기
+function applyRowSelection(selectedZone, selectedRack, selectedRow) {
+	const moveColumn = document.getElementById('moveColumn');
+	
+	if (!selectedZone || !selectedRack || !selectedRow) {
+		fillSelectMove(moveColumn, []);
+		return;
+	}
+	
+	const list = locationInfo.filter(
+		loc => 
+			loc.zone === selectedZone &&
+			loc.rack === selectedRack &&
+			loc.rackRow === selectedRow &&
+			loc.useYn === "Y"
+	);
+	
+	
+	const cols = sortNumericStrings(getUniqueValuesMove(list, 'rackCol'));
+	fillSelectMove(moveColumn, cols);
 }
 
 
@@ -141,6 +168,15 @@ document.getElementById('moveRack').addEventListener('change', () => {
 	const selectedRack = moveRack.value;
 
 	applyRackSelection(selectedZone, selectedRack);
+});
+
+// row 선택 시 col 채우기
+document.getElementById('moveRow').addEventListener('change', () => {
+    const zone = document.getElementById('moveZone').value;
+    const rack = document.getElementById('moveRack').value;
+    const row  = document.getElementById('moveRow').value;
+
+    applyRowSelection(zone, rack, row); 
 });
 
 

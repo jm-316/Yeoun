@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import com.yeoun.inventory.dto.InventoryDTO;
 import com.yeoun.inventory.dto.InventorySafetyCheckDTO;
 import com.yeoun.inventory.entity.Inventory;
-import com.yeoun.inventory.entity.WarehouseLocation;
+import com.yeoun.warehouse.entity.WarehouseLocation;
 
 public interface InventoryRepository
 	extends JpaRepository<Inventory, Long>, JpaSpecificationExecutor<Inventory> {

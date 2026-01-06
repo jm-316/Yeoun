@@ -46,12 +46,11 @@ function resetWarehouseModal() {
     colStart.value = 1;
     colEnd.value = 1;
 
-    previewBox.innerHTML = "";
 }
 
 // 창고 데이터 가져오기
 async function loadLocationCache() {
-	locationCache = await getLocationData();
+	locationCache = locationInfo;
 }
 
 // zone 목록 추출
@@ -225,7 +224,11 @@ document.getElementById("registerBtn").addEventListener("click", async () => {
 	}
 	
 	try { 
+<<<<<<< HEAD
 		const res = await fetch(apiUrl(`api/inventories/locations/add`), {
+=======
+		const res = await fetch("/api/warehouse/locations/add", {
+>>>>>>> refs/remotes/origin/warehouse
 			method: "POST",
 			headers : {
 				[csrfHeader]: csrfToken,
@@ -241,7 +244,6 @@ document.getElementById("registerBtn").addEventListener("click", async () => {
 		alert("창고 등록 완료");
 
 		await loadLocationCache();
-		initDashboard();
 		bsWarehouseModal.hide();
 	} catch (error) {
 		console.error(error);

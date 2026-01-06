@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.yeoun.masterData.entity.MaterialMst;
 import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.warehouse.entity.WarehouseLocation;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

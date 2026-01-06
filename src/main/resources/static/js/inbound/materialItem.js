@@ -60,7 +60,8 @@ function applyZoneSelection(index) {
 	if (!selectedZone) return;
 	
 	const list = locationInfo.filter(location => location.zone === selectedZone);
-	const racks = sortNumericStrings([...new Set(list.map(location => location.rack))]);
+	const racks = sortNumericStrings([...new Set(list.filter(location => location.useYn === "Y")
+		.map(location => location.rack))]);
 	
 	fillSelect(rack, racks);
 }
@@ -83,12 +84,32 @@ function applyRackSelection(index) {
 	 );
 	 
 	 // 중복 제거한 목록 추출
-	 const rows = sortNumericStrings([...new Set(list.map(location => location.rackRow))]);
-	 const cols = sortNumericStrings([...new Set(list.map(l => l.rackCol))]);
+	 const rows = sortNumericStrings([...new Set(list.filter(location => location.useYn === "Y").map(location => location.rackRow))]);
+	 const cols = sortNumericStrings([...new Set(list.filter(location => location.useYn === "Y").map(l => l.rackCol))]);
 	 
 	 fillSelect(row, rows);
 	 fillSelect(col, cols);
 }
+
+function applyRowSelection(index) {
+	const { zone, rack, row, col } = getRowSelects(index);
+	
+	const list = locationInfo.filter(
+	  l =>
+	    l.zone === zone.value &&
+	    l.rack === rack.value &&
+	    l.rackRow === row.value
+	);
+	
+	const cols = sortNumericStrings([...new Set(list.map(l => l.rackCol))]);
+	fillSelect(col, cols);
+}
+
+document.addEventListener("change", e => {
+	if (e.target.classList.contains("moveRow")) {
+  		applyRowSelection(e.target.dataset.index);
+  	}
+});
 
 // 페이지 로딩될 때 select 및 수량 정보 채우기
 document.addEventListener("DOMContentLoaded", async () => {
@@ -108,7 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	})
 	
 	// 모든 row의 zone select 채우기
-	const zones = [... new Set(locationInfo.map(location => location.zone))];
+	const zones = [... new Set(locationInfo.filter(location => location.useYn === "Y").map(location => location.zone))];
 	const sortedZones = sortNumericStrings(zones);
 	
 	document.querySelectorAll(".moveZone").forEach(select => {
