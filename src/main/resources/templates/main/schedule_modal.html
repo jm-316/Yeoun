@@ -16,6 +16,84 @@
 						<label for="scheduleTitle" class="form-label">제목</label>
 						<input type="text" id="scheduleTitle" class="form-control" name="scheduleTitle"/>
 					</div>
+					<!-- ---------------------------------------------------------------- -->
+					<!-- 반복일정 추가 -->
+					<div class="mb-3 mt-3">
+						<div style="display:flex; gap:8px; align-items: flex-end;">
+							<!-- 반복 타입 -->
+							<div class="col-md-3">
+								<select id="repeatType" class="form-select" name="repeatType">
+									<option value="NONE" selected>반복없음</option>
+									<option value="DAILY">매일</option>
+									<option value="WEEKLY">매주</option>
+									<option value="MONTHLY">매월</option>
+									<option value="YEARLY">매년</option>
+								</select>
+							</div>
+							
+							<!-- 인터벌 -->
+							<div class="col-md-3" id="intervalDiv" style="display:none;">
+								<div class="input-group">
+									<input type="number" class="form-control" id="repeatInterval"
+									       name="repeatInterval" value="1" min="1" max="12">
+									<span class="input-group-text">회마다</span>
+								</div>
+							</div>
+							
+							<!-- 반복 종료일 -->
+							<div class="col-md-5">
+							    <div class="input-group" id="repeatEndDateDiv" style="display:none">
+									<input type="date" class="form-control" id="repeatEndDate"
+									       name="repeatEndDate" disabled>
+									<span class="input-group-text">까지 반복</span>
+							    </div>
+							</div>
+						</div>
+							
+							<!-- WEEKLY 일 때만 보이는 요일 선택 -->
+						<div id="weeklyDays" class="mb-3 pt-2" style="display:none;">
+							<label class="form-label fw-bold small mb-2">반복 요일:</label>
+							<input type="hidden" id="repeatWeekdays" name="repeatWeekdays">
+							<div class="row g-1">
+								<div class="col-1 p-1"><div class="form-check form-check-sm">
+								    <input class="form-check-input" type="checkbox" name="byDay" id="sun" value="1">
+								    <label class="form-check-label tiny-label text-muted" for="sun">일</label>
+								</div></div>
+							
+								<div class="col-1 p-1"><div class="form-check form-check-sm">
+								    <input class="form-check-input" type="checkbox" name="byDay" id="mon" value="2">
+								    <label class="form-check-label tiny-label fw-semibold" for="mon">월</label>
+								</div></div>
+								
+								<div class="col-1 p-1"><div class="form-check form-check-sm">
+									<input class="form-check-input" type="checkbox" name="byDay" id="tue" value="4">
+									<label class="form-check-label tiny-label fw-semibold" for="tue">화</label>
+								</div></div>
+								
+								<div class="col-1 p-1"><div class="form-check form-check-sm">
+									<input class="form-check-input" type="checkbox" name="byDay" id="wed" value="8">
+									<label class="form-check-label tiny-label fw-semibold" for="wed">수</label>
+								</div></div>
+								
+								<div class="col-1 p-1"><div class="form-check form-check-sm">
+									<input class="form-check-input" type="checkbox" name="byDay" id="thu" value="16">
+									<label class="form-check-label tiny-label fw-semibold" for="thu">목</label>
+								</div></div>
+								
+								<div class="col-1 p-1"><div class="form-check form-check-sm">
+									<input class="form-check-input" type="checkbox" name="byDay" id="fri" value="32">
+									<label class="form-check-label tiny-label fw-semibold" for="fri">금</label>
+								</div></div>
+								
+								<div class="col-1 p-1"><div class="form-check form-check-sm">
+									<input class="form-check-input" type="checkbox" name="byDay" id="sat" value="64">
+									<label class="form-check-label tiny-label text-muted" for="sat">토</label>
+								</div></div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- ---------------------------------------------------------------- -->
 					<div class="mb-3 mt-3" style="display:flex; gap:8px;">
 						<div>
 							<select id="schedule-type" class="form-select" name="scheduleType">

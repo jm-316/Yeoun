@@ -23,8 +23,24 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 			      or (s.scheduleType = 'share' and ss.sharedEmp.empId = :empId)
 			      or s.emp.empId = :empId
 			    )
+			and s.repeatType = 'NONE'
 			""")
 	List<Schedule> getIndividualSchedule(@Param("empId")String empId 
 			, @Param("startDate")LocalDateTime startDate, @Param("endDate")LocalDateTime endDate);
+
+	
+	@Query("""
+		    select s
+		    from Schedule s
+		    left join s.scheduleSharers ss
+		    where s.repeatType <> 'NONE'
+		      and (
+		            s.scheduleType = 'company'
+		         or (s.scheduleType = 'share' and ss.sharedEmp.empId = :empId)
+		         or s.emp.empId = :empId
+		      )
+		      and s.repeatEndDate >= :startDate
+			""")
+	List<Schedule> getRepeatScheduleList(@Param("empId")String empId, @Param("startDate")LocalDateTime startOfDay);
 	
 }

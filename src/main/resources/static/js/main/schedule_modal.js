@@ -136,6 +136,17 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	addScheduleForm.addEventListener('submit', function(event) {
 		event.preventDefault(); // 기본제출 막기
+		
+		const repeatTypeSelect    = document.getElementById('repeatType');
+		const repeatWeekdaysInput = document.getElementById('repeatWeekdays');
+		
+		const repeatType = repeatTypeSelect.value;
+		if (repeatType === 'WEEKLY') {
+		  const bit = calculateWeekdaysBit();
+		  repeatWeekdaysInput.value = bit;
+		} else {
+		  repeatWeekdaysInput.value = 0;
+		}
 
 		// 일정 등록 일때 구분
 		if(addScheduleBtn.value == 'add') {
@@ -158,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			}
 			
-			fetch('/main/schedule', {
+			fetch(apiUrl('/main/schedule'), {
 				method: 'POST'
 				, headers: {
 					[csrfHeader]: csrfToken
@@ -200,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					}
 				}
 				
-				fetch('/main/schedule', {
+				fetch(apiUrl('/main/schedule'), {
 					method: 'PATCH'
 					, headers: {
 						[csrfHeader]: csrfToken
@@ -265,6 +276,7 @@ document.getElementById('schedule-type').addEventListener('change', (event) => {
 		shareEl.style.display = 'none';
 	}
 });
+
 // 모달열기함수
 async function openScheduleModal(mode, data = null) {
 	const modal = new bootstrap.Modal(document.getElementById('add-schedule-modal'));
@@ -286,10 +298,30 @@ async function openScheduleModal(mode, data = null) {
 	const sp = picker.getStartpicker(); 
 	const ep = picker.getEndpicker();
 	
+	const repeatTypeSelect   = document.getElementById('repeatType');
+	const repeatIntervalInput = document.getElementById('repeatInterval');
+	const repeatEndDateInput  = document.getElementById('repeatEndDate');
+	const repeatWeekdaysInput = document.getElementById('repeatWeekdays'); // hidden
+
 	// -------------------------------------------------------------------
 	// -------------------------------------------------------------------
 	// 모달이 열릴때 add, edit 구분
 	if(mode === 'add') {
+		
+		repeatTypeSelect.value = 'NONE';
+		// 반복일정 없음으로 설정 적용
+		repeatTypeSelect.dispatchEvent(new Event('change'));
+		
+		if (repeatIntervalInput) repeatIntervalInput.value = 1;
+		if (repeatEndDateInput)  repeatEndDateInput.value = '';
+		
+		//요일 체크박스 전부 해제
+		['sun','mon','tue','wed','thu','fri','sat'].forEach(id => {
+			const el = document.getElementById(id);
+			if (el) el.checked = false;
+			if (el) el.disabled = false;
+		});
+		
 		deleteBtn.disabled = false;
 		submitBtn.disabled = false;
 		submitBtn.classList.remove('d-none');
@@ -338,6 +370,8 @@ async function openScheduleModal(mode, data = null) {
 		organizeBtn.disabled = false;
 
 	} else if (mode === 'edit' && data) {
+		console.log(data,"21323123123");
+		
 		modalTitle.textContent = '일정조회';
 		deleteBtn.classList.remove('d-none');
 		submitBtn.classList.remove('d-none');
@@ -375,6 +409,50 @@ async function openScheduleModal(mode, data = null) {
 		form.alldayYN.value = data.alldayYN; // hidden value
 		form.scheduleContent.value = data.scheduleContent || '';
 		
+		// --------------------------------------------------------------------
+		// 반복일정 세팅
+		const repeatType = data.repeatType || 'NONE';
+		repeatTypeSelect.value = repeatType;
+		repeatTypeSelect.dispatchEvent(new Event('change'));
+		
+		// 반복인터벌값이 있을경우에만 설정
+		if (repeatIntervalInput) {
+		  repeatIntervalInput.value = data.repeatInterval ?? 1;
+		}
+		
+		// 반복 종료일정 있을 경우에만 설정
+		if (repeatEndDateInput) {
+			if (data.repeatEndDate) {
+				// "2026-01-27T00:00:00" 형태라면 앞 10자리만
+				repeatEndDateInput.value = data.repeatEndDate.substring(0, 10);
+			} else {
+				repeatEndDateInput.value = '';
+			}
+		}
+		
+		const bit = data.repeatWeekdays || 0;
+		
+		// 일단 모두 해제
+		['sun','mon','tue','wed','thu','fri','sat'].forEach(id => {
+			const el = document.getElementById(id);
+			if (el) el.checked = false;
+		});
+		
+		if (repeatType === 'WEEKLY') {
+			if (bit & 1)  document.getElementById('sun').checked = true; // 2^0
+			if (bit & 2)  document.getElementById('mon').checked = true; // 2^1
+			if (bit & 4)  document.getElementById('tue').checked = true; // 2^2
+			if (bit & 8)  document.getElementById('wed').checked = true; // 2^3
+			if (bit & 16) document.getElementById('thu').checked = true; // 2^4
+			if (bit & 32) document.getElementById('fri').checked = true; // 2^5
+			if (bit & 64) document.getElementById('sat').checked = true; // 2^6
+		}
+		
+		if (repeatWeekdaysInput) {
+			repeatWeekdaysInput.value = bit;
+		}
+		
+		// --------------------------------------------------------------------
 		if (data.createdUser !== currentUserId) {
 		    // 권한 없음: 조직선택, 삭제, 수정 버튼 비활성화
 			organizeBtn.disabled = true;
@@ -395,6 +473,15 @@ async function openScheduleModal(mode, data = null) {
 		            el.disabled = true;
 		        }
 		    });
+			
+			repeatTypeSelect.disabled    = true;
+			if (repeatIntervalInput) repeatIntervalInput.disabled = true;
+			if (repeatEndDateInput)  repeatEndDateInput.disabled  = true;
+			['sun','mon','tue','wed','thu','fri','sat'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.disabled = true;
+			});
+			
 		} else {
 		    // 권한 있는 사용자에게는 모든 기능 활성화
 			organizeBtn.disabled = false;
@@ -414,6 +501,14 @@ async function openScheduleModal(mode, data = null) {
 		        }
 				createdUserName.readOnly = true;
 		    });
+			
+			repeatTypeSelect.disabled    = false;
+			if (repeatIntervalInput) repeatIntervalInput.disabled = false;
+			if (repeatEndDateInput)  repeatEndDateInput.disabled  = false;
+			['sun','mon','tue','wed','thu','fri','sat'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.disabled = false;
+			});
 		}
 	}
 	
@@ -660,7 +755,6 @@ function setSharers(checkedUpEmpList) {
 }
 
 
-
 function getCheckedEmpId() {
     let checked = [];
     const rows = treeGrid.getData();
@@ -692,10 +786,57 @@ async function checkSharers(scheduleType, scheduleId) {
 	}
 }
 
+// --------------------------------------------------
+// 일정 타입에 따른 영역 토글
+document.addEventListener('DOMContentLoaded', function () {
+  const repeatTypeSelect = document.getElementById('repeatType');
+  const intervalDiv = document.getElementById('intervalDiv');
+  const weeklyDaysDiv = document.getElementById('weeklyDays');
+  const endDateDiv = document.getElementById('repeatEndDateDiv');
+  const endDateInput = document.getElementById('repeatEndDate');
+
+  repeatTypeSelect.addEventListener('change', function () {
+    const type = this.value;
+
+    if (type === 'NONE') {
+      intervalDiv.style.display = 'none';
+      weeklyDaysDiv.style.display = 'none';
+	  endDateDiv.style.display = 'none';
+      endDateInput.disabled = true;
+      endDateInput.required = false;
+    } else if (type === 'WEEKLY') {
+      intervalDiv.style.display = 'block';
+      weeklyDaysDiv.style.display = 'block';
+	  endDateDiv.style.display = 'flex';
+      endDateInput.disabled = false;
+      endDateInput.required = true;
+      // 필요하면 기본 오늘 요일 체크
+    } else {
+      intervalDiv.style.display = 'block';
+      weeklyDaysDiv.style.display = 'none';
+	  endDateDiv.style.display = 'flex';
+      endDateInput.disabled = false;
+      endDateInput.required = true;
+    }
+  });
+
+  // 초기 상태
+  repeatTypeSelect.dispatchEvent(new Event('change'));
+});
 
 
-
-
+// 체크박스 선택된 요일 비트 플래그 계산
+function calculateWeekdaysBit() {
+    let bit = 0;
+    if (document.getElementById('sun').checked) bit |= 1;   // 2^0
+    if (document.getElementById('mon').checked) bit |= 2;   // 2^1
+    if (document.getElementById('tue').checked) bit |= 4;   // 2^2
+    if (document.getElementById('wed').checked) bit |= 8;   // 2^3
+    if (document.getElementById('thu').checked) bit |= 16;   // 2^4
+    if (document.getElementById('fri').checked) bit |= 32;   // 2^5
+    if (document.getElementById('sat').checked) bit |= 64;   // 2^6
+    return bit;
+}
 
 
 
