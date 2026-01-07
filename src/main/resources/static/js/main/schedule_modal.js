@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById('delete-schedule-btn').addEventListener('click', function () {
 		if(confirm("삭제하시겠습니까 ?")) {
 			//삭제요청보내기
-			fetch('/main/schedule', {
+			fetch(apiUrl('/main/schedule'), {
 				method: 'DELETE'
 				, headers: {
 					[csrfHeader]: csrfToken
@@ -582,7 +582,7 @@ function closeOrgModal() {
 let toastTreeData = null;
 // 조직도 불러오기
 async function getOrganizationChart() {
-	await fetch(`/api/schedules/organizationChart`, {method: 'GET'})
+	await fetch(apiUrl(`/api/schedules/organizationChart`), {method: 'GET'})
 	.then(response => {
 		if (!response.ok) throw new Error(response.text());
 		return response.json();  //JSON 파싱
