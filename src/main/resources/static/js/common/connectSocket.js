@@ -16,7 +16,7 @@ let connected = false;
 //	STOMP 연결 설정
 //===============================
 function connectWebSocket(onConnected) {
-	const socket = new SockJS("/websocket");  
+	const socket = new SockJS(apiUrl("/websocket"));  
 	stompClient = Stomp.over(socket);
 
 	stompClient.connect({
