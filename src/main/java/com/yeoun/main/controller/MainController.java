@@ -72,7 +72,9 @@ public class MainController {
 	public ResponseEntity<Map<String, String>> createSchedule(
 			@ModelAttribute("scheduleDTO") @Valid ScheduleDTO scheduleDTO,
 			BindingResult bindingResult,
-			@RequestParam(name = "sharedEmpList", required = false, defaultValue = "[]") String sharedEmpListJson) {
+			@RequestParam(name = "sharedEmpList", required = false, defaultValue = "[]") String sharedEmpListJson
+//			,@RequestParam(name = "byDay", required = false)List<Long> byDayList
+			) {
 		// 리턴에 사용할 Map 객체 생성
 		Map<String, String> msg = new HashMap<>();
 		// 받아온 sharedEmpListJson를 파싱해서 저장할 ScheduleSharerDTO리스트 생성

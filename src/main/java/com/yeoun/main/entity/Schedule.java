@@ -1,5 +1,6 @@
 package com.yeoun.main.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -72,6 +73,31 @@ public class Schedule {
 	@LastModifiedDate
 	private LocalDateTime updatedDate; // 수정 일시
 	
+	// --------------------------------------------------------------------
+	// 반복일정 컬럼
+	// 반복일정 타입
+	@Column(name = "REPEAT_TYPE", nullable = false )
+	private String repeatType;           // DAILY, WEEKLY, ...
+	
+	@Column(name = "REPEAT_INTERVAL", nullable = true)
+	private Long repeatInterval;      // 1~12
+	
+	@Column(name = "REPEAT_WEEKDAYS", nullable = true)
+	private Long repeatWeekdays;      // 비트마스크 (WEEKLY 전용)
+	
+	@Column(name = "REPEAT_END_DATE", nullable = true)
+	private LocalDateTime repeatEndDate; // null = 무한
+	
+	public boolean isRecurring() {
+	    return repeatType != null && !"NONE".equals(repeatType);
+	}
+	
+    public boolean hasWeekday(int dayOfWeek0to6) {
+        if (repeatWeekdays == null) return false;
+        int bit = 1 << dayOfWeek0to6;   // 0=일,1=월,...
+        return (repeatWeekdays & bit) != 0;
+    }
+	
 	// ------------------------------------------------------------------------
 	@OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ScheduleSharer> scheduleSharers;
@@ -83,5 +109,16 @@ public class Schedule {
 		this.alldayYN = scheduleDTO.getAlldayYN();
 		this.scheduleStart = scheduleDTO.getScheduleStart();
 		this.scheduleFinish = scheduleDTO.getScheduleFinish();
+		
+		this.repeatType = scheduleDTO.getRepeatType();
+		this.repeatInterval = scheduleDTO.getRepeatInterval();
+		this.repeatWeekdays = scheduleDTO.getRepeatWeekdays();
+		
+	    if (scheduleDTO.getRepeatEndDate() != null && !scheduleDTO.getRepeatEndDate().isBlank()) {
+	    	LocalDate date = LocalDate.parse(scheduleDTO.getRepeatEndDate());
+	    	this.repeatEndDate = date.atTime(23, 59, 59);
+	    } else {
+	        this.repeatEndDate = null;
+	    }
 	}
 }

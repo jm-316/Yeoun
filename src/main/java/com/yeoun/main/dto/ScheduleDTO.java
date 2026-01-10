@@ -1,5 +1,6 @@
 package com.yeoun.main.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.modelmapper.ModelMapper;
@@ -12,6 +13,8 @@ import com.yeoun.emp.entity.Dept;
 import com.yeoun.emp.entity.Emp;
 import com.yeoun.main.entity.Schedule;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -58,6 +61,16 @@ public class ScheduleDTO {
 	private String deptId;
 	private String deptName;
 	
+	// --------------------------------------------------
+	// 반복일정 속성 추가
+	@NotBlank
+    private String repeatType = "NONE";        // NONE/DAILY/WEEKLY/...
+    @Min(1)@Max(12)
+    private Long repeatInterval = 0l;   // 1~12
+    @Min(0)@Max(127)
+    private Long repeatWeekdays = 0l;   // 0~127
+    private String repeatEndDate;
+	
 	// ----------------------------------------------------------
 	private static ModelMapper modelMapper = new ModelMapper();
 	
@@ -75,6 +88,24 @@ public class ScheduleDTO {
 	        }
 	        schedule.setEmp(emp);
 	    }
+	    
+        if ("NONE".equals(repeatType)) {
+        	schedule.setRepeatType(null);
+        	schedule.setRepeatInterval(null);
+        	schedule.setRepeatWeekdays(0l);
+        	schedule.setRepeatEndDate(null);
+        } else {
+        	schedule.setRepeatType(repeatType);
+        	schedule.setRepeatInterval(repeatInterval != null ? repeatInterval : 1);
+        	schedule.setRepeatWeekdays(
+                repeatType.equals("WEEKLY") ? (repeatWeekdays != null ? repeatWeekdays : 0) : 0
+            );
+            if (repeatEndDate != null && !repeatEndDate.isBlank()) {
+            	LocalDate date = LocalDate.parse(repeatEndDate);
+            	schedule.setRepeatEndDate(date.atTime(23, 59, 59));
+            }
+        }
+	    
 		return schedule; 
 	}
 	
