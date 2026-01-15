@@ -1,0 +1,230 @@
+<th:block xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:fragment="approval_modal">
+	<!-- 모달 -->
+	<div class="modal fade" id="approval-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+		    <form class="modal-content approval-doc" id="approval-form">
+		        <div class="modal-header">
+		            <h3 class="modal-title">결재 양식</h3>
+		            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		        </div>
+		
+		        <div class="modal-body">
+		            <!-- 문서 헤더 -->
+		            <section class="doc-section doc-header">
+		                <!-- 왼쪽: 제목/기안자/양식종류 등 -->
+		                <table class="doc-info-table">
+						    <tr>
+						        <th>문서 제목</th>
+						        <td colspan="3">
+						            <input id="approval-title" class="form-control" type="text" name="approvalTitle" placeholder="문서제목" required>
+						        </td>
+						    </tr>
+						    <tr>
+						        <th>기안자</th>
+						        <td>[[${#authentication.principal.empName}]] ([[${#authentication.principal.empId}]])</td>
+						        <th>기안일</th>
+						        <td id="today-date"></td>
+						    </tr>
+						    <tr>
+						        <th>양식 종류</th>
+						        <td>
+						        	<select id="form-type-select">
+						        		<option value="free" selected>자유 양식</option>
+						        		<option value="leave" >휴가 신청</option>
+						        		<option value="expense" >지출 결의서</option>
+									</select>
+						        </td>
+						        <th>결재완료기간</th>
+						        <td>
+						            <div class="d-flex align-items-center gap-2">
+						                <input id="create-date" type="date" name="createdDate" class="form-control" required readonly>
+						                <span>~</span>
+						                <input id="finish-date" type="date" name="finishDate" class="form-control" 
+						                	th:attr="min=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+						            </div>
+						        </td>
+						    </tr>
+						    
+						    <!-- 휴가 신청서 전용 필드 -->
+					        <tr id="leave-type-row" style="display: none;">
+					            <th>휴가종류</th>
+					            <td colspan="3">
+					                <select id="leave-type" name="leaveType" class="form-select" style="width: 200px;">
+					                    <option value="">선택</option>
+					                    <option value="연차">연차</option>
+					                    <option value="반차">반차</option>
+<!-- 					                    <option value="병가">병가</option> -->
+<!-- 					                    <option value="경조사">경조사</option> -->
+					                </select>
+					            </td>
+					        </tr>
+					        <tr id="leave-period-row" style="display: none;">
+					            <th>휴가기간</th>
+					            <td colspan="3">
+					                <div class="d-flex align-items-center gap-2">
+					                    <input id="leave-start-date" type="date" name="leaveStartDate" class="form-control" style="width: 180px;"
+					                    	th:attr="min=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+					                    <span>~</span>
+					                    <input id="leave-end-date" type="date" name="leaveEndDate" class="form-control" style="width: 180px;"
+					                    	th:attr="min=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+					                    <span style="margin-left: 15px; font-weight: 600;">일수:</span>
+					                    <input id="leave-days" type="text" name="leaveDays" class="form-control" style="width: 80px;" readonly>
+					                </div>
+					            </td>
+					        </tr>
+					        
+					        <!-- 지출 결의서 전용 필드 -->
+					        <tr id="expense-type-row" style="display: none;">
+					            <th>지출종류</th>
+					            <td colspan="3">
+					                <select id="expense-type" name="expenseType" class="form-select" style="width: 200px;">
+					                    <option value="">선택</option>
+					                    <option value="CJB">출장비</option>
+					                    <option value="JDB">접대비</option>
+					                    <option value="BPB">비품구매</option>
+					                    <option value="YRB">교육비</option>
+					                    <option value="ETC">기타</option>
+					                </select>
+					            </td>
+					        </tr>
+					        <tr id="expense-date-row" style="display: none;">
+					            <th>지출일자</th>
+					            <td>
+					                <input id="expense-date" type="date" name="expenseDate" class="form-control">
+					            </td>
+					            <th>지출처</th>
+					            <td>
+					                <input id="expense-vendor" type="text" name="expenseVendor" class="form-control" placeholder="업체명/상호">
+					            </td>
+					        </tr>
+					        <tr id="expense-amount-row" style="display: none;">
+					            <th>금액</th>
+					            <td colspan="3">
+					            	<div class="d-flex">
+						                <input id="expense-amount" type="number" name="expenseAmount" class="form-control" style="width: 200px;" placeholder="0">
+						                <small class="text-muted">원</small>
+					            	</div>
+					            </td>
+					        </tr>
+					    </table>
+		            </section>
+		
+		            <!-- 본문 -->
+		            <section class="doc-section doc-body">
+		                <!-- 공통: 문서제목, 사유내용 -->
+		            	<div class="doc-body-section">
+						    <div class="doc-body-title">사유내용</div>
+						    <textarea id="reason-write" class="form-control doc-reason" name="reason" rows="10"
+						        placeholder="결재사유내용 작성" maxlength="3000"></textarea>
+						    <small id="reason-char-count" class="form-text text-muted" style="float:right;">0/3000자</small>
+						</div>
+		                <!-- 각 양식별: 휴가/지출/인사발령 전용 섹션 -->
+		            </section>
+		
+		            <!-- 결재선 -->
+		            <section class="doc-section doc-approver">
+	                    <div class="d-flex justify-content-between align-items-center mb-3">
+					        <h5 class="approver-section-title mb-0">결재선</h5>
+					        <div class="d-flex gap-2">
+					            <button type="button" id="open-approver-org-btn" class="btn btn-sm btn-primary">
+					                <i class="bi bi-plus-circle"></i> 추가
+					            </button>
+<!-- 					            <button type="button" id="load-approver-template-btn" class="btn btn-sm btn-outline-primary"> -->
+<!-- 					                <i class="bi bi-star"></i> 불러오기 -->
+<!-- 					            </button> -->
+					        </div>
+					    </div>
+				    
+					    <!-- 결재선 테이블 -->
+					    <table class="approver-table">
+					        <thead>
+					            <tr>
+					                <th style="width: 80px;">구분</th>
+					                <th style="width: 100px;">직급</th>
+					                <th>이름(사번)</th>
+					                <th style="width: 80px;">삭제</th>
+					            </tr>
+					        </thead>
+					        <tbody id="approver-list">
+					            <tr>
+					                <td>기안</td>
+<!-- 					                [[${#authentication.principal.empName}]] ([[${#authentication.principal.empId}]]) -->
+					                <td th:text="${#authentication.principal.posName}">-</td>
+					                <td th:text="${#authentication.principal.empName} + ' (' + ${#authentication.principal.empId} + ')'">-</td>
+					                <td>-</td>
+					            </tr>
+					            <!-- 결재자들이 여기 동적으로 추가됨 -->
+					        </tbody>
+					    </table>
+		            </section>
+		
+		            <!-- 첨부파일 -->
+		            <section class="doc-section doc-attachment">
+		                <!-- 첨부파일 버튼/리스트 -->
+		                    <h5 class="attachment-section-title">첨부파일</h5>
+						    <div class="attachment-upload-area">
+						        <input type="file" id="file-input" name="attachments" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" style="display: none;">
+						        <button type="button" id="file-upload-btn" class="btn btn-outline-primary btn-sm">
+						            <i class="bi bi-paperclip"></i> 파일 선택
+						        </button>
+						        <small class="text-muted ms-2">최대 10MB, 최대 5개 파일</small>
+						    </div>
+						    
+						    <!-- 선택된 파일 목록 -->
+						    <div id="file-list" class="file-list mt-3">
+						        <!-- 파일들이 여기 동적으로 추가됨 -->
+						    </div>
+		            </section>
+		        </div>
+		
+		        <div class="modal-footer">
+		            <!-- 반려/승인/등록 버튼 영역 -->
+				    <button type="button" id="approve-btn" class="btn btn-success" style="display: none;">
+				        <i class="bi bi-check-circle"></i> 승인
+				    </button>
+				    <button type="button" id="final-approve-btn" class="btn btn-primary" style="display: none;">
+				        <i class="bi bi-check-circle-fill"></i> 전결 승인
+				    </button>
+				    <button type="button" id="reject-btn" class="btn btn-danger" style="display: none;">
+				        <i class="bi bi-x-circle"></i> 반려
+				    </button>
+				    
+				    <!-- 기안자용 버튼 (기안 모드에서만 표시) -->
+				    <button type="submit" id="submit-btn" class="btn btn-primary">
+				        <i class="bi bi-save"></i> 등록
+				    </button>
+				    
+				    <!-- 공통 닫기 버튼 -->
+				    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+				        닫기
+				    </button>
+		        </div>
+		    </form>
+		</div>
+    </div>
+    <!-- 모달끝 -->
+    
+	<!-- 결재선 조직도 모달 -->
+	<div class="modal fade" id="approver-org-modal" tabindex="-1" aria-hidden="true">
+	    <div class="modal-dialog modal-lg modal-dialog-centered">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title">결재권한자 선택</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <div class="modal-body">
+	                <div id="approverOrgChartGrid" style="width:100%; height:400px;"></div>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" id="add-selected-approvers-btn" class="btn btn-primary">선택한 직원 추가</button>
+	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+
+	<script th:inline="javascript" th:src="@{/js/approval/approvalModal.js}"></script>
+
