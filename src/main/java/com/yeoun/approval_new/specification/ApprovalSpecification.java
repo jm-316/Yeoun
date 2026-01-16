@@ -23,29 +23,45 @@ public class ApprovalSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             
-            // 1. 탭별 조건
             String tab = searchDTO.getTab();
             String userId = searchDTO.getCurrentUserId();
             
-            if ("my".equals(tab)) {
-                // 내 기안
+            // ========== 탭별 조건 ==========
+            if ("all".equals(tab)) {
+                // 전체 결재: 내가 기안했거나 OR 결재선에 내가 있는 모든 문서
+                Join<ApprovalDocument, ApprovalLine> lineJoin = root.join("approvalLines");
+                
+                Predicate myDraft = criteriaBuilder.equal(root.get("employee").get("empId"), userId);
+                Predicate inApprovalLine = criteriaBuilder.equal(lineJoin.get("approver").get("empId"), userId);
+                
+                predicates.add(criteriaBuilder.or(myDraft, inApprovalLine));
+                
+            } else if ("my".equals(tab)) {
+                // 내 기안: 내가 기안한 문서만
                 predicates.add(criteriaBuilder.equal(root.get("employee").get("empId"), userId));
                 
             } else if ("pending".equals(tab)) {
-                // 결재 대기
+                // 결재 대기: 내가 기안한 건 제외, 결재선에 내가 있고 PENDING
                 Join<ApprovalDocument, ApprovalLine> lineJoin = root.join("approvalLines");
-                predicates.add(criteriaBuilder.equal(lineJoin.get("approver").get("empId"), userId)); 
-                predicates.add(criteriaBuilder.equal(lineJoin.get("status"), "PENDING"));
+                
+                Predicate notMyDraft = criteriaBuilder.notEqual(root.get("employee").get("empId"), userId);
+                Predicate inApprovalLine = criteriaBuilder.equal(lineJoin.get("approver").get("empId"), userId);
+                Predicate isPending = criteriaBuilder.equal(lineJoin.get("status"), "PENDING");
+                
+                predicates.add(criteriaBuilder.and(notMyDraft, inApprovalLine, isPending));
                 
             } else if ("completed".equals(tab)) {
-                // 결재 완료
+                // 결재 완료: 내가 기안한 건 제외, 결재선에 내가 있고 승인/반려됨
                 Join<ApprovalDocument, ApprovalLine> lineJoin = root.join("approvalLines");
-                predicates.add(criteriaBuilder.equal(lineJoin.get("approver").get("empId"), userId)); 
-                predicates.add(lineJoin.get("status").in("APPROVED", "FINAL_APPROVED", "REJECTED"));
+                
+                Predicate notMyDraft = criteriaBuilder.notEqual(root.get("employee").get("empId"), userId);
+                Predicate inApprovalLine = criteriaBuilder.equal(lineJoin.get("approver").get("empId"), userId);
+                Predicate isCompleted = lineJoin.get("status").in("APPROVED", "FINAL_APPROVED", "REJECTED");
+                
+                predicates.add(criteriaBuilder.and(notMyDraft, inApprovalLine, isCompleted));
             }
-            // "all"은 조건 없음
             
-            // 2. 날짜 범위 검색
+            // ========== 날짜 범위 검색 ==========
             if (searchDTO.getSearchStartDate() != null && !searchDTO.getSearchStartDate().isEmpty()) {
                 LocalDate startDate = LocalDate.parse(searchDTO.getSearchStartDate());
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdDate"), startDate));
@@ -56,7 +72,7 @@ public class ApprovalSpecification {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdDate"), endDate));
             }
             
-            // 3. 키워드 검색 (기안자명 OR 문서제목)
+            // ========== 키워드 검색 (기안자명 OR 문서제목) ==========
             if (searchDTO.getSearchKeyword() != null && !searchDTO.getSearchKeyword().isEmpty()) {
                 String keyword = "%" + searchDTO.getSearchKeyword() + "%";
                 
