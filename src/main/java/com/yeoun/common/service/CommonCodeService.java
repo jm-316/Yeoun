@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.yeoun.common.dto.CommonCodeDTO;
+import com.yeoun.common.dto.CommonCodeIdAndNameDTO;
 import com.yeoun.common.entity.CommonCode;
 import com.yeoun.common.repository.CommonCodeRepository;
 
@@ -46,6 +47,15 @@ public class CommonCodeService {
 		
 		return codeList.stream()
 				.map(CommonCodeDTO::fromEntity)
+				.collect(Collectors.toList());
+	}
+
+	// 원재료 유형
+	public List<CommonCodeIdAndNameDTO> getMatType(String parentCodeId) {
+	
+		return commonCodeRepository.findByParentCodeIdAndUseYnOrderByCodeSeq(parentCodeId, "Y")
+				.stream()
+				.map(CommonCodeIdAndNameDTO::fromEntity)
 				.collect(Collectors.toList());
 	}
 	
