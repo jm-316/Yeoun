@@ -58,7 +58,7 @@ public class ApprovalDocumentDTO {
     private static ModelMapper modelMapper = new ModelMapper();
     
     // Entity → DTO
-    public static ApprovalDocumentDTO fromEntity(ApprovalDocument entity, ModelMapper modelMapper) {
+    public static ApprovalDocumentDTO fromEntity(ApprovalDocument entity) {
         // 기본 매핑
         ApprovalDocumentDTO dto = modelMapper.map(entity, ApprovalDocumentDTO.class);
         

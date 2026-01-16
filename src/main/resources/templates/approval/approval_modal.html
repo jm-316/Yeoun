@@ -23,7 +23,11 @@
 						    </tr>
 						    <tr>
 						        <th>기안자</th>
-						        <td>[[${#authentication.principal.empName}]] ([[${#authentication.principal.empId}]])</td>
+						        <td>
+						        	<span id="approval-creator">
+							        	[[${#authentication.principal.empName}]] ([[${#authentication.principal.empId}]])
+						        	</span>
+						        </td>
 						        <th>기안일</th>
 						        <td id="today-date"></td>
 						    </tr>
@@ -54,7 +58,8 @@
 					                <select id="leave-type" name="leaveType" class="form-select" style="width: 200px;">
 					                    <option value="">선택</option>
 					                    <option value="연차">연차</option>
-					                    <option value="반차">반차</option>
+					                    <option value="오전 반차">오전 반차</option>
+					                    <option value="오후 반차">오후 반차</option>
 <!-- 					                    <option value="병가">병가</option> -->
 <!-- 					                    <option value="경조사">경조사</option> -->
 					                </select>
@@ -144,17 +149,16 @@
 					                <th style="width: 80px;">구분</th>
 					                <th style="width: 100px;">직급</th>
 					                <th>이름(사번)</th>
-					                <th style="width: 80px;">삭제</th>
+					                <th style="width: 120px;" id="approver-action-header">삭제</th>
 					            </tr>
 					        </thead>
 					        <tbody id="approver-list">
-					            <tr>
-					                <td>기안</td>
-<!-- 					                [[${#authentication.principal.empName}]] ([[${#authentication.principal.empId}]]) -->
-					                <td th:text="${#authentication.principal.posName}">-</td>
-					                <td th:text="${#authentication.principal.empName} + ' (' + ${#authentication.principal.empId} + ')'">-</td>
-					                <td>-</td>
-					            </tr>
+<!-- 					            <tr> -->
+<!-- 					                <td>기안</td> -->
+<!-- 					                <td th:text="${#authentication.principal.posName}">-</td> -->
+<!-- 					                <td th:text="${#authentication.principal.empName} + ' (' + ${#authentication.principal.empId} + ')'">-</td> -->
+<!-- 					                <td>-</td> -->
+<!-- 					            </tr> -->
 					            <!-- 결재자들이 여기 동적으로 추가됨 -->
 					        </tbody>
 					    </table>

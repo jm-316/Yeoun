@@ -52,7 +52,6 @@ public class ApprovalDocument implements FileUploadHelpper{
     @Column(name = "approval_title", length = 200, nullable = false)
     private String approvalTitle;
     
-    @Lob
     @Column(name = "reason")
     private String reason;
     

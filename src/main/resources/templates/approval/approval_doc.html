@@ -122,36 +122,31 @@
 			</div>
 		</div>
 		<hr>
-		<div class="col-xl-15">
+		<div class="col-12">
 			<div class="nav-align-top mb-4">
 	            <ul class="nav nav-tabs" role="tablist">
 					<li class="nav-item">
-						<button type="button" class="nav-link" aria-selected="true">
-							결재사항
+						<button type="button" class="nav-link" aria-selected="true" id="every-approval">
+							전체 결재
 						</button>
 					</li>
 					<li class="nav-item">
-						<button type="button" class="nav-link" aria-selected="true">
-							전체결재
+						<button type="button" class="nav-link" aria-selected="true" id="my-approval">
+							내 기안
 						</button>
 					</li>
 					<li class="nav-item">
-						<button type="button" class="nav-link" aria-selected="true">
-							내 결재목록
+						<button type="button" class="nav-link" aria-selected="true" id="wait-approval">
+							결재 대기
 						</button>
 					</li>
 					<li class="nav-item">
-						<button type="button" class="nav-link" aria-selected="true">
-							결재대기
-						</button>
-					</li>
-					<li class="nav-item">
-						<button type="button" class="nav-link" aria-selected="true">
-							결재완료
+						<button type="button" class="nav-link" aria-selected="true" id="complete-approval">
+							결재 완료
 						</button>
 					</li>
 	            </ul>
-	            <div class="tab-content" style="height: 700px;">
+	            <div class="tab-content" style="height: auto;">
 					<div class="tab-pane fade show active"  id="nav-approval-tab" role="tabpanel">
 						<div id="approvalGrid" ></div>
 					</div>

@@ -5,13 +5,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.yeoun.approval_new.dto.ApprovalDocumentDTO;
 import com.yeoun.approval_new.dto.ApprovalExpenseDTO;
 import com.yeoun.approval_new.dto.ApprovalLeaveDTO;
 import com.yeoun.approval_new.dto.ApprovalLineDTO;
+import com.yeoun.approval_new.dto.ApprovalListDTO;
+import com.yeoun.approval_new.dto.ApprovalResponseDTO;
+import com.yeoun.approval_new.dto.ApprovalSearchDTO;
 import com.yeoun.approval_new.entity.ApprovalDocument;
 import com.yeoun.approval_new.entity.ApprovalExpense;
 import com.yeoun.approval_new.entity.ApprovalLeave;
@@ -20,13 +29,13 @@ import com.yeoun.approval_new.repository.ApprovalDocumentRepository;
 import com.yeoun.approval_new.repository.ApprovalExpenseRepository;
 import com.yeoun.approval_new.repository.ApprovalLeaveRepository;
 import com.yeoun.approval_new.repository.ApprovalLineRepository;
+import com.yeoun.approval_new.specification.ApprovalSpecification;
 import com.yeoun.common.dto.FileAttachDTO;
 import com.yeoun.common.entity.FileAttach;
 import com.yeoun.common.repository.FileAttachRepository;
 import com.yeoun.common.util.FileUtil;
 import com.yeoun.emp.repository.EmpRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -101,4 +110,87 @@ public class ApprovalDocumentService {
 		
 		return savedDocument.getApprovalId();
 	}
+	
+	// 결재문서 조회 로직
+	@Transactional(readOnly = true)
+	public Page<ApprovalListDTO> getApprovalList(ApprovalSearchDTO searchDTO, int page, int perPage) {
+	    // 정렬
+	    Sort sort = createSort(searchDTO.getSortColumn(), searchDTO.getSortAscending());
+	    Pageable pageable = PageRequest.of(page - 1, perPage, sort);
+		
+	    // 동적 쿼리 실행
+	    Specification<ApprovalDocument> spec = ApprovalSpecification.searchWith(searchDTO);
+	    Page<ApprovalDocument> documentPage = documentRepository.findAll(spec, pageable);
+	    
+	    log.info("결재 목록 조회 완료: tab={}, totalCount={}", searchDTO.getTab(), documentPage.getTotalElements());
+	    
+	    // Entity → DTO 변환
+	    return documentPage.map(ApprovalListDTO::fromEntity);
+	}
+	
+	// 결재 문서 상세 조회
+	@Transactional(readOnly = true)
+	public ApprovalResponseDTO getApprovalDetail(Long approvalId) {
+	    
+	    // 문서 조회 (모든 관계 fetch join)
+	    ApprovalDocument document = documentRepository.findByIdWithAll(approvalId)
+	        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 문서입니다: " + approvalId));
+	    
+	    log.info("문서 조회 완료: approvalId={}, formType={}", approvalId, document.getFormType());
+	    
+	    // Entity → DTO 변환
+	    ApprovalResponseDTO responseDTO = ApprovalResponseDTO.fromEntity(
+	        document, 
+	        empRepository,
+	        fileAttachRepository
+	    );
+	    
+	    log.info("첨부파일 개수: {}", 
+	            responseDTO.getAttachments() != null ? responseDTO.getAttachments().size() : 0);
+	    
+	    return responseDTO;
+	}
+	
+	// -----------------------------------------------------------------------------
+	// 유틸 모음
+	// sort생성
+    private Sort createSort(String sortColumn, Boolean sortAscending) {
+        // 기본 정렬: 생성일시 내림차순
+        if (sortColumn == null || sortColumn.isEmpty()) {
+            return Sort.by(Sort.Direction.DESC, "createdAt");
+        }
+        
+        // 정렬 방향 결정
+        Sort.Direction direction = (sortAscending != null && sortAscending) 
+            ? Sort.Direction.ASC 
+            : Sort.Direction.DESC;
+        
+        // 컬럼명 매핑 (Grid 컬럼명 → Entity 필드명)
+        String entityField = mapColumnToEntityField(sortColumn);
+        
+        return Sort.by(direction, entityField);
+    }
+    
+    // 컬럼명과 엔티티 필드 매칭
+    private String mapColumnToEntityField(String columnName) {
+        switch (columnName) {
+            case "approvalId":
+                return "approvalId";
+            case "formType":
+                return "formType";
+            case "approvalTitle":
+                return "approvalTitle";
+            case "empName":
+                return "employee.empName";  // 조인 필드
+            case "createdDate":
+                return "createdDate";
+            case "finishDate":
+                return "finishDate";
+            case "status":
+                return "status";
+            default:
+                return "createdAt";  // 기본값
+        }
+    }
+
 }
