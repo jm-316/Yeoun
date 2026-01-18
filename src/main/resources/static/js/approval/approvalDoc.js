@@ -10,8 +10,8 @@ let currentTab = 'all';
 const approvalGridEl = document.getElementById('approvalGrid');
 
 // 결재문서 모달
-const approvalModalEl = document.getElementById('approval-modal');
-const approvalModal   = new bootstrap.Modal(approvalModalEl);
+//const approvalModalEl = document.getElementById('approval-modal');
+//const approvalModal   = new bootstrap.Modal(approvalModalEl);
 
 // ============================================
 // 초기 실행

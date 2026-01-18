@@ -5,7 +5,7 @@
 
 let selectedFiles = [];  // 선택된 파일 배열
 const MAX_FILE_SIZE = 10 * 1024 * 1024;  // 10MB
-const MAX_FILE_COUNT = 5;
+const MAX_FILE_COUNT_APPROVAL = 5;
 
 // 현재 결재 문서
 let CURRENT_APPROVAL_ID = null;
@@ -26,8 +26,12 @@ const MAX_APPROVERS = 3;
 // 결재문서 모달
 // ============================================
 
+const approvalModalEl = document.getElementById('approval-modal');
+const approvalModal   = new bootstrap.Modal(approvalModalEl);
+
 // 결재모달 열기 함수
 async function openApprovalModal(mode, options = {}) {
+	console.log("!@#!222@#");
     // 1) 항상 먼저 초기화
     resetApprovalForm();
 
@@ -989,10 +993,15 @@ async function submitApprovalDocument() {
 		const result = await res.json();
 		
 		alert(result.message || '결재 문서가 등록되었습니다.');
+
 		
 		// 모달 닫고 새로고침
 		setTimeout(() => {
 		    approvalModal.hide();
+			// 그리드 새로고침
+			if (approvalGrid) {
+			    approvalGrid.readData(1, { tab: currentTab }, true);
+			}
 //		    location.reload();  
 		}, 300);
 	} catch (error) {
@@ -1191,8 +1200,8 @@ document.getElementById('file-input').addEventListener('change', function (e) {
     const files = Array.from(e.target.files);
     
     // 파일 개수 체크
-    if (selectedFiles.length + files.length > MAX_FILE_COUNT) {
-        alert(`최대 ${MAX_FILE_COUNT}개 파일만 첨부 가능합니다.`);
+    if (selectedFiles.length + files.length > MAX_FILE_COUNT_APPROVAL) {
+        alert(`최대 ${MAX_FILE_COUNT_APPROVAL}개 파일만 첨부 가능합니다.`);
         return;
     }
     
@@ -1292,3 +1301,6 @@ document.getElementById('final-approve-btn').addEventListener('click', () => {
 document.getElementById('reject-btn').addEventListener('click', () => {
 	rejectDocument(); // 반려 처리
 });
+
+window.openApprovalModal = openApprovalModal;
+console.log('✅ openApprovalModal loaded');

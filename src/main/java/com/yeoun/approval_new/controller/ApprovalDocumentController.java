@@ -53,6 +53,7 @@ public class ApprovalDocumentController {
 		return "approval/approval_doc";
  	}
   	
+  	//결재 등록
   	@PostMapping("/create")
   	@ResponseBody
   	public ResponseEntity<Map<String, Object>> createApprovalDocument(
