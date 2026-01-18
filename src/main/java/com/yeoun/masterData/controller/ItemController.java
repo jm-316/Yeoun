@@ -1,17 +1,23 @@
 package com.yeoun.masterData.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.yeoun.auth.dto.LoginDTO;
 import com.yeoun.masterData.dto.MaterialDTO;
+import com.yeoun.masterData.dto.ProductDTO;
 import com.yeoun.masterData.service.ItemService;
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -51,5 +57,53 @@ public class ItemController {
 		List<MaterialDTO> materialList = itemService.getMaterialList();
 		
 		return ResponseEntity.ok(materialList);
+	}
+	
+	// 원재료 등록
+	@PostMapping("/data/material/add")
+	public ResponseEntity<String> modifyMaterial(@RequestBody Map<String, List<MaterialDTO>> data, @AuthenticationPrincipal LoginDTO loginDTO) {
+		List<MaterialDTO> createdRows = data.get("created");
+		List<MaterialDTO> updatedRows = data.get("updated");
+		
+		// 신규 등록
+		if (createdRows != null && !createdRows.isEmpty()) {
+			itemService.createMaterial(createdRows, loginDTO.getEmpId());
+		}
+		
+		// 수정
+		if (updatedRows != null && !updatedRows.isEmpty()) {
+			itemService.updateMaterial(updatedRows);
+		}
+		
+		 return ResponseEntity.ok("저장 완료");
+	}
+	
+	// ==========================================
+	// 완제품 조회
+	@GetMapping("/data/productList")
+	public ResponseEntity<List<ProductDTO>> productList() {
+		
+		List<ProductDTO> productList = itemService.getProductList();
+		
+		return ResponseEntity.ok(productList);
+	}
+	
+	// 완제품 등록
+	@PostMapping("/data/product/add")
+	public ResponseEntity<String> modifyProduct(@RequestBody Map<String, List<ProductDTO>> data, @AuthenticationPrincipal LoginDTO loginDTO) {
+		List<ProductDTO> createdRows = data.get("created");
+		List<ProductDTO> updatedRows = data.get("updated");
+		
+		// 신규 등록
+		if (createdRows != null && !createdRows.isEmpty()) {
+			itemService.createProduct(createdRows, loginDTO.getEmpId());
+		}
+		
+		// 수정
+		if (updatedRows != null && !updatedRows.isEmpty()) {
+			itemService.updateProduct(updatedRows);
+		}
+		
+		return ResponseEntity.ok("저장 완료");
 	}
 }

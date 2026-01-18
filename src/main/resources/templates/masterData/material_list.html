@@ -12,10 +12,15 @@
 			<!-- 조회 버튼 -->
 			<button class="btn btn-outline-primary" id="searchbtn">검색</button>
 		</div>
-		<div class="col-12 col-lg d-flex justify-content-end">
+		<div class="col-12 col-lg d-flex justify-content-end gap-2">
 			<button type="button" class="btn btn-primary"
-				data-bs-toggle="modal" data-bs-target="#modalCenter"
-				id="matRegistBtn" sec:authorize="hasAnyRole('SYS_ADMIN', 'LOG_ADMIN')">출고등록
+				id="matRegistBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">추가
+			</button>
+			<button type="button" class="btn btn-success"
+				id="matSaveBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">저장
+			</button>
+			<button type="button" class="btn btn-danger"
+				id="matDeleteBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">삭제
 			</button>
 		</div>
 	</div>
@@ -23,4 +28,10 @@
 	<div class="card-body p-0">
 		<div id="materialGrid"></div>
 	</div>
+	<th:block layout:fragment="myScript">
+		<script type="text/javascript"
+			src="https://uicdn.toast.com/tui.pagination/v3.4.0/tui-pagination.js"></script>
+		<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+		<script th:src="@{/js/masterData/materialGrid.js}"></script>
+	</th:block>
 </th:block>

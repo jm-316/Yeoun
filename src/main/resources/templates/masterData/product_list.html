@@ -9,10 +9,15 @@
 			<!-- 조회 버튼 -->
 			<button class="btn btn-outline-primary" id="search">검색</button>
 		</div>
-		<div class="col-12 col-lg d-flex justify-content-end">
-			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCenter" 
-				id="prdRegistBtn" sec:authorize="hasAnyRole('SYS_ADMIN', 'LOG_ADMIN')">
-				출고등록
+		<div class="col-12 col-lg d-flex justify-content-end gap-2">
+			<button type="button" class="btn btn-primary"
+				id="prdRegistBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">추가
+			</button>
+			<button type="button" class="btn btn-success"
+				id="prdSaveBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">저장
+			</button>
+			<button type="button" class="btn btn-danger"
+				id="prdDeleteBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">삭제
 			</button>
 		</div>
 	</div>
@@ -20,5 +25,10 @@
 	<div class="card-body p-0">
 		<div id="productGrid"></div>
 	</div>
-	<br>
+	<th:block layout:fragment="myScript">
+		<script type="text/javascript"
+			src="https://uicdn.toast.com/tui.pagination/v3.4.0/tui-pagination.js"></script>
+		<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+		<script th:src="@{/js/masterData/productGrid.js}"></script>
+	</th:block>
 </th:block>

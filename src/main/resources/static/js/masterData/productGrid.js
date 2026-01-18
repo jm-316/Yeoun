@@ -1,13 +1,13 @@
-let matTypeList = []; // 원재료 타입 리스트 (드롭다운에 사용)
-let unitList = []; // 원재료 단위 리스트 (드롭다운에 사용)
-let matTypeMap = {};
+let prdTypeList = []; // 완제품 타입 리스트 (드롭다운에 사용)
+let prdUnitList = []; // 완제품 단위 리스트 (드롭다운에 사용)
+let prdTypeMap = {};
 
 // effectiveDate 허용범위 (개월 단위)
 const EFFECTIVE_DATE_MIN = 0;
 const EFFECTIVE_DATE_MAX = 120; // 예: 최대 120개월(10년)
 
-const materialGrid = new tui.Grid({
-	el: document.getElementById("materialGrid"),
+const productGrid = new tui.Grid({
+	el: document.getElementById("productGrid"),
 	bodyHeight: 500,
 	rowHeaders: ['rowNum'],
 	pageOptions: {
@@ -21,17 +21,17 @@ const materialGrid = new tui.Grid({
 	columns: [
 		{
 			header: "원재료코드",
-			name: "matCode",
+			name: "prdCode",
 			editor: "text"
 		},
 		{
 			header: "원재료명",
-			name: "matName",
+			name: "prdName",
 			editor: "text"
 		},
 		{
 			header: "타입",
-			name: "matType",
+			name: "prdType",
 			editor: {
 				type: 'select', // 드롭다운 사용
 				options: {
@@ -39,13 +39,13 @@ const materialGrid = new tui.Grid({
 				}
 			},
 			formatter: ({value}) => {
-				const type = matTypeList.find(item => item.value === value);
+				const type = prdTypeList.find(item => item.value === value);
 				return type ? type.text : value;
 			}
 		},
 		{
 			header: "단위",
-			name: "matUnit",
+			name: "prdUnit",
 			editor: {
 				type: 'select', // 드롭다운 사용
 				options: {
@@ -99,27 +99,27 @@ const materialGrid = new tui.Grid({
 });
 
 // 변경하기 전 값
-const beforeEditValues = {};
+const beforeEditPrdValues = {};
 
-materialGrid.on("editingStart", ev => {
+productGrid.on("editingStart", ev => {
     const { rowKey, columnName } = ev;
 
-    beforeEditValues[rowKey] ??= {};
-    beforeEditValues[rowKey][columnName] =
-        materialGrid.getValue(rowKey, columnName);
+    beforeEditPrdValues[rowKey] ??= {};
+    beforeEditPrdValues[rowKey][columnName] =
+        productGrid.getValue(rowKey, columnName);
 });
 
-const validationRules = {
-	matCode: {
+const validationPrdRules = {
+	prdCode: {
 		required: true,
 		pattern: /^[A-Za-z0-9\-_]{3,20}$/,
-		errorMessage: "원재료 코드는 영문 대문자와 숫자 3~10자만 가능합니다.",
+		errorMessage: "완제품 코드는 영문 대문자와 숫자 3~10자만 가능합니다.",
 		checkDuplicate: true
 	},
-	matName: {
+	prdName: {
 		required: true,
 		pattern: /^[가-힣a-zA-Z0-9\s~!@#$%^&*\(\)_+\-=\[\];:'",.<>/?]+$/,
-		errorMessage: "원재료명은 한글, 영문, 숫자 2~50자만 가능합니다.",
+		errorMessage: "완제품명은 한글, 영문, 숫자 2~50자만 가능합니다.",
 		checkDuplicate: true
 	},
 	effectiveDate: {
@@ -132,8 +132,8 @@ const validationRules = {
 }
 
 // 통합 유효성 검사
-function validateField(rowKey, columnName, value) {
-	const rule = validationRules[columnName];
+function validatePrdField(rowKey, columnName, value) {
+	const rule = validationPrdRules[columnName];
 	
 	// 검증 규칙이 없으면 통과
 	if (!rule) {
@@ -174,7 +174,7 @@ function validateField(rowKey, columnName, value) {
 	
 	// 중복 체크
 	if (rule.checkDuplicate) {
-		const isDuplicate = materialGrid.getData().some((row) => {
+		const isDuplicate = productGrid.getData().some((row) => {
 			return row[columnName] === stringValue && row.rowKey !== rowKey;
 		});
 	
@@ -190,26 +190,26 @@ function validateField(rowKey, columnName, value) {
 
 // 이전 값으로 복원
 function restoreValue(rowKey, columnName) {
-	const beforeValue = beforeEditValues?.[rowKey]?.[columnName] || "";
+	const beforeValue = beforeEditPrdValues?.[rowKey]?.[columnName] || "";
 	setTimeout(() => {
-		materialGrid.setValue(rowKey, columnName, beforeValue);
+		productGrid.setValue(rowKey, columnName, beforeValue);
 	}, 0);
 }
 
 
-materialGrid.on("editingFinish", ev => {
+productGrid.on("editingFinish", ev => {
     const { rowKey, columnName, value } = ev;
 	
 	// 통합 검증
-	if (!validateField(rowKey, columnName, value)) return;
+	if (!validatePrdField(rowKey, columnName, value)) return;
 	
 	// 기타 컬럼 (select 관련 로직)
   	if (value === null || value === undefined || value === '') {
-      const beforeValue = beforeEditValues?.[rowKey]?.[columnName];
+      const beforeValue = beforeEditPrdValues?.[rowKey]?.[columnName];
 
       if (beforeValue !== undefined) {
           setTimeout(() => {
-              materialGrid.setValue(rowKey, columnName, beforeValue);
+              productGrid.setValue(rowKey, columnName, beforeValue);
           }, 0);
       }
   	}
@@ -217,7 +217,7 @@ materialGrid.on("editingFinish", ev => {
 
 // 컬럼 헤더명 가져오기
 function getColumnHeader(columnName) {
-	const column = materialGrid.getColumns().find(col => col.name === columnName);
+	const column = productGrid.getColumns().find(col => col.name === columnName);
 	return column ? column.header : columnName;
 }
 
@@ -231,33 +231,33 @@ function getColumnHeader(columnName) {
 //});
 
 // 클릭 동작
-materialGrid.on('click', ev => {
+productGrid.on('click', ev => {
 	
     if (!ev.rowKey) return;
 
     if (ev.columnName === "useYn") {
-        materialGrid.startEditing(ev.rowKey, ev.columnName);
+        productGrid.startEditing(ev.rowKey, ev.columnName);
     }
 	
 	if (ev.columnName === "matUnit") {
-	    materialGrid.startEditing(ev.rowKey, ev.columnName);
+	    productGrid.startEditing(ev.rowKey, ev.columnName);
 	}
 	
 	if (ev.columnName === "matType") {
-	    materialGrid.startEditing(ev.rowKey, ev.columnName);
+	    productGrid.startEditing(ev.rowKey, ev.columnName);
 	}
 	
 	if (ev.columnName === "effectiveDate") {
-	    materialGrid.startEditing(ev.rowKey, ev.columnName);
+	    productGrid.startEditing(ev.rowKey, ev.columnName);
 	}
 });
 
 // 원재료 정보 불러오기
-async function loadMaterial() {
-	const MATERIAL_LIST = "/masterData1/data/materialList";
+async function loadProduct() {
+	const PRODUCT_LIST = "/masterData1/data/productList";
 			
 	try {
-		const res = await fetch(MATERIAL_LIST, {method: "GET"});
+		const res = await fetch(PRODUCT_LIST, {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");
@@ -267,10 +267,10 @@ async function loadMaterial() {
 		
 		// 데이터가 없을 경우 빈배열 반환
 		if (!data || data.length === 0) {
-			materialGrid.resetData([]);
+			productGrid.resetData([]);
 		}
 
-		materialGrid.resetData(data);
+		productGrid.resetData(data);
 		
 	} catch (error) {
 		console.error(error);
@@ -278,28 +278,26 @@ async function loadMaterial() {
 }
 
 // 공통코드에서 원재료 타입 가져오기
-async function loadMatTypeCode() {
-	const MATERIAL_TYPE_URL = "/commomCode/matType";
+async function loadPrdTypeCode() {
+	const PRODUCT_TYPE_URL = "/commomCode/prdType";
 	
 	try {
-		const res = await fetch(MATERIAL_TYPE_URL);
+		const res = await fetch(PRODUCT_TYPE_URL);
 		let data = await res.json();
 		
-		data = data.filter(item => item.codeId !== "WIP" && item.codeId !== "FIN")
-		
 		// select에서 보여질 내용
-		matTypeList = data.map(item => ({
+		prdTypeList = data.map(item => ({
 			value: item.codeId,
 			text: item.codeName
 		}));
 		
 		// 영어를 한글로 변환할 때 사용
-		matTypeMap = data.reduce((acc, cur) => {
+		prdTypeMap = data.reduce((acc, cur) => {
 			acc[cur.codeId] = cur.codeName;
 			return acc;
 		}, {});
 		
-		updateGridColumnOptions();
+		updateProductGridColumnOptions();
 		
 	} catch (e) {
 		console.error(e);
@@ -307,20 +305,20 @@ async function loadMatTypeCode() {
 }
 
 // 공통코드에서 단위 가져오기
-async function loadUnit() {
-	const MATERIAL_UNIT_URL = "/commomCode/unit";
+async function loadPrdUnit() {
+	const PRODUCT_UNIT_URL = "/commomCode/unit";
 	
 	try {
-		const res = await fetch(MATERIAL_UNIT_URL);
+		const res = await fetch(PRODUCT_UNIT_URL);
 		const data = await res.json();
 		
 		// select에서 보여질 내용
-		unitList = data.map(item => ({
+		prdUnitList = data.map(item => ({
 			value: item.codeId,
 			text: item.codeName
 		}));
 		
-		updateGridColumnOptions();
+		updateProductGridColumnOptions();
 		
 	} catch (e) {
 		console.error(e);
@@ -328,28 +326,28 @@ async function loadUnit() {
 }
 
 // 그리드 컬럼 옵션 업데이트 함수
-function updateGridColumnOptions() {
-	const columns = materialGrid.getColumns();
-	const matTypeColumn = columns.find(col => col.name === 'matType');
-	const matUnitColumn = columns.find(col => col.name === 'matUnit');
+function updateProductGridColumnOptions() {
+	const columns = productGrid.getColumns();
+	const prdTypeColumn = columns.find(col => col.name === 'prdType');
+	const prdUnitColumn = columns.find(col => col.name === 'prdUnit');
 	
-	if (matTypeColumn && matTypeColumn.editor) {
-		matTypeColumn.editor.options.listItems = matTypeList;
+	if (prdTypeColumn && prdTypeColumn.editor) {
+		prdTypeColumn.editor.options.listItems = prdTypeList;
 	}
 	
-	if (matUnitColumn && matUnitColumn.editor) {
-		matUnitColumn.editor.options.listItems = unitList;
+	if (prdUnitColumn && prdUnitColumn.editor) {
+		prdUnitColumn.editor.options.listItems = prdUnitList;
 	}
 	
-	materialGrid.setColumns(columns);
+	productGrid.setColumns(columns);
 }
 
 
 // 페이지 로딩 시 실행하는 함수들
 window.addEventListener("DOMContentLoaded", async (e) => {
-	await loadMatTypeCode(); // 공통코드에서 원재료 타입 조회
-	await loadUnit(); // 공통코드에서 단위 조회
-	await loadMaterial(); // 원재료 목록 조회
+	await loadPrdTypeCode(); // 공통코드에서 원재료 타입 조회
+	await loadPrdUnit(); // 공통코드에서 단위 조회
+	await loadProduct(); // 원재료 목록 조회
 	
 
 	//스피너  off
@@ -357,23 +355,23 @@ window.addEventListener("DOMContentLoaded", async (e) => {
 });
 
 // 추가 버튼 이벤트
-document.getElementById("matRegistBtn").addEventListener("click", () => {
-	materialGrid.prependRow();
+document.getElementById("prdRegistBtn").addEventListener("click", () => {
+	productGrid.prependRow();
 });
 
 
 // 저장 버튼 이벤트
-document.getElementById("matSaveBtn").addEventListener("click", async () => {
+document.getElementById("prdSaveBtn").addEventListener("click", async () => {
 	
 	// 편집 완료
-	materialGrid.finishEditing();
+	productGrid.finishEditing();
 	
-	const modifiedData = materialGrid.getModifiedRows() || {};
+	const modifiedData = productGrid.getModifiedRows() || {};
 	const updateRows = modifiedData.updatedRows || [];
 	let createdRows = modifiedData.createdRows || [];
 	
 	const isEmptyRow = (row) => {
-	    return !row.matCode && !row.matName && !row.matType && !row.matUnit;
+	    return !row.prdCode && !row.prdName && !row.prdType && !row.prdUnit;
 	};
 	
 	createdRows = createdRows.filter(row => !isEmptyRow(row));
@@ -391,20 +389,21 @@ document.getElementById("matSaveBtn").addEventListener("click", async () => {
 	
 	showSpinner();
 	
-	await saveMaterial(saveData);
-	alert("저장되었습니다.");
+	await saveProduct(saveData);
 	
-	await loadMaterial(); // 데이터 재조회
+	await loadProduct(); // 데이터 재조회
 	
 	hideSpinner();
 });
 
 // 원재료 등록
-async function saveMaterial(data) {
-	const MATERIAL_ADD_URL = "/masterData1/data/material/add";
+async function saveProduct(data) {
+	const PRODUCT_ADD_URL = "/masterData1/data/product/add";
+	
+	console.log(data)
 	
 	try {
-		const res = await fetch(apiUrl(MATERIAL_ADD_URL), {
+		const res = await fetch(apiUrl(PRODUCT_ADD_URL), {
 			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,
@@ -417,12 +416,13 @@ async function saveMaterial(data) {
 			   throw new Error(`등록 실패: ${res.status}`);
 		}
 		
+		alert("저장이 완료되었습니다.");
+		
 	} catch (e) {
 		console.error(e);
 		alert("저장에 실패했습니다.")
 	}
 }
-
 
 function showSpinner() {
 	document.getElementById('loading-overlay').style.display = 'flex';

@@ -7,13 +7,16 @@ import org.modelmapper.ModelMapper;
 import com.yeoun.masterData.entity.Material;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class MaterialDTO {
 	private Long matId;
 	
@@ -38,6 +41,19 @@ public class MaterialDTO {
 	
 	private LocalDateTime createdDate;
 	
+	@Builder
+	public MaterialDTO(Long matId, String matCode, String matType,
+			String matName, String matUnit,Integer effectiveDate, char useYn, String empId) {
+		this.matId = matId;
+		this.matCode = matCode;
+		this.matType = matType;
+		this.matName = matName;
+		this.matUnit = matUnit;
+		this.effectiveDate = effectiveDate;
+		this.useYn = useYn;
+		this.empId = empId;
+	}
+	
 	// -----------------------------------
 	// DTO <-> Entity 변환
 	private static ModelMapper modelMapper = new ModelMapper();
@@ -55,4 +71,5 @@ public class MaterialDTO {
 		
 		return materialDTO;
 	}
+
 }

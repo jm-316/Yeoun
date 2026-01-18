@@ -51,7 +51,7 @@ public class CommonCodeService {
 	}
 
 	// 원재료 유형
-	public List<CommonCodeIdAndNameDTO> getMatType(String parentCodeId) {
+	public List<CommonCodeIdAndNameDTO> getType(String parentCodeId) {
 	
 		return commonCodeRepository.findByParentCodeIdAndUseYnOrderByCodeSeq(parentCodeId, "Y")
 				.stream()
