@@ -55,6 +55,8 @@ public class ApprovalDocumentDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
+    private String rejectReason;
+    
     private static ModelMapper modelMapper = new ModelMapper();
     
     // Entity → DTO

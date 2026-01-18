@@ -13,6 +13,7 @@ import com.yeoun.approval_new.entity.ApprovalLine;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Subquery;
 
 public class ApprovalSpecification {
     
@@ -41,24 +42,40 @@ public class ApprovalSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("employee").get("empId"), userId));
                 
             } else if ("pending".equals(tab)) {
-                // 결재 대기: 내가 기안한 건 제외, 결재선에 내가 있고 PENDING
+                // 결재 대기: 결재선에 내가 있고 내가 결재할 차례, 사태 : PENDING
                 Join<ApprovalDocument, ApprovalLine> lineJoin = root.join("approvalLines");
                 
-                Predicate notMyDraft = criteriaBuilder.notEqual(root.get("employee").get("empId"), userId);
+                Predicate docPending = criteriaBuilder.equal(root.get("status"), "PENDING");
+                
+//                Predicate notMyDraft = criteriaBuilder.notEqual(root.get("employee").get("empId"), userId);
                 Predicate inApprovalLine = criteriaBuilder.equal(lineJoin.get("approver").get("empId"), userId);
                 Predicate isPending = criteriaBuilder.equal(lineJoin.get("status"), "PENDING");
                 
-                predicates.add(criteriaBuilder.and(notMyDraft, inApprovalLine, isPending));
+                // 서브쿼리: 이전 stepOrder에 PENDING이 없는지 확인
+                Subquery<ApprovalLine> subquery = query.subquery(ApprovalLine.class);
+                Join<ApprovalDocument, ApprovalLine> subLineJoin = subquery.correlate(root).join("approvalLines");
+                Predicate priorPending = criteriaBuilder.and(
+                    criteriaBuilder.lessThan(subLineJoin.get("stepOrder"), lineJoin.get("stepOrder")),
+                    criteriaBuilder.equal(subLineJoin.get("status"), "PENDING")
+                );
+                subquery.select(subLineJoin).where(priorPending);
+                
+                Predicate noPriorPending = criteriaBuilder.not(criteriaBuilder.exists(subquery));
+//                predicates.add(criteriaBuilder.and(notMyDraft, inApprovalLine, isPending));
+//                predicates.add(criteriaBuilder.and(inApprovalLine, isPending));
+                predicates.add(criteriaBuilder.and(inApprovalLine, isPending, docPending, noPriorPending));
                 
             } else if ("completed".equals(tab)) {
-                // 결재 완료: 내가 기안한 건 제외, 결재선에 내가 있고 승인/반려됨
+                // 결재 완료: 결재선에 내가 있고 승인/반려됨
                 Join<ApprovalDocument, ApprovalLine> lineJoin = root.join("approvalLines");
                 
-                Predicate notMyDraft = criteriaBuilder.notEqual(root.get("employee").get("empId"), userId);
+//                Predicate notMyDraft = criteriaBuilder.notEqual(root.get("employee").get("empId"), userId);
                 Predicate inApprovalLine = criteriaBuilder.equal(lineJoin.get("approver").get("empId"), userId);
-                Predicate isCompleted = lineJoin.get("status").in("APPROVED", "FINAL_APPROVED", "REJECTED");
+                Predicate isCompleted = lineJoin.get("status").in("APPROVED", "FINAL_APPROVED", "REJECTED", "SKIPPED");
                 
-                predicates.add(criteriaBuilder.and(notMyDraft, inApprovalLine, isCompleted));
+                Predicate docNotPending = criteriaBuilder.notEqual(root.get("status"), "PENDING");
+                
+                predicates.add(criteriaBuilder.and(inApprovalLine, docNotPending, isCompleted));
             }
             
             // ========== 날짜 범위 검색 ==========

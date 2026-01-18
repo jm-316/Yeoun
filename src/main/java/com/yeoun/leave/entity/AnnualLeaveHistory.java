@@ -61,7 +61,7 @@ public class AnnualLeaveHistory {
 	private LocalDate endDate; // 사용 종료일
 	
 	@Column(nullable = false)
-	private int usedDays; //  사용 일수
+	private Double usedDays; //  사용 일수
 	
 	@Column(nullable = false)
 	private String reason; // 연차 사용 이유
@@ -70,7 +70,7 @@ public class AnnualLeaveHistory {
 	
 	@Builder
 	public AnnualLeaveHistory(Emp emp, AnnualLeave annualLeave, String leaveType, LocalDate startDate,
-			LocalDate endDate, int usedDays, String reason, Long paymentId) {
+			LocalDate endDate, Double usedDays, String reason, Long paymentId) {
 		this.emp = emp;
 		this.annualLeave = annualLeave;
 		this.leaveType = leaveType;

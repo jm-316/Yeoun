@@ -61,6 +61,8 @@ public class ApprovalDocument implements FileUploadHelpper{
     @Column(name = "finish_date", nullable = false)
     private LocalDate finishDate;
     
+    @Column(name = "reject_reason", length = 500)
+    private String rejectReason;
 //    @Column(name = "emp_id", length = 50, nullable = false)
 //    private String empId;
     // 수정: empId → Emp 관계 (FK 컬럼명은 기존 emp_id 유지)

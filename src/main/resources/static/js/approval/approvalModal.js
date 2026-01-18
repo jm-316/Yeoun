@@ -7,6 +7,9 @@ let selectedFiles = [];  // 선택된 파일 배열
 const MAX_FILE_SIZE = 10 * 1024 * 1024;  // 10MB
 const MAX_FILE_COUNT = 5;
 
+// 현재 결재 문서
+let CURRENT_APPROVAL_ID = null;
+
 // 결재자 목록 배열
 let approverList = [];
 
@@ -112,7 +115,13 @@ async function openApprovalModal(mode, options = {}) {
 
 // 결재문서 모달 초기화
 function resetApprovalForm() {
+	CURRENT_APPROVAL_ID = null;
+	
     const formEl          = document.querySelector('#approval-modal form');
+	if (formEl) {
+	    formEl.reset();
+	}
+	
     const titleEl         = document.getElementById('approval-title');
     const reasonEl        = document.getElementById('reason-write');
     const reasonCountEl   = document.getElementById('reason-char-count');
@@ -167,21 +176,55 @@ function resetApprovalForm() {
 	const formTypeSelect = document.getElementById('form-type-select');
 	if (formTypeSelect) {
 	    formTypeSelect.value = 'free';
+		formTypeSelect.disabled = false; 
 	    toggleFormFields('free');
 	}
+	
+	// 휴가 필드
+	const leaveTypeEl      = document.getElementById('leave-type');
+	const leaveStartDateEl = document.getElementById('leave-start-date');
+	const leaveEndDateEl   = document.getElementById('leave-end-date');
+	const leaveDaysEl      = document.getElementById('leave-days');
 
+	if (leaveTypeEl)      leaveTypeEl.disabled = false;
+	if (leaveStartDateEl) leaveStartDateEl.readOnly = false;
+	if (leaveEndDateEl) {
+	    leaveEndDateEl.readOnly  = false;
+	    leaveEndDateEl.disabled  = false;   // 반차 로직에서 disabled 걸린 것까지 초기화
+	    leaveEndDateEl.style.backgroundColor = ''; 
+	}
+	if (leaveDaysEl) {
+	    leaveDaysEl.readOnly = true;        // 원래 자동계산이니까 readOnly 유지
+	    leaveDaysEl.style.backgroundColor = '#e9ecef';
+	}
 	// 휴가 필드 초기화
 	document.getElementById('leave-type').value = '';
 	document.getElementById('leave-start-date').value = '';
 	document.getElementById('leave-end-date').value = '';
 	document.getElementById('leave-days').value = '';
 
+	// 지출 필드
+	const expenseTypeEl   = document.getElementById('expense-type');
+	const expenseDateEl   = document.getElementById('expense-date');
+	const expenseVendorEl = document.getElementById('expense-vendor');
+	const expenseAmountEl = document.getElementById('expense-amount');
+
+	if (expenseTypeEl)   expenseTypeEl.disabled = false;
+	if (expenseDateEl)   expenseDateEl.readOnly = false;
+	if (expenseVendorEl) expenseVendorEl.readOnly = false;
+	if (expenseAmountEl) expenseAmountEl.readOnly = false;
 	// 지출 필드 초기화
 	document.getElementById('expense-type').value = '';
 	document.getElementById('expense-date').value = '';
 	document.getElementById('expense-vendor').value = '';
 	document.getElementById('expense-amount').value = '';
 	
+	// 버튼들
+	const fileUploadBtn  = document.getElementById('file-upload-btn');
+	const approverOrgBtn = document.getElementById('open-approver-org-btn');
+
+	if (fileUploadBtn)  fileUploadBtn.style.display = '';
+	if (approverOrgBtn) approverOrgBtn.style.display = '';
 
     // 4) 모드별 버튼 상태 초기값 (기본: 기안 모드 기준)
     const saveBtn              = document.getElementById('saveBtn');
@@ -195,6 +238,9 @@ function resetApprovalForm() {
 	// 결재선 초기화
 	approverList = [];
 	renderApproverList(false);
+	
+	// 반려이유 숨김
+	hideRejectReason();
 	
 	const approverSelect = document.getElementById('approver-select');
 	if (approverSelect) {
@@ -243,9 +289,10 @@ function calculateLeaveDays() {
     const endDateInput = document.getElementById('leave-end-date');
     const endDate = endDateInput.value;
     const daysInput = document.getElementById('leave-days');
-    
+    const leaveType = document.getElementById('leave-type').value;
+	
 	// 반차면 일수 계산하지 않음
-	if (leaveType === '반차') {
+	if (leaveType !== '연차') {
 	    return;
 	}
 	
@@ -273,6 +320,9 @@ function calculateLeaveDays() {
 
 async function loadApprovalDetail(approvalId) {
     try {
+		// 현재 여는 문서ID 저장
+		CURRENT_APPROVAL_ID = approvalId;
+		
         const response = await fetch(apiUrl(`new/approval/detail/${approvalId}`), {
             method: 'GET',
             headers: {
@@ -332,8 +382,7 @@ function checkApprovalPermission(approvers, currentUserId) {
 
 // 모달에 데이터 채우기
 async function fillModalData(data) {
-	console.log("!@#!@#!@#!@#");
-	console.log("data :", data);
+	console.log(data,"213213213");
     // 기본 정보
     document.getElementById('approval-title').value = data.document.approvalTitle;
     document.getElementById('reason-write').value = data.document.reason || '';
@@ -369,11 +418,19 @@ async function fillModalData(data) {
             empId: a.approverId,
             empName: a.approverName,
             posName: a.posName,
-			status: a.status
+			status: a.status,
+			rejectReason: a.rejectReason
         }));
         await renderApproverList(true);
     }
     
+	// 반려 사유 있을때 표시
+	if (data.document.status === 'REJECTED' && data.document.rejectReason) {
+	    showRejectReason(data.document.rejectReason);
+	} else {
+		hideRejectReason();
+	}
+	
     // 글자수 표시
     const reasonLength = (data.document.reason || '').length;
     document.getElementById('reason-char-count').textContent = `${reasonLength}/3000자`;
@@ -385,6 +442,26 @@ async function fillModalData(data) {
 	    // 첨부파일 없으면 빈 상태
 	    document.getElementById('file-list').innerHTML = '';
 	}	
+}
+
+// 반려사유 보이기
+function showRejectReason(reason) {
+    const container = document.getElementById('reject-reason-container');
+    const textEl    = document.getElementById('reject-reason-text');
+    if (!container || !textEl) return;
+
+    textEl.textContent = reason;
+    container.style.display = '';
+}
+
+// 반려사유 가리기
+function hideRejectReason() {
+    const container = document.getElementById('reject-reason-container');
+    const textEl    = document.getElementById('reject-reason-text');
+    if (!container || !textEl) return;
+
+    textEl.textContent = '';
+    container.style.display = 'none';
 }
 
 // 첨부파일 읽기 전용 표시 (다운로드 가능)
@@ -893,7 +970,7 @@ function collectFormData() {
 }
 
 
-// 서버로 전송함수
+// 결재문서 등록함수
 async function submitApprovalDocument() {
     const formData = collectFormData();
 	try {
@@ -922,9 +999,104 @@ async function submitApprovalDocument() {
         console.error('등록 에러:', error);
         alert(error.message || '요청 처리 중 오류가 발생했습니다.');
     }
-	
 }
 
+// 전결, 결재 승인 처리 함수
+async function approveDocument(isFinalApproval) {
+    const confirmMessage = isFinalApproval 
+        ? '전결 승인하시겠습니까?\n전결 승인 시 이후 결재 단계가 생략됩니다.' 
+        : '승인하시겠습니까?';
+    
+    if (!confirm(confirmMessage)) return;
+    
+    if (!CURRENT_APPROVAL_ID) {  // ← 전역 변수 사용
+        alert('결재 정보를 찾을 수 없습니다.');
+        return;
+    }
+    
+    try {
+        const response = await fetch(apiUrl('new/approval/approve'), {
+            method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                approvalId: CURRENT_APPROVAL_ID,  // ← 전역 변수
+                isFinalApproval: isFinalApproval
+            })
+        });
+	    
+	    if (!response.ok) throw new Error('승인 처리 실패');
+	    
+	    const result = await response.json();
+	    
+	    if (result.result) {
+	        alert(isFinalApproval ? '전결 승인되었습니다.' : '승인되었습니다.');
+	        approvalModal.hide();
+	        
+	        // 그리드 새로고침
+	        if (approvalGrid) {
+	            approvalGrid.readData(1, { tab: currentTab }, true);
+	        }
+	    } else {
+	        alert(result.message || '승인 처리에 실패했습니다.');
+	    }
+		    
+	} catch (error) {
+	    console.error('승인 처리 에러:', error);
+	    alert('승인 처리 중 오류가 발생했습니다.');
+	}
+}
+
+// 반려 처리 함수
+async function rejectDocument() {
+    const reason = prompt('반려 사유를 입력해주세요:');
+    
+    if (!reason || reason.trim() === '') {
+        alert('반려 사유를 입력해주세요.');
+        return;
+    }
+    
+    if (!CURRENT_APPROVAL_ID) {  // ← 전역 변수 사용
+        alert('결재 정보를 찾을 수 없습니다.');
+        return;
+    }
+    
+    try {
+        const response = await fetch(apiUrl('new/approval/reject'), {
+            method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                approvalId: CURRENT_APPROVAL_ID,  // ← 전역 변수
+                rejectReason: reason
+            })
+        });
+	    
+	    if (!response.ok) throw new Error('반려 처리 실패');
+	    
+	    const result = await response.json();
+	    
+	    if (result.result) {
+	        alert('반려되었습니다.');
+	        approvalModal.hide();
+	        
+	        // 그리드 새로고침
+	        if (approvalGrid) {
+	            approvalGrid.readData(1, { tab: currentTab }, true);
+	        }
+	    } else {
+	        alert(result.message || '반려 처리에 실패했습니다.');
+	    }
+	    
+	} catch (error) {
+	    console.error('반려 처리 에러:', error);
+	    alert('반려 처리 중 오류가 발생했습니다.');
+	}
+}
 
 // ============================================
 // 이벤트 리스너 등록
@@ -981,13 +1153,26 @@ document.getElementById('leave-type').addEventListener('change', function () {
 });
 
 // 휴가 기간 변경 시 일수 자동 계산
+document.getElementById('leave-type').addEventListener('change', function () {
+    const leaveType = document.getElementById('leave-type').value;
+    const startDateEl = document.getElementById('leave-start-date');
+    const endDateEl = document.getElementById('leave-end-date');
+    const daysEl = document.getElementById('leave-days');
+    
+    if (leaveType !== '연차') {
+        endDateEl.value = startDateEl.value;  // 종료일 = 시작일
+        daysEl.value = 0.5;
+    } else {
+        calculateLeaveDays();  // 기존 일수 계산 로직
+    }
+});
 // 시작일 변경 시 반차면 종료일도 자동 설정
 document.getElementById('leave-start-date').addEventListener('change', function () {
     const leaveType = document.getElementById('leave-type').value;
     const endDateEl = document.getElementById('leave-end-date');
     const daysEl = document.getElementById('leave-days');
     
-    if (leaveType === '반차') {
+    if (leaveType !== '연차') {
         endDateEl.value = this.value;  // 종료일 = 시작일
         daysEl.value = 0.5;
     } else {
@@ -1092,3 +1277,18 @@ if (approvalForm) {
         submitApprovalDocument();
     });
 }
+
+// 승인 버튼
+document.getElementById('approve-btn').addEventListener('click', () => {
+	approveDocument(false); // 일반 승인
+});
+
+// 전결 승인 버튼  
+document.getElementById('final-approve-btn').addEventListener('click', () => {
+	approveDocument(true); // 전결 승인
+});
+
+// 반려 버튼
+document.getElementById('reject-btn').addEventListener('click', () => {
+	rejectDocument(); // 반려 처리
+});

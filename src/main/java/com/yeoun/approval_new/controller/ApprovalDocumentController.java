@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -221,4 +222,85 @@ public class ApprovalDocumentController {
             return ResponseEntity.internalServerError().body(errorResponse);
         }
     }
+    
+	// 승인 처리
+    @PostMapping("/approve")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> approveDocument(
+        @RequestBody Map<String, Object> request,
+        @AuthenticationPrincipal LoginDTO loginDTO
+    ) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            Long approvalId = Long.parseLong(request.get("approvalId").toString());
+            Boolean isFinalApproval = (Boolean) request.get("isFinalApproval");
+            String currentUserId = loginDTO.getEmpId();
+            
+            log.info("승인 처리 요청: approvalId={}, isFinal={}, userId={}", 
+                approvalId, isFinalApproval, currentUserId);
+            
+            adService.approveDocument(approvalId, currentUserId, isFinalApproval);
+            
+            result.put("result", true);
+            result.put("message", isFinalApproval ? "전결 승인되었습니다." : "승인되었습니다.");
+            
+            log.info("승인 처리 완료: approvalId={}", approvalId);
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (IllegalArgumentException e) {
+            log.error("승인 처리 실패 - 권한 없음: {}", e.getMessage());
+            result.put("result", false);
+            result.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(result);
+            
+        } catch (Exception e) {
+            log.error("승인 처리 실패", e);
+            result.put("result", false);
+            result.put("message", "승인 처리 중 오류가 발생했습니다.");
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
+
+    // 반려 처리
+    @PostMapping("/reject")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> rejectDocument(
+        @RequestBody Map<String, Object> request,
+        @AuthenticationPrincipal LoginDTO loginDTO
+    ) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            Long approvalId = Long.parseLong(request.get("approvalId").toString());
+            String rejectReason = request.get("rejectReason").toString();
+            String currentUserId = loginDTO.getEmpId();
+            
+            log.info("반려 처리 요청: approvalId={}, userId={}", approvalId, currentUserId);
+            
+            // 서비스 호출
+            adService.rejectDocument(approvalId, currentUserId, rejectReason);
+            
+            result.put("result", true);
+            result.put("message", "반려되었습니다.");
+            
+            log.info("반려 처리 완료: approvalId={}", approvalId);
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (IllegalArgumentException e) {
+            log.error("반려 처리 실패 - 권한 없음: {}", e.getMessage());
+            result.put("result", false);
+            result.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(result);
+            
+        } catch (Exception e) {
+            log.error("반려 처리 실패", e);
+            result.put("result", false);
+            result.put("message", "반려 처리 중 오류가 발생했습니다.");
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
+
 }
