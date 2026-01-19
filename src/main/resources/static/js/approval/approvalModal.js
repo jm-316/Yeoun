@@ -825,7 +825,7 @@ function removeApprover(index) {
 // ============================================
 // 유효성 검사
 // ============================================
-function validateApprovalForm() {
+async function validateApprovalForm() {
     const titleEl = document.getElementById('approval-title');
     const finishDateEl = document.getElementById('finish-date');
     const formType = document.getElementById('form-type-select').value;
@@ -869,6 +869,23 @@ function validateApprovalForm() {
             alert('휴가기간을 선택해주세요.');
             return false;
         }
+		
+		// ========== 년도 체크 ==========
+		const currentYear = new Date().getFullYear();
+		const startYear = new Date(leaveStartDate).getFullYear();
+		const endYear = new Date(leaveEndDate).getFullYear();
+
+		if (startYear !== currentYear || endYear !== currentYear) {
+		    alert(`휴가는 ${currentYear}년도 내에서만 신청 가능합니다.`);
+		    return false;
+		}
+
+		// ========== 휴가 중복 체크 (비동기) ==========
+		const isDuplicate = await checkLeaveDuplicate(leaveStartDate, leaveEndDate, leaveType);
+		if (isDuplicate) {
+		    return false;  // 중복이면 등록 중단
+		}
+		
     }
     
     if (formType === 'expense') {
@@ -896,6 +913,38 @@ function validateApprovalForm() {
     }
     
     return true;
+}
+
+// 휴가 중복 체크 함수
+async function checkLeaveDuplicate(startDate, endDate, leaveType) {
+    try {
+        const currentUserId = document.getElementById('currentUserId').value;
+        
+        const response = await fetch(
+            apiUrl(`new/approval/check-leave-duplicate?leaveType=${leaveType}&startDate=${startDate}&endDate=${endDate}`),
+            {
+                method: 'GET',
+                headers: {
+                    [csrfHeader]: csrfToken
+                }
+            }
+        );
+        
+        const result = await response.json();
+        
+        if (result.isDuplicate) {
+			alert(`${result.message}\n기존 휴가: ${result.existingLeave}`);
+//            alert(`선택하신 기간(${startDate} ~ ${endDate})에 이미 요청된 휴가가 있습니다.\n기존 휴가: ${result.existingLeave}`);
+            return true;  // 중복
+        }
+        
+        return false;  // 중복 아님
+        
+    } catch (error) {
+        console.error('휴가 중복 체크 실패:', error);
+        alert('휴가 중복 확인 중 오류가 발생했습니다.');
+        return true;  // 에러 시 안전하게 중복으로 처리
+    }
 }
 
 // ============================================
@@ -1275,15 +1324,16 @@ document.getElementById('add-selected-approvers-btn').addEventListener('click', 
 // 등록 버튼 이벤트 등록
 const approvalForm = document.getElementById('approval-form');
 if (approvalForm) {
-    approvalForm.addEventListener('submit', function (e) {
+    approvalForm.addEventListener('submit', async function (e) {
         e.preventDefault();  // 기본 submit 막기
 		// 유효성 검사
-        if (!validateApprovalForm()) {
+		const isValid = await validateApprovalForm(); 
+        if (!isValid) {
             return;
         }
         
         // FormData 생성 및 전송
-        submitApprovalDocument();
+        await submitApprovalDocument();
     });
 }
 

@@ -1,5 +1,6 @@
 package com.yeoun.approval_new.controller;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -301,6 +302,30 @@ public class ApprovalDocumentController {
             result.put("result", false);
             result.put("message", "반려 처리 중 오류가 발생했습니다.");
             return ResponseEntity.internalServerError().body(result);
+        }
+    }
+    
+    //휴가 중복 체크
+    @GetMapping("/check-leave-duplicate")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> checkLeaveDuplicate(
+		@AuthenticationPrincipal LoginDTO loginDTO,
+		@RequestParam(name = "leaveType") String leaveType,
+	    @RequestParam(name = "startDate") String startDate,
+	    @RequestParam(name = "endDate") String endDate    		
+    ) {
+    	String empId = loginDTO.getEmpId();
+        try {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            
+            Map<String, Object> result = adService.checkLeaveDuplicate(empId, start, end, leaveType);
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            log.error("휴가 중복 체크 실패", e);
+            return ResponseEntity.ok(Map.of("isDuplicate", false));
         }
     }
 

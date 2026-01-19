@@ -1,8 +1,10 @@
 package com.yeoun.approval_new.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -395,5 +397,78 @@ public class ApprovalDocumentService {
         
         alarmService.sendPersonalMessage(alarmDTO);
     }
+    
+    //휴가 중복 체크
+	public Map<String, Object> checkLeaveDuplicate(String empId, LocalDate startDate, LocalDate endDate, String leaveType) {
+		
+		List<ApprovalDocument> overlapping = documentRepository.countOverlappingLeave(empId, startDate, endDate);
+		
+	    if (overlapping.isEmpty()) {
+	        return Map.of("isDuplicate", false);
+	    }
+	    
+	    // 중복 검사
+	    if ("연차".equals(leaveType)) {
+	        // 연차 : 기간내 중복되는 날짜가 있으면 등록불가
+	        ApprovalLeave firstOverlap = overlapping.get(0).getApprovalLeave();
+	        
+	        return Map.of(
+	            "isDuplicate", true,
+	            "message", "연차는 다른 휴가와 겹칠 수 없습니다.",
+	            "existingLeave", formatLeaveInfo(firstOverlap)
+	        );
+	        
+	    } else {
+	    	// 반차 : 기간내 중복되는 연차 혹은 같은종류의 반차(오전, 오후) 가 있으면 등록불가
+	        // overlapping에 연차가 등록되어 있는지 확인
+	    	boolean hasAnnualLeave = overlapping.stream()
+	                .map(doc -> doc.getApprovalLeave().getLeaveType())
+	                .anyMatch(type -> "연차".equals(type));
+	    	
+	    	// 연차가 존재할때 동작
+	        if (hasAnnualLeave) {
+	            ApprovalLeave annualLeave = overlapping.stream()
+	                .filter(doc -> "연차".equals(doc.getApprovalLeave().getLeaveType()))
+	                .findFirst()
+	                .get()
+	                .getApprovalLeave();
+	            
+	            return Map.of(
+	                "isDuplicate", true,
+	                "message", "해당 날짜에 이미 연차가 신청되어 있습니다.",
+	                "existingLeave", formatLeaveInfo(annualLeave)
+	            );
+	        }
+	        
+	        // 같은반차가 등록되어있나 확인
+	        boolean hasSameType = overlapping.stream()
+	                .map(doc -> doc.getApprovalLeave().getLeaveType())
+	                .anyMatch(type -> type.equals(leaveType));
+	        
+	        if (hasSameType) {
+	            ApprovalLeave duplicate = overlapping.stream()
+	                .filter(doc -> doc.getApprovalLeave().getLeaveType().equals(leaveType))
+	                .findFirst()
+	                .get()
+	                .getApprovalLeave();
+	            
+	            return Map.of(
+	                "isDuplicate", true,
+	                "message", "같은 날에 동일한 반차가 이미 신청되어 있습니다.",
+	                "existingLeave", formatLeaveInfo(duplicate)
+	            );
+	        }
+	        
+	        // 다른 종류의 반차만 있는경우 등록가능
+	        return Map.of("isDuplicate", false);
+	    }
+	}
+	
+	private String formatLeaveInfo(ApprovalLeave leave) {
+	    return String.format("%s (%s ~ %s)", 
+	        leave.getLeaveType(), 
+	        leave.getLeaveStartDate(), 
+	        leave.getLeaveEndDate());
+	}
 
 }

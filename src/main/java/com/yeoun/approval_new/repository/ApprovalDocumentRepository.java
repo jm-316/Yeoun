@@ -1,5 +1,7 @@
 package com.yeoun.approval_new.repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -52,4 +54,19 @@ public interface ApprovalDocumentRepository extends JpaRepository<ApprovalDocume
            "LEFT JOIN FETCH ad.approvalLines al " +
            "WHERE ad.approvalId = :approvalId")
     Optional<ApprovalDocument> findByIdWithAll(@Param("approvalId") Long approvalId);
+    
+    // 휴가 중복 체크 
+    @Query("SELECT ad FROM ApprovalDocument ad " +
+           "JOIN ad.approvalLeave al " +
+           "WHERE ad.employee.empId = :empId " +
+           "AND ad.formType = 'leave' " +
+           "AND ad.status != 'REJECTED' " +
+           "AND (" +
+           "  (al.leaveStartDate <= :endDate AND al.leaveEndDate >= :startDate)" +  // 날짜 겹침
+           ")")
+    List<ApprovalDocument> countOverlappingLeave(
+        @Param("empId") String empId, 
+        @Param("startDate") LocalDate startDate, 
+        @Param("endDate") LocalDate endDate
+    );
 }
