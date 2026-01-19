@@ -32,6 +32,9 @@ public class LoginDTO implements UserDetails {
 	private String empName; // 직원이름
 	private String deptId; // 직원 부서ID
 	private String deptName;// 직원 부서명
+    // 직급 정보 추가
+    private String posCode;
+    private String posName;
 	// ------------------------------
 	
 	public boolean hasRole(String role) {

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.yeoun.approval.entity.ApprovalDoc;
 import com.yeoun.approval.repository.ApprovalDocRepository;
+import com.yeoun.approval_new.entity.ApprovalDocument;
+import com.yeoun.approval_new.entity.ApprovalLeave;
 import com.yeoun.attendance.entity.WorkPolicy;
 import com.yeoun.attendance.repository.WorkPolicyRepository;
 import com.yeoun.auth.dto.LoginDTO;
@@ -176,10 +178,41 @@ public class LeaveService {
 		annualLeave.useAnnual(usedDays);
 	}
 	
+	// approval_new 연차등록
+	@Transactional
+	public void createAnnual(ApprovalDocument document) {
+		Emp emp = document.getEmployee();
+		AnnualLeave annualLeave = leaveRepository.findByEmp_empId(emp.getEmpId())
+				.orElseThrow(() -> new NoSuchElementException("연차 테이블을 찾을 수 없습니다."));
+		ApprovalLeave leave = document.getApprovalLeave();
+		
+		// 연차 사용 기록 등록 
+		LeaveHistoryDTO  leaveHistoryDTO = LeaveHistoryDTO.builder()
+				.emp_id(emp.getEmpId())
+				.emp_name(emp.getEmpName())
+				.dept_id(emp.getDept().getDeptId())
+				.leaveType(toLeaveCode(leave.getLeaveType()))
+				.startDate(leave.getLeaveStartDate())
+				.endDate(leave.getLeaveEndDate())
+				.usedDays(leave.getLeaveDays())
+				.reason(document.getReason())
+				.approvalId(document.getApprovalId())
+				.build();
+		
+		AnnualLeaveHistory annualLeaveHistory = leaveHistoryDTO.toEntity();
+		annualLeaveHistory.setAnnualLeave(annualLeave);
+		annualLeaveHistory.setDept(emp.getDept());
+		
+		historyRepository.save(annualLeaveHistory);
+		
+		// 사용한 연차 반영
+		annualLeave.useAnnual(leave.getLeaveDays());
+	}
+	
 	private static final Map<String, String> LEAVE_TYPE_MAP = Map.of(
 		"연차", "ANNUAL",
-		"반차", "HALF",
-		"병가", "SICK"
+		"오전 반차", "AM_HALF",
+		"오후 반차", "PM_HALF"
 	);
 	
 	private String toLeaveCode(String type) {
@@ -231,4 +264,6 @@ public class LeaveService {
 			leave.updateAnnual(newStart, newEnd, currentYear, workPolicy.getAnnualBasis());
 		}
 	}
+	
+
 }

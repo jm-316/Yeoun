@@ -4,10 +4,12 @@
 
 	<!-- 조직도 계층형 쿼리 불러오기 -->	
 	<select id="getOrganizationList" resultType="Map">
-		SELECT d.DEPT_ID, d.DEPT_NAME, d.PARENT_ID, e.EMP_ID, e.EMP_NAME
+		SELECT d.DEPT_ID, d.DEPT_NAME, d.PARENT_ID, e.EMP_ID, e.EMP_NAME, p.POS_CODE, p.POS_NAME
 		FROM DEPT d
 		LEFT OUTER JOIN EMP e
 		on d.DEPT_ID = e.DEPT_ID
+		LEFT JOIN POSITION p
+		on e.POS_CODE = p.POS_CODE
 		WHERE e.STATUS = 'ACTIVE'
 		START WITH d.PARENT_ID IS NULL
 		CONNECT BY PRIOR d.DEPT_ID = d.PARENT_ID

@@ -7,10 +7,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yeoun.auth.dto.LoginDTO;
 import com.yeoun.emp.entity.Dept;
 import com.yeoun.emp.entity.Emp;
+import com.yeoun.emp.entity.Position;
 import com.yeoun.emp.repository.DeptRepository;
 import com.yeoun.emp.repository.EmpRepository;
 
@@ -22,6 +24,7 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 @Log4j2
+@Transactional(readOnly = true)
 public class CustomUserDetailsService implements UserDetailsService {
 	
 	private final EmpRepository empRepository;
@@ -64,6 +67,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 		if (dept != null) {
 		    loginDTO.setDeptId(dept.getDeptId());
 		    loginDTO.setDeptName(dept.getDeptName());
+		}
+		
+		// 직급정보 
+		Position position = emp.getPosition();
+		if (position != null) {
+			loginDTO.setPosCode(position.getPosCode());
+			loginDTO.setPosName(position.getPosName());
 		}
 
 		// 권한 리스트: LoginDTO.getAuthorities()에서 사용하므로 그대로 세팅
