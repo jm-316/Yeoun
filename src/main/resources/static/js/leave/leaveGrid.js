@@ -63,7 +63,8 @@ async function loadLeaveList(startDate, endDate) {
 		// 연차유형 변환
 		const leaveTypeMap = {
 			ANNUAL: "연차",
-			HALF: "반차",
+			AM_HALF: "오전 반차",
+			PM_HALF: "오후 반차",
 			SICK: "병가",
 		};
 		
