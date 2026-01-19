@@ -31,7 +31,6 @@ const approvalModal   = new bootstrap.Modal(approvalModalEl);
 
 // 결재모달 열기 함수
 async function openApprovalModal(mode, options = {}) {
-	console.log("!@#!222@#");
     // 1) 항상 먼저 초기화
     resetApprovalForm();
 
@@ -149,6 +148,7 @@ function resetApprovalForm() {
         createDateEl.value = today;
     }
     if (finishDateEl) {
+		finishDateEl.readOnly = false;
         finishDateEl.value = '';
     }
 

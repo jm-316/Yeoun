@@ -92,14 +92,20 @@
 		<div class="d-flex justify-content-between">
 			<div class="d-flex">
 				<div class="d-flex align-items-center gap-2" style="min-width: 280px;margin-right:25px;">
-					<div class="mb-6 col-lg-5 col-xl-7 col-12 mb-0" style="width: 180px;">
+					<div class="mb-6 col-lg-5 col-xl-7 col-12 mb-0" style="width: 400px;">
 						<label class="form-label">결재생성일</label>
-						<input id="searchStartDate" type="date" name="startDate" class="form-control">
-					</div>
-					<span style="margin-top: 33px;">~</span>
-					<div class="mb-6 col-lg-5 col-xl-7 col-12 mb-0" style="width: 180px;">
-						<label class="form-label">결재완료일</label>
-						<input id="searchEndDate" type="date" name="endDate" class="form-control">
+						<div class="d-flex">
+							<div class="mb-6 col-lg-5 col-xl-7 col-12 mb-0" style="width: 180px;">
+								<input id="searchStartDate" type="date" name="startDate" class="form-control">
+							</div>
+							<div class="mb-6 col-lg-5 col-xl-7 col-12 mb-0" style="width:10px; margin-left: auto; margin-right: auto;">
+								<span style="margin-top: 33px;">~</span>
+							</div>
+							<div class="mb-6 col-lg-5 col-xl-7 col-12 mb-0" style="width: 180px;">
+		<!-- 						<label class="form-label">결재생성일</label> -->
+								<input id="searchEndDate" type="date" name="endDate" class="form-control">
+							</div>
+						</div>
 					</div>
 					<div class="mb-6 col-lg-5 col-xl-7 col-12 mb-0" style="width: 180px;">
 						<label class="form-label">기안자및문서제목</label>
