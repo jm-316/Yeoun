@@ -10,7 +10,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -25,6 +28,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@Builder
 public class BomItem {
 	
 	@Id
@@ -44,4 +49,14 @@ public class BomItem {
 	
 	@Column(nullable = false)
 	private Double bomQty;  // 소모량
+
+	public BomItem(Long bomItemId, Bom bom, Material material, String bomUnit, Double bomQty) {
+		this.bomItemId = bomItemId;
+		this.bom = bom;
+		this.material = material;
+		this.bomUnit = bomUnit;
+		this.bomQty = bomQty;
+	}
+	
+	
 }

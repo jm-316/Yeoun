@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.yeoun.masterData.dto.MaterialDTO;
 import com.yeoun.masterData.entity.Material;
 
 public interface MaterialRepository extends JpaRepository<Material, Long> {
@@ -14,6 +13,9 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
 	Optional<Material> findByMatCode(String matCode);
 
 	List<Material> findByUseYn(Character useYn1);
+
+	// 원재료Id로 원재료 조회
+	Optional<Material> findByMatId(Long matId);
 
 	
 }

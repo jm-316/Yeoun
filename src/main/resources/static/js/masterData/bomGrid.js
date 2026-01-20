@@ -1,4 +1,5 @@
 let bomItem = [];
+let selectedBomId = null;
 
 const bomGrid = new tui.Grid({
 	el: document.getElementById("bomGrid"),
@@ -158,6 +159,7 @@ bomGrid.on('click', async (ev) => {
 	
 	if (bomId) {
 		isSelect = true;
+		selectedBomId = bomId;
 		await loadBomItem(bomId);
 	}
 });
@@ -286,11 +288,70 @@ bomItemGrid.on('click', async (ev) => {
 	              	// 이벤트 리스너 제거 (한 번만 실행되도록)
 	              	modalElement.removeEventListener('shown.bs.modal', loadData);
 	          }, { once: true }); // once 옵션으로 자동 제거
-//			
 		} catch (error) {
 			console.error(error);
 		}
 	}
+});
+
+// 변경하기 전 값
+const beforeEditItemValues = {};
+
+bomItemGrid.on("editingStart", ev => {
+    const { rowKey, columnName } = ev;
+
+    beforeEditItemValues[rowKey] ??= {};
+    beforeEditItemValues[rowKey][columnName] =
+        bomItemGrid.getValue(rowKey, columnName);
+});
+
+const validationItemRules = {
+	bomQty: {
+		required: true,
+		pattern: /^\d+(\.\d{1,2})?$/,
+		errorMessage: "숫자만 입력 가능하며 소수점은 둘째 자리까지 허용됩니다."
+	}
+}
+
+// 통합 유효성 검사
+function validateItemField(rowKey, columnName, value) {
+	const rule = validationItemRules[columnName];
+	
+	// 검증 규칙이 없으면 통과
+	if (!rule) {
+		return true;
+	}
+	
+	// 빈 값이고 필수가 아니면 통과
+	if (!value || value === "") {
+		return true;
+	}
+	
+	const stringValue = String(value).trim();
+	
+	// 패턴 체크
+	if (rule.pattern && !rule.pattern.test(stringValue)) {
+		alert(rule.errorMessage);
+		restoreValue(rowKey, columnName);
+		return false;
+	} 
+	
+	return true;
+}
+
+// 이전 값으로 복원
+function restoreValue(rowKey, columnName) {
+	const beforeValue = beforeEditItemValues?.[rowKey]?.[columnName] || "";
+	setTimeout(() => {
+		bomItemGrid.setValue(rowKey, columnName, beforeValue);
+	}, 0);
+}
+
+bomItemGrid.on("editingFinish", ev => {
+    const { rowKey, columnName, value } = ev;
+	
+	// 통합 검증
+	if (!validateItemField(rowKey, columnName, value)) return;
 });
 
 async function loadMaterial(useYn) {
@@ -319,9 +380,129 @@ async function loadMaterial(useYn) {
 document.getElementById("bomItemRegistBtn").addEventListener("click", () => {
 	// bom을 선택했을 때 bom item 추가할 수 있음
 	if (isSelect) {
-		bomItemGrid.prependRow();
+		bomItemGrid.prependRow({
+		    bomItemId: null,        // 신규 항목
+		    bomId: selectedBomId,   // 선택된 BOM의 ID
+		    matId: null,
+		    matName: null,
+		    bomQty: 0,
+		    bomUnit: null,
+		});
 	}
 });
+
+
+// bom Item 저장
+document.getElementById("bomItemSaveBtn").addEventListener("click", async () => {
+	// 편집 완료
+	bomItemGrid.finishEditing();
+	
+	const modifiedData = bomItemGrid.getModifiedRows() || {};
+	const updateRows = modifiedData.updatedRows || [];
+	let createdRows = modifiedData.createdRows || [];
+	
+	const isEmptyRow = (row) => {
+		return !row.matId && !row.matCode && !row.matName && !row.bomQty;
+	}
+	
+	createdRows = createdRows.filter(row => !isEmptyRow(row));
+	
+	if (updateRows.length === 0 && createdRows.length === 0) {
+		alert("수정된 내용이 없습니다.");
+		return;
+	}
+	
+	const saveData = {
+		created: createdRows,
+		updated: updateRows
+	}
+	
+	await saveBomItem(saveData);
+	
+	await loadBomItem(selectedBomId);
+});
+
+async function saveBomItem(data) {
+	const BOM_ITEM_ADD_URL = "/bomMst/data/bomItem/add";
+	
+	try {
+		const res = await fetch(apiUrl(BOM_ITEM_ADD_URL), {
+			method: 'POST',
+			headers: {
+				[csrfHeader]: csrfToken,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if (!res.ok) {
+			throw new Error(`등록 실패: ${res.status}`);
+		}
+		
+		alert("저장되었습니다.");
+	} catch (error) {
+		console.error(error);
+		alert("저장에 실패했습니다.");
+	}
+}
+
+// row 삭제 버튼
+document.getElementById("bomItemDeleteBtn").addEventListener("click", async () => {
+	const checkedRows = bomItemGrid.getCheckedRowKeys();
+	
+	if (checkedRows.length === 0) {
+		alert("삭제할 원재료를 선택해주세요.");
+		return;
+	}
+	
+	// 삭제할 때 사용할 bomItemId 배열
+	const bomItemIds = checkedRows.map(rowKey => {
+		const rowData = bomItemGrid.getRow(rowKey);
+		return rowData.bomItemId;
+	});
+	
+	// null 과 undefined 필터링
+	const validBomItemIds = bomItemIds.filter(item => item !== null && item !== undefined)
+									  .map(String);
+									  
+	if (!confirm(`${checkedRows.length}개의 항목을 삭제하시겠습니까?`)) {
+		return;
+	}
+	if (validBomItemIds.length === 0) {
+		grid.removeCheckedRows();
+		alert('삭제되었습니다.');
+		return;
+	}
+	
+	await deleteBomItem(validBomItemIds);
+});
+
+async function deleteBomItem(bomItemIds) {
+	try {
+		const BOM_ITEM_DELETE_URL = "/bomMst/data/bomItem/delete";
+		
+		const res = await fetch(apiUrl(BOM_ITEM_DELETE_URL), {
+			method: 'DELETE',
+			headers: {
+				[csrfHeader]: csrfToken,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ bomItemIds: bomItemIds })
+		});
+		
+		if (!res.ok) {
+			throw new Error("삭제 실패");
+		}
+		
+		bomItemGrid.removeCheckedRows();
+		
+		alert("삭제되었습니다.");
+		
+	} catch (error) {
+		console.error(error);
+		alert("삭제 중 오류가 발생했습니다.");
+	}
+}
 
 // 페이지 로딩 시 실행하는 함수들
 window.addEventListener("DOMContentLoaded", async () => {

@@ -48,10 +48,13 @@
 					<div class="row" style="width:70%;">
 						<div class="d-flex align-items-center justify-content-between mb-2">
 							<h5 class="card-title">BOM ITME</h5>
-							<button type="button" class="btn btn-primary" id="bomItemRegistBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">
-								추가
-							</button>
-							<button id="saveBomDetailRowBtn" class="btn btn-success btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')" type="button">저장</button>
+							<div>
+								<button type="button" class="btn btn-primary btn-md-sm" id="bomItemRegistBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">
+									추가
+								</button>
+								<button id=bomItemSaveBtn class="btn btn-success btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')" type="button">저장</button>
+								<button id=bomItemDeleteBtn class="btn btn-danger btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')" type="button">삭제</button>
+							</div>
 						</div>
 						<div id="bomItemGrid"></div>
 					</div>
