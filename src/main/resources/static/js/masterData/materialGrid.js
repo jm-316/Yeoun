@@ -253,8 +253,8 @@ materialGrid.on('click', ev => {
 });
 
 // 원재료 정보 불러오기
-async function loadMaterial() {
-	const MATERIAL_LIST = "/masterData1/data/materialList";
+async function loadMaterial(useYn) {
+	const MATERIAL_LIST = `/masterData1/data/materialList?useYn=${useYn}`;
 			
 	try {
 		const res = await fetch(MATERIAL_LIST, {method: "GET"});
@@ -349,7 +349,7 @@ function updateGridColumnOptions() {
 window.addEventListener("DOMContentLoaded", async (e) => {
 	await loadMatTypeCode(); // 공통코드에서 원재료 타입 조회
 	await loadUnit(); // 공통코드에서 단위 조회
-	await loadMaterial(); // 원재료 목록 조회
+	await loadMaterial("all"); // 원재료 목록 조회
 	
 
 	//스피너  off

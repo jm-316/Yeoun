@@ -34,6 +34,16 @@ public class ItemService {
 				.map(MaterialDTO::fromEntity)
 				.collect(Collectors.toList());
 	}
+	
+	// 원재료 조회 (활성화된 내역만)
+	public List<MaterialDTO> getMaterialListWithUseYn(String useYnStr) {
+		Character useYn = useYnStr.charAt(0);
+		
+		return materialRepository.findByUseYn(useYn)
+				.stream()
+				.map(MaterialDTO::fromEntity)
+				.collect(Collectors.toList());
+	}
 
 	// 원재료 등록
 	@Transactional
