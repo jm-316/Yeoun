@@ -96,6 +96,15 @@ public class ItemService {
 				.map(ProductDTO::fromEntity)
 				.collect(Collectors.toList());
 	}
+	
+	// 완제품 조회(활성여부)
+	public List<ProductDTO> getProductListWithUseYn(String useYnStr) {
+		Character useYn = useYnStr.charAt(0);
+		return productRepository.findByUseYn(useYn)
+				.stream()
+				.map(ProductDTO::fromEntity)
+				.collect(Collectors.toList());
+	}
 
 	// 완제품 신규 등록
 	@Transactional

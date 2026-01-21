@@ -1,5 +1,9 @@
 let bomItem = [];
+let bomList = [];
 let selectedBomId = null;
+let targetGrid = null;
+
+const productItemModal = new bootstrap.Modal(document.getElementById("products-modal"));
 
 const bomGrid = new tui.Grid({
 	el: document.getElementById("bomGrid"),
@@ -184,323 +188,178 @@ async function loadBom() {
 
 		bomGrid.resetData(data);
 		
+		bomList = data;
+		
 	} catch (error) {
 		console.error(error);
 	}
 }
 
-// ==================================================================
-const bomItemGrid = new tui.Grid({
-	el: document.getElementById("bomItemGrid"),
-	bodyHeight: 500,
+// =============================================
+// bom 등록
+
+const bomModal = new bootstrap.Modal(document.getElementById("bom-modal"));
+
+const registBomItemGrid = new tui.Grid({
+	el : document.getElementById("registBomItemGrid"),
 	rowHeaders: ['checkbox'],
 	pageOptions: {
 	    useClient: true,  // 클라이언트 사이드 페이징
-	    perPage: 20       // 페이지당 20개 행
-	},
+	    perPage: 10       // 페이지당 10개 행
+	},	
 	columnOptions: {
 		resizable: true
 	},
+	editingEvent: 'click',
 	columns: [
-			{
-				header: "BOMID",
-				name: "bomId",
-				hidden: true
+		{
+			header: "MATID",
+			name: "matId",
+			hidden: true
+		},
+		{
+			header: "원재료코드",
+			name: "matCode",
+		},
+		{
+			header: "원재료명",
+			name: "matName",
+		},
+		{
+			header: "타입",
+			name: "matType",
+			formatter: ({value}) => {
+				const type = matTypeList.find(item => item.value === value);
+				return type ? type.text : value;
+			}
+		},
+		{
+			header: "단위",
+			name: "matUnit",
+		},
+		{
+			header: "유효일자(개월)",
+			name: "effectiveDate",
+			editor: {
+				type: "text",
+			},
+			formatter: ({value}) => {
 				
-			},
-			{
-				header: "BOMITEMID",
-				name: "bomItemId",
-				hidden: true
+				if (value !== null) {
+					if (value > 0) {
+						return `${value}개월`
+					} else {
+						return "유통기한없음"
+					}
+				} else {
+					return ""
+				}
 				
-			},
-			{
-				header: "MATID",
-				name: "matId",
-				hidden: true
-				
-			},
-			{
-				header: "원재료명",
-				name: "matName",
-			},
-			{
-				header: "사용량",
-				name: "bomQty",
-				editor: "text"
-			},
-			{
-				header: "단위",
-				name: "bomUnit",
-			},
-		]
+			}
+		},
+	]
 });
 
-// bom 정보 불러오기
-async function loadBomItem(bomId) {
-	const BOM_ITEM_LIST = `/bomMst/bomItems/${bomId}`;
-			
-	try {
-		bomItemGrid.resetData([]); // 기존 데이터 초기화
-		
-		const res = await fetch(BOM_ITEM_LIST, {method: "GET"});
-		
-		if (!res.ok) {
-			throw new Error("데이터 로드 실패!");
-		}
-		
-		const data = await res.json();
-		
-		// 데이터가 없을 경우 빈배열 반환
-		if (!data || data.length === 0) {
-			bomItemGrid.resetData([]);
-		}
-
-		bomItemGrid.resetData(data);
-		
-	} catch (error) {
-		console.error(error);
-	}
-}
-
-bomItemGrid.on('click', async (ev) => {
+registBomItemGrid.on("click", async (ev) => {
 	const { columnName, rowKey } = ev;
 	
-	const rowData = bomItemGrid.getRow(ev.rowKey);
+	console.log(columnName);
 	
-	if (columnName === "matName" && rowData.bomItemId === null) {
-		try {
-			bomItemGrid.disable();
-			
-			// 원재료 모달 열기
-			matItemsModal.show();
-			
-			// 현재 선택된 row 정보 저장
-			window.selectedBomRowKey = rowKey;
-			
-			const modalElement = document.getElementById('matItems-modal');
-	        	modalElement.addEventListener('shown.bs.modal', async function loadData() {
-	            	await loadMaterial("Y");
-	              
-	              	// 그리드 강제 리프레시
-	              	materialItemGrid.refreshLayout();
-	              
-	              	// 이벤트 리스너 제거 (한 번만 실행되도록)
-	              	modalElement.removeEventListener('shown.bs.modal', loadData);
-	          }, { once: true }); // once 옵션으로 자동 제거
-		} catch (error) {
-			console.error(error);
-		}
+	if (columnName === "matName" || columnName === "matCode") {
+		// 원재료 모달 열기
+		matItemsModal.show();
+		
+		// 현재 선택된 row 정보 저장
+		window.selectedBomRowKey = rowKey;
+		
+		const modalElement = document.getElementById('matItems-modal');
+			modalElement.addEventListener('shown.bs.modal', async function loadData() {
+		    	await loadMaterial("Y");
+		      
+		      	// 그리드 강제 리프레시
+		      	materialItemGrid.refreshLayout();
+		      
+		      	// 이벤트 리스너 제거 (한 번만 실행되도록)
+		      	modalElement.removeEventListener('shown.bs.modal', loadData);
+		}, { once: true }); // once 옵션으로 자동 제거
 	}
 });
 
-// 변경하기 전 값
-const beforeEditItemValues = {};
-
-bomItemGrid.on("editingStart", ev => {
-    const { rowKey, columnName } = ev;
-
-    beforeEditItemValues[rowKey] ??= {};
-    beforeEditItemValues[rowKey][columnName] =
-        bomItemGrid.getValue(rowKey, columnName);
+document.getElementById("bomRegistBtn").addEventListener("click", () => {
+	bomModal.show();
+	
+	const modalElement = document.getElementById('bom-modal');
+		modalElement.addEventListener('shown.bs.modal', async function loadData() {
+	    	await loadMaterial("Y");
+	      
+	      	// 그리드 강제 리프레시
+	      	registBomItemGrid.refreshLayout();
+	      
+	      	// 이벤트 리스너 제거 (한 번만 실행되도록)
+	      	modalElement.removeEventListener('shown.bs.modal', loadData);
+	  }, { once: true }); // once 옵션으로 자동 제거
 });
 
-const validationItemRules = {
-	bomQty: {
-		required: true,
-		pattern: /^\d+(\.\d{1,2})?$/,
-		errorMessage: "숫자만 입력 가능하며 소수점은 둘째 자리까지 허용됩니다."
-	}
-}
-
-// 통합 유효성 검사
-function validateItemField(rowKey, columnName, value) {
-	const rule = validationItemRules[columnName];
-	
-	// 검증 규칙이 없으면 통과
-	if (!rule) {
-		return true;
-	}
-	
-	// 빈 값이고 필수가 아니면 통과
-	if (!value || value === "") {
-		return true;
-	}
-	
-	const stringValue = String(value).trim();
-	
-	// 패턴 체크
-	if (rule.pattern && !rule.pattern.test(stringValue)) {
-		alert(rule.errorMessage);
-		restoreValue(rowKey, columnName);
-		return false;
-	} 
-	
-	return true;
-}
-
-// 이전 값으로 복원
-function restoreValue(rowKey, columnName) {
-	const beforeValue = beforeEditItemValues?.[rowKey]?.[columnName] || "";
-	setTimeout(() => {
-		bomItemGrid.setValue(rowKey, columnName, beforeValue);
-	}, 0);
-}
-
-bomItemGrid.on("editingFinish", ev => {
-    const { rowKey, columnName, value } = ev;
-	
-	// 통합 검증
-	if (!validateItemField(rowKey, columnName, value)) return;
+// 원재료 추가 버튼 이벤트
+document.getElementById("registBtn").addEventListener("click", () => {
+	registBomItemGrid.prependRow();
+	targetGrid = "registBom";
 });
 
-async function loadMaterial(useYn) {
-	const MATERIAL_LIST = `/masterData1/data/materialList?useYn=${useYn}`;
-			
-	try {
-		const res = await fetch(MATERIAL_LIST, {method: "GET"});
-		
-		if (!res.ok) {
-			throw new Error("데이터 로드 실패!");
-		}
-		
-		const data = await res.json();
-		
-		materialItemGrid.resetData(data);
-		materialItemData = data;
-		
-	} catch (error) {
-		console.error(error);
-	} finally {
-		bomItemGrid.enable();
-	}
-}
-
-// bom Item 추가 버튼 이벤트
-document.getElementById("bomItemRegistBtn").addEventListener("click", () => {
-	// bom을 선택했을 때 bom item 추가할 수 있음
-	if (isSelect) {
-		bomItemGrid.prependRow({
-		    bomItemId: null,        // 신규 항목
-		    bomId: selectedBomId,   // 선택된 BOM의 ID
-		    matId: null,
-		    matName: null,
-		    bomQty: 0,
-		    bomUnit: null,
-		});
-	}
+// bom name 입력 이벤트
+document.getElementById("bomName").addEventListener("input", async (e) => {
+	const bomName = e.target.value.trim();
+	
+	await checkBomName(bomName);
 });
 
-
-// bom Item 저장
-document.getElementById("bomItemSaveBtn").addEventListener("click", async () => {
-	// 편집 완료
-	bomItemGrid.finishEditing();
+// 완제품 조회 이벤트
+document.getElementById("searchProduct").addEventListener("click", async () => {
+	// 완제품 모달 열기
+	productItemModal.show();
 	
-	const modifiedData = bomItemGrid.getModifiedRows() || {};
-	const updateRows = modifiedData.updatedRows || [];
-	let createdRows = modifiedData.createdRows || [];
-	
-	const isEmptyRow = (row) => {
-		return !row.matId && !row.matCode && !row.matName && !row.bomQty;
-	}
-	
-	createdRows = createdRows.filter(row => !isEmptyRow(row));
-	
-	if (updateRows.length === 0 && createdRows.length === 0) {
-		alert("수정된 내용이 없습니다.");
-		return;
-	}
-	
-	const saveData = {
-		created: createdRows,
-		updated: updateRows
-	}
-	
-	await saveBomItem(saveData);
-	
-	await loadBomItem(selectedBomId);
+	const modalElement = document.getElementById('products-modal');
+		modalElement.addEventListener('shown.bs.modal', async function loadData() {
+	    	await loadProduct("Y");
+	      
+	      	// 그리드 강제 리프레시
+	      	productItemGrid.refreshLayout();
+	      
+	      	// 이벤트 리스너 제거 (한 번만 실행되도록)
+	      	modalElement.removeEventListener('shown.bs.modal', loadData);
+	  }, { once: true }); // once 옵션으로 자동 제거
 });
 
-async function saveBomItem(data) {
-	const BOM_ITEM_ADD_URL = "/bomMst/data/bomItem/add";
-	
-	try {
-		const res = await fetch(apiUrl(BOM_ITEM_ADD_URL), {
-			method: 'POST',
-			headers: {
-				[csrfHeader]: csrfToken,
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(data)
-		});
-		
-		if (!res.ok) {
-			throw new Error(`등록 실패: ${res.status}`);
-		}
-		
-		alert("저장되었습니다.");
-	} catch (error) {
-		console.error(error);
-		alert("저장에 실패했습니다.");
-	}
-}
-
-// row 삭제 버튼
-document.getElementById("bomItemDeleteBtn").addEventListener("click", async () => {
-	const checkedRows = bomItemGrid.getCheckedRowKeys();
+// 삭제 버튼 이벤트
+document.getElementById("deleteBtn").addEventListener("click", () => {
+	const checkedRows = registBomItemGrid.getCheckedRowKeys();
 	
 	if (checkedRows.length === 0) {
 		alert("삭제할 원재료를 선택해주세요.");
 		return;
 	}
 	
-	// 삭제할 때 사용할 bomItemId 배열
-	const bomItemIds = checkedRows.map(rowKey => {
-		const rowData = bomItemGrid.getRow(rowKey);
-		return rowData.bomItemId;
-	});
-	
-	// null 과 undefined 필터링
-	const validBomItemIds = bomItemIds.filter(item => item !== null && item !== undefined)
-									  .map(String);
-									  
-	if (!confirm(`${checkedRows.length}개의 항목을 삭제하시겠습니까?`)) {
-		return;
-	}
-	if (validBomItemIds.length === 0) {
-		grid.removeCheckedRows();
-		alert('삭제되었습니다.');
-		return;
-	}
-	
-	await deleteBomItem(validBomItemIds);
+	registBomItemGrid.removeCheckedRows();
 });
 
-async function deleteBomItem(bomItemIds) {
+async function checkBomName(bomName) {
+	const feedbackElement = document.getElementById("bomNameFeedback");
+	
 	try {
-		const BOM_ITEM_DELETE_URL = "/bomMst/data/bomItem/delete";
+		const CHECK_BOM_NAME_URL = `/bomMst/data/checkDuplicate?bomName=${bomName}`;
 		
-		const res = await fetch(apiUrl(BOM_ITEM_DELETE_URL), {
-			method: 'DELETE',
-			headers: {
-				[csrfHeader]: csrfToken,
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ bomItemIds: bomItemIds })
-		});
+		const res = await fetch(CHECK_BOM_NAME_URL);
+		const data = await res.json();
 		
-		if (!res.ok) {
-			throw new Error("삭제 실패");
+		if (data.isDuplicate) {
+			feedbackElement.innerHTML = '<span style="color: red;">이미 사용 중인 BOM 이름입니다.</span>';
+		} else {
+			feedbackElement.innerHTML = '<span style="color: green;">사용 가능한 BOM 이름입니다.</span>';
 		}
 		
-		bomItemGrid.removeCheckedRows();
-		
-		alert("삭제되었습니다.");
-		
 	} catch (error) {
-		console.error(error);
-		alert("삭제 중 오류가 발생했습니다.");
+		console.log(error);
+		alert("중복 검사에 실패했습니다.");
 	}
 }
 
@@ -511,3 +370,20 @@ window.addEventListener("DOMContentLoaded", async () => {
 	//스피너  off
 //	hideSpinner();
 });
+
+async function loadUnit(url) {
+	
+	try {
+		const res = await fetch(url);
+		const data = await res.json();
+		
+		// select에서 보여질 내용
+		unitList = data.map(item => ({
+			value: item.codeId,
+			text: item.codeName
+		}));
+		
+	} catch (e) {
+		console.error(e);
+	}
+}

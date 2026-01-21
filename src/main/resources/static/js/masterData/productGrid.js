@@ -20,12 +20,12 @@ const productGrid = new tui.Grid({
 	editingEvent: 'click',
 	columns: [
 		{
-			header: "원재료코드",
+			header: "완제품코드",
 			name: "prdCode",
 			editor: "text"
 		},
 		{
-			header: "원재료명",
+			header: "완제품명",
 			name: "prdName",
 			editor: "text"
 		},
@@ -253,8 +253,8 @@ productGrid.on('click', ev => {
 });
 
 // 원재료 정보 불러오기
-async function loadProduct() {
-	const PRODUCT_LIST = "/masterData1/data/productList";
+async function loadProduct(useYn) {
+	const PRODUCT_LIST = `/masterData1/data/productList?useYn=${useYn}`;
 			
 	try {
 		const res = await fetch(PRODUCT_LIST, {method: "GET"});
@@ -277,7 +277,7 @@ async function loadProduct() {
 	}
 }
 
-// 공통코드에서 원재료 타입 가져오기
+// 공통코드에서 완제품 타입 가져오기
 async function loadPrdTypeCode() {
 	const PRODUCT_TYPE_URL = "/commomCode/prdType";
 	
@@ -347,7 +347,7 @@ function updateProductGridColumnOptions() {
 window.addEventListener("DOMContentLoaded", async (e) => {
 	await loadPrdTypeCode(); // 공통코드에서 원재료 타입 조회
 	await loadPrdUnit(); // 공통코드에서 단위 조회
-	await loadProduct(); // 원재료 목록 조회
+	await loadProduct("all"); // 원재료 목록 조회
 	
 
 	//스피너  off
@@ -391,7 +391,7 @@ document.getElementById("prdSaveBtn").addEventListener("click", async () => {
 	
 	await saveProduct(saveData);
 	
-	await loadProduct(); // 데이터 재조회
+	await loadProduct("all"); // 데이터 재조회
 	
 	hideSpinner();
 });

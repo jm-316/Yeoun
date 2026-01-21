@@ -3,7 +3,7 @@ let matTypeList = []; // 원재료 타입 리스트 (드롭다운에 사용)
 let unitList = []; // 원재료 단위 리스트 (드롭다운에 사용)
 let matTypeMap = {};
 
-const matItemsModal = new bootstrap.Modal(document.getElementById('matItems-modal'));
+const matItemsModal = new bootstrap.Modal(document.getElementById("matItems-modal"));
 
 const materialItemGrid = new tui.Grid({
 	el: document.getElementById("matItemsGrid"),
@@ -70,22 +70,28 @@ const selectMaterial = {}
 
 // 클릭 동작
 materialItemGrid.on('click', ev => {
-	
-    if (!ev.rowKey) return;
-	
 	const rowData = materialItemGrid.getRow(ev.rowKey);
 	
 	selectMaterial.matId = rowData.matId;
 	selectMaterial.matCode = rowData.matCode;
 	selectMaterial.matName = rowData.matName;
 	selectMaterial.matUnit = rowData.matUnit;
+	selectMaterial.matType = rowData.matType;
+	selectMaterial.effectiveDate = rowData.effectiveDate;
 	
 	// BOMItemGird에 선택한 원재료 정보 적용
-	if (window.selectedBomRowKey !== undefined) {
+	if (window.selectedBomRowKey !== undefined && targetGrid === "bomItem") {
 		bomItemGrid.setValue(window.selectedBomRowKey, 'matId', selectMaterial.matId);
         bomItemGrid.setValue(window.selectedBomRowKey, 'matCode', selectMaterial.matCode);
         bomItemGrid.setValue(window.selectedBomRowKey, 'matName', selectMaterial.matName);
         bomItemGrid.setValue(window.selectedBomRowKey, 'bomUnit', selectMaterial.matUnit);
+	} else if (window.selectedBomRowKey !== undefined && targetGrid === "registBom") {
+		registBomItemGrid.setValue(window.selectedBomRowKey, 'matId', selectMaterial.matId);
+		registBomItemGrid.setValue(window.selectedBomRowKey, 'matCode', selectMaterial.matCode);
+		registBomItemGrid.setValue(window.selectedBomRowKey, 'matName', selectMaterial.matName);
+		registBomItemGrid.setValue(window.selectedBomRowKey, 'matType', selectMaterial.matType);
+		registBomItemGrid.setValue(window.selectedBomRowKey, 'matUnit', selectMaterial.matUnit);
+		registBomItemGrid.setValue(window.selectedBomRowKey, 'effectiveDate', selectMaterial.effectiveDate);
 	}
 	
 	// 모달 닫기
@@ -159,29 +165,12 @@ async function loadMatTypeCode() {
 }
 
 // 공통코드에서 단위 가져오기
-async function loadUnit() {
-	const MATERIAL_UNIT_URL = "/commomCode/unit";
-	
-	try {
-		const res = await fetch(MATERIAL_UNIT_URL);
-		const data = await res.json();
-		
-		// select에서 보여질 내용
-		unitList = data.map(item => ({
-			value: item.codeId,
-			text: item.codeName
-		}));
-		
-	} catch (e) {
-		console.error(e);
-	}
-}
-
+const MATERIAL_UNIT_URL = "/commomCode/unit";
 
 // 페이지 로딩 시 실행하는 함수들
 window.addEventListener("DOMContentLoaded", async (e) => {
 	await loadMatTypeCode(); // 공통코드에서 원재료 타입 조회
-	await loadUnit(); // 공통코드에서 단위 조회
+	await loadUnit(MATERIAL_UNIT_URL); // 공통코드에서 단위 조회
 
 	//스피너  off
 //	hideSpinner();

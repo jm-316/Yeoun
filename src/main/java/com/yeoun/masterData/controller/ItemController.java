@@ -89,9 +89,15 @@ public class ItemController {
 	// ==========================================
 	// 완제품 조회
 	@GetMapping("/data/productList")
-	public ResponseEntity<List<ProductDTO>> productList() {
+	public ResponseEntity<List<ProductDTO>> productList(@RequestParam (value = "useYn", defaultValue = "all") String useYn) {
+		List<ProductDTO> productList = new ArrayList<>();
 		
-		List<ProductDTO> productList = itemService.getProductList();
+		if ("all".equals(useYn)) {
+			productList = itemService.getProductList();
+		} else if ("Y".equals(useYn)) {
+			productList = itemService.getProductListWithUseYn(useYn);
+		}
+		
 		
 		return ResponseEntity.ok(productList);
 	}

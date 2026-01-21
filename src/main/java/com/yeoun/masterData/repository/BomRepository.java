@@ -11,6 +11,9 @@ import com.yeoun.masterData.entity.Bom;
 public interface BomRepository extends JpaRepository<Bom, Long>{
 
 	Optional<Bom> findByBomId(Long bomId);
+
+	// BOM Name 중복 검사
+	boolean existsByBomName(String bomName);
   
 	
 }

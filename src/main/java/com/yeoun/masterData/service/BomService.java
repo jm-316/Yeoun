@@ -93,4 +93,9 @@ public class BomService {
 		bomItemRepository.deleteAllByBomItemIdIn(ids);
 	}
 
+	// BOM Name 중복 검사
+	public boolean existsByBomName(String bomName) {
+		return bomRepository.existsByBomName(bomName);
+	}
+
 }
