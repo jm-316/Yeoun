@@ -1,6 +1,7 @@
 package com.yeoun.masterData.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,7 +84,18 @@ public class ItemController {
 			itemService.updateMaterial(updatedRows);
 		}
 		
-		 return ResponseEntity.ok("저장 완료");
+		return ResponseEntity.ok("저장 완료");
+	}
+	
+	// 원재료 코드 수정 가능 여부 확인
+	@GetMapping("/data/check")
+	public ResponseEntity<Map<String, Boolean>> checkMatCode(@RequestParam("matCode") String matCode) {
+		boolean isUsed = itemService.isMatCodeInUse(matCode);
+		
+		Map<String, Boolean> data = new HashMap<>();
+		data.put("isUsed", isUsed);
+		
+		return ResponseEntity.ok(data);
 	}
 	
 	// ==========================================
@@ -119,5 +131,16 @@ public class ItemController {
 		}
 		
 		return ResponseEntity.ok("저장 완료");
+	}
+	
+	// 완제품 코드 수정 가능 여부 확인
+	@GetMapping("/data/check/prd")
+	public ResponseEntity<Map<String, Boolean>> checkPrdCode(@RequestParam("prdCode") String prdCode) {
+		boolean isUsed = itemService.isPrdCodeInUse(prdCode);
+		
+		Map<String, Boolean> data = new HashMap<>();
+		data.put("isUsed", isUsed);
+		
+		return ResponseEntity.ok(data);
 	}
 }

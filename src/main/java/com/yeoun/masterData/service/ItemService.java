@@ -6,13 +6,22 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.yeoun.inventory.entity.Inventory;
+import com.yeoun.inventory.repository.InventoryRepository;
 import com.yeoun.masterData.dto.MaterialDTO;
 import com.yeoun.masterData.dto.ProductDTO;
 import com.yeoun.masterData.entity.Material;
 import com.yeoun.masterData.entity.Product;
+import com.yeoun.masterData.repository.BomItemRepository;
 import com.yeoun.masterData.repository.BomRepository;
 import com.yeoun.masterData.repository.MaterialRepository;
 import com.yeoun.masterData.repository.ProductRepository;
+import com.yeoun.order.repository.WorkOrderRepository;
+import com.yeoun.production.enums.ProductionStatus;
+import com.yeoun.production.repository.ProductionPlanRepository;
+import com.yeoun.sales.enums.OrderItemStatus;
+import com.yeoun.sales.repository.OrderItemRepository;
+import com.yeoun.sales.repository.OrdersRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +35,11 @@ public class ItemService {
 	private final MaterialRepository materialRepository;
 	private final ProductRepository productRepository;
 	private final BomRepository bomRepository;
+	private final BomItemRepository bomItemRepository;
+	private final InventoryRepository inventoryRepository;
+	private final ProductionPlanRepository productionPlanRepository;
+	private final OrderItemRepository orderItemRepository;
+	private final WorkOrderRepository workOrderRepository;
 	
 	// 원재료 목록 조회
 	public List<MaterialDTO> getMaterialList() {
@@ -72,21 +86,51 @@ public class ItemService {
 					.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 원재료입니다."));
 			
 			if ('N' == dto.getUseYn() && 'Y' == material.getUseYn()) {
-//				validateDeactivation(material);
+				List<Long> prdIds  = bomItemRepository.findProductIdsByMaterialId(dto.getMatId());
+				
+				List<String> prdCodes = productRepository.findPrdCodesByPrdId(prdIds);
+				
+				if (!prdCodes.isEmpty()) {
+					// 생산계획에서 사용하는지 확인
+					boolean usedInPlan = productionPlanRepository.existsByPrdIdsInAndStatusIn(
+							prdCodes,
+							List.of(ProductionStatus.PLANNING,
+									ProductionStatus.MATERIAL_PENDING,
+									ProductionStatus.IN_PROGRESS
+							)
+						);
+					
+					if (usedInPlan) {
+						throw new IllegalStateException("해당 원재료를 사용하는 제품의 생산계획이 존재합니다.");
+					}
+					
+					boolean usedInOrder = orderItemRepository.existsByPrdIdsInAndStatusIn(
+								prdCodes,
+								List.of(OrderItemStatus.REQUEST,
+										OrderItemStatus.CONFIRMED,
+										OrderItemStatus.PLANNED
+								)
+							);
+					if (usedInOrder) {
+						 throw new IllegalStateException("해당 원재료를 사용하는 제품의 수주가 존재합니다.");
+					}
+					
+					List<String> statuses = List.of("CREATED", "RELEASED", "IN_PROGRESS");
+					
+					boolean usedInWorkOrdr = workOrderRepository.existsByPrdIdsInAndStatusIn(
+								prdCodes,
+								statuses
+							);
+					
+					if (usedInWorkOrdr) {
+						  throw new IllegalStateException("해당 자재를 사용하는 제품이 현재 생산 중(작업지시)입니다.");
+					}
+				}
 			}
+			material.updateMaterial(dto.getMatCode(), dto.getMatName(), dto.getMatUnit(), dto.getEffectiveDate(), dto.getMatUnit());
+			material.chageUseYn(dto.getUseYn());
 		}
 	}
-	
-	/**
-	 * 비활성화 가능 여부 검증 메서드 <br>
-	 * 활성되된 BOM을 사용하는 생산 계획 / 작업 있는지 확인<br>
-	 * 해당 원재료를 사용하는 제품의 수주가 있는지 확인
-	 * 
-	 * @param material
-	 */
-//	private void validateDeactivation(Material material) {
-//		boolean isUsedInBom = bomRepository.existsByMatCodeAndUseYn(material.getMatCode(), 'Y');
-//	}
 	
 	// ============================================
 	// 완제품 조회
@@ -127,8 +171,78 @@ public class ItemService {
 	}
 
 	// 완제품 수정
+	@Transactional
 	public void updateProduct(List<ProductDTO> updatedRows) {
-		// TODO Auto-generated method stub
+		for (ProductDTO dto : updatedRows) {
+			Product product = productRepository.findByPrdId(dto.getPrdId())
+					.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 완제품 입니다."));
+			
+			if ('N' == dto.getUseYn() && 'Y' == product.getUseYn()) {
+				
+				String prdCode = product.getPrdCode();
+				
+				boolean usedInPlan = productionPlanRepository.existsByPrdIdAndStatusIn(
+						prdCode,
+						List.of(ProductionStatus.PLANNING,
+								ProductionStatus.MATERIAL_PENDING,
+								ProductionStatus.IN_PROGRESS
+						)
+					);
+				
+				if (usedInPlan) {
+					throw new IllegalStateException("해당 완제품을 사용하는 생산계획이 존재합니다.");
+				}
+				
+				boolean usedInOrder = orderItemRepository.existsByPrdIdAndStatusIn(
+							prdCode,
+							List.of("REQUEST", "CONFIRMED", "PLANNED")
+						);
+						
+				if (usedInOrder) {
+					 throw new IllegalStateException("해당 제품의 수주가 존재합니다.");
+				}
+				
+				List<String> statuses = List.of("CREATED", "RELEASED", "IN_PROGRESS");
+				
+				boolean usedInWorkOrdr = workOrderRepository.existsByPrdIdAndStatusIn(
+							prdCode,
+							statuses
+						);
+					
+				if (usedInWorkOrdr) {
+					  throw new IllegalStateException("해당 제품이 현재 생산 중(작업지시)입니다.");
+				}
+			}
+			product.updateProduct(dto.getPrdCode(),dto.getPrdType(), dto.getPrdName(), dto.getPrdUnit(), dto.getEffectiveDate());
+			product.chageUseYn(dto.getUseYn());
+		}
 		
+	}
+
+	// 원재료 코드 수정 가능 여부 확인
+	public boolean isMatCodeInUse(String matCode) {
+		Material material = materialRepository.findByMatCode(matCode)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 원재료입니다."));
+		// BOM Item에 등록되어 있는지
+		int bomCount = bomItemRepository.countByMaterialMatId(material.getMatId());
+		
+		// 재고가 있는지
+		int stockCount = inventoryRepository.countByItemId(matCode);
+		
+		return (bomCount > 0 || stockCount > 0);
+	}
+
+	// 완제품 코드 수정 가능 여부 확인
+	public boolean isPrdCodeInUse(String prdCode) {
+		Product product = productRepository.findByPrdCode(prdCode)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 완제품입니다."));
+		
+		// BOM에 등록되어 있는지 확인
+		int bomCount = bomRepository.countByProductPrdId(product.getPrdId());
+		
+		// 재고가 있는지 확인
+		int stockCount = inventoryRepository.countByItemId(prdCode);
+		
+		return (bomCount > 0 || stockCount > 0);
 	}
 }

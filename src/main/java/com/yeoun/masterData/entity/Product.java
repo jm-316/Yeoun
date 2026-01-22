@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.StringUtils;
 
 import com.yeoun.emp.entity.Emp;
 
@@ -64,4 +65,39 @@ public class Product {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "EMP_ID", nullable = false)
 	private Emp emp; // 생성자
+	
+	/**
+	 * 완제품의 완제품 코드, 완제품명, 완제품 단위, 완제품 타입, 완제품 유효기간을 변경하는 메서드
+	 * 
+	 * @param prdCode
+	 * @param prdType
+	 * @param prdName
+	 * @param prdUnit
+	 * @param effectiveDate
+	 */
+	public void updateProduct(String prdCode, String prdType, String prdName, String prdUnit, Integer effectiveDate) {
+		if (StringUtils.hasText(prdCode)) {
+			this.prdCode = prdCode;
+		}
+		
+		if (StringUtils.hasText(prdType)) {
+			this.prdType = prdType;
+		}
+		
+		if (StringUtils.hasText(prdName)) {
+			this.prdName = prdName;
+		}
+		
+		if (StringUtils.hasText(prdUnit)) {
+			this.prdUnit = prdUnit;
+		}
+		
+		if (effectiveDate != null) {
+			this.effectiveDate = effectiveDate;
+		}
+	}
+	
+	public void chageUseYn(char useYn) {
+		this.useYn = useYn;
+	}
 }

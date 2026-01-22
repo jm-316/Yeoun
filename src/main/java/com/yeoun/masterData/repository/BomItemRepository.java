@@ -17,6 +17,13 @@ public interface BomItemRepository extends JpaRepository<BomItem, Long>{
 	 
 	@Query("DELETE FROM BomItem b WHERE b.bomItemId IN :bomItemIds")
 	void deleteAllByBomItemIdIn(@Param("bomItemIds") List<Long> bomItemIds);
+
+	// BOM ITEM에 원재료 등록되었는지 카운팅
+	int countByMaterialMatId(Long matId);
+
+	// matId로 productId 조회
+	@Query("SELECT b.product.prdId FROM BomItem bi JOIN bi.bom b WHERE bi.material.id = :matId")
+	List<Long> findProductIdsByMaterialId(@Param("matId") Long matId);
   
 	
 }

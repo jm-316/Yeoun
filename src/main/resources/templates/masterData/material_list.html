@@ -7,7 +7,7 @@
 			
 			</div>
 			<!-- 키워드 -->
-			<input type="text" class="form-control" placeholder="원재료명 / LOT번호"
+			<input type="text" class="form-control" placeholder="원재료명 / 원재료 코드를 입력하세요."
 				id="materialKeyword" style="width: 220px;">
 			<!-- 조회 버튼 -->
 			<button class="btn btn-outline-primary" id="searchbtn">검색</button>
@@ -18,9 +18,6 @@
 			</button>
 			<button type="button" class="btn btn-success"
 				id="matSaveBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">저장
-			</button>
-			<button type="button" class="btn btn-danger"
-				id="matDeleteBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">삭제
 			</button>
 		</div>
 	</div>

@@ -1,3 +1,4 @@
+let productDataList = [];
 let prdTypeList = []; // 완제품 타입 리스트 (드롭다운에 사용)
 let prdUnitList = []; // 완제품 단위 리스트 (드롭다운에 사용)
 let prdTypeMap = {};
@@ -22,16 +23,19 @@ const productGrid = new tui.Grid({
 		{
 			header: "완제품코드",
 			name: "prdCode",
-			editor: "text"
+			editor: "text",
+			sortable: true
 		},
 		{
 			header: "완제품명",
 			name: "prdName",
-			editor: "text"
+			editor: "text",
+			sortable: true
 		},
 		{
 			header: "타입",
 			name: "prdType",
+			filter: "select",
 			editor: {
 				type: 'select', // 드롭다운 사용
 				options: {
@@ -101,13 +105,45 @@ const productGrid = new tui.Grid({
 // 변경하기 전 값
 const beforeEditPrdValues = {};
 
-productGrid.on("editingStart", ev => {
+productGrid.on("editingStart", async (ev) => {
     const { rowKey, columnName } = ev;
+	
+	if (columnName === "prdCode") {
+		const rowData = productGrid.getRow(rowKey);
+		const prdCode = rowData.prdCode;
+		const canEdit = await checkPrdCode(prdCode);
+		
+		if (!canEdit.allowed) {
+			alert(canEdit.message);
+			ev.stop();
+			return;
+		}
+	}
 
     beforeEditPrdValues[rowKey] ??= {};
     beforeEditPrdValues[rowKey][columnName] =
         productGrid.getValue(rowKey, columnName);
 });
+
+// 완제품 코드 수정 가능 여부 확인
+async function checkmatCode(prdCode) {
+	try {
+		const CHECK_PRD_CODE_URL = `/masterData1/data/check/prd?prdCode=${prdCode}`
+		
+		const res = await fetch(CHECK_PRD_CODE_URL);
+		const data = await res.json();
+		
+		return {
+			allowed: !data.isUsed,
+			message: data.isUsed 
+               ? "BOM에 등록 또는 재고가 있는 완제품는 코드를 변경할 수 없습니다."
+               : null
+		};
+	} catch (error) {
+		console.error(error);
+		alert("완제품 코드 검사에 실패했습니다.");
+	}
+}
 
 const validationPrdRules = {
 	prdCode: {
@@ -221,15 +257,6 @@ function getColumnHeader(columnName) {
 	return column ? column.header : columnName;
 }
 
-// 데이터 변경 감지
-//materialGrid.on("afterChange", ev => {
-//	ev.changes.forEach(change => {
-//		const { rowKey, columnName, prevValue  } = change;
-//		
-////		materialGrid.setValue(rowKey, columnName, prevValue);
-//	});
-//});
-
 // 클릭 동작
 productGrid.on('click', ev => {
 	
@@ -271,6 +298,7 @@ async function loadProduct(useYn) {
 		}
 
 		productGrid.resetData(data);
+		productDataList = data;
 		
 	} catch (error) {
 		console.error(error);
@@ -354,6 +382,32 @@ window.addEventListener("DOMContentLoaded", async (e) => {
 	hideSpinner();
 });
 
+// 검색어 입력
+let searchPrdKeyword = "";
+document.getElementById("productKeyword").addEventListener("input", (e) => {
+	searchPrdKeyword = e.target.value;
+});
+
+// 검색 버튼 이벤트
+document.getElementById("productSearch").addEventListener("click", () => {
+	const keyword = searchPrdKeyword.trim().toLowerCase();
+	
+	// 검색어가 없으면 빈 화면 보여주기
+	if (!keyword) {
+		productGrid.resetData([]);
+		return;
+	}
+	
+	const filterData = productDataList.filter(item => {
+		const prdName = item.prdName ? item.prdName.toLowerCase() : "";
+		const prdCode = item.prdCode ? item.prdCode.toLowerCase() : "";
+		
+		return prdName.includes(keyword) || prdCode.includes(keyword);
+	});
+	
+	productGrid.resetData(filterData);
+});
+
 // 추가 버튼 이벤트
 document.getElementById("prdRegistBtn").addEventListener("click", () => {
 	productGrid.prependRow();
@@ -391,16 +445,12 @@ document.getElementById("prdSaveBtn").addEventListener("click", async () => {
 	
 	await saveProduct(saveData);
 	
-	await loadProduct("all"); // 데이터 재조회
-	
 	hideSpinner();
 });
 
 // 원재료 등록
 async function saveProduct(data) {
 	const PRODUCT_ADD_URL = "/masterData1/data/product/add";
-	
-	console.log(data)
 	
 	try {
 		const res = await fetch(apiUrl(PRODUCT_ADD_URL), {
@@ -413,14 +463,26 @@ async function saveProduct(data) {
 		});
 		
 		if (!res.ok) {
-			   throw new Error(`등록 실패: ${res.status}`);
+		    let message = `등록 실패 (${res.status})`;
+
+		    try {
+		        const errorText = await res.text();
+				if (errorText) {
+				    message = errorText;
+				}
+		    } catch (_) {}
+
+		    throw new Error(message);
 		}
 		
 		alert("저장이 완료되었습니다.");
 		
+		await loadProduct("all"); // 데이터 재조회
+		
 	} catch (e) {
 		console.error(e);
-		alert("저장에 실패했습니다.")
+		alert(e.message || "저장에 실패했습니다.");
+		await loadProduct("all"); // 데이터 재조회
 	}
 }
 

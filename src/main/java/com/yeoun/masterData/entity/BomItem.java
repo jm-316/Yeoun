@@ -49,13 +49,18 @@ public class BomItem {
 	
 	@Column(nullable = false)
 	private Double bomQty;  // 소모량
+	
+//	@Column(nullable = false)
+	private char useYn; // 사용여부
 
-	public BomItem(Long bomItemId, Bom bom, Material material, String bomUnit, Double bomQty) {
+	public BomItem(Long bomItemId, Bom bom, Material material, String bomUnit, 
+			Double bomQty, char useYn) {
 		this.bomItemId = bomItemId;
 		this.bom = bom;
 		this.material = material;
 		this.bomUnit = bomUnit;
 		this.bomQty = bomQty;
+		this.useYn = useYn;
 	}
 	
 	

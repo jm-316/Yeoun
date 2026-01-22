@@ -1,6 +1,7 @@
 let matTypeList = []; // 원재료 타입 리스트 (드롭다운에 사용)
 let unitList = []; // 원재료 단위 리스트 (드롭다운에 사용)
 let matTypeMap = {};
+let matDataList = [];
 
 // effectiveDate 허용범위 (개월 단위)
 const EFFECTIVE_DATE_MIN = 0;
@@ -22,16 +23,19 @@ const materialGrid = new tui.Grid({
 		{
 			header: "원재료코드",
 			name: "matCode",
-			editor: "text"
+			editor: "text",
+			sortable: true
 		},
 		{
 			header: "원재료명",
 			name: "matName",
+			sortable: true,
 			editor: "text"
 		},
 		{
 			header: "타입",
 			name: "matType",
+			filter: "select",
 			editor: {
 				type: 'select', // 드롭다운 사용
 				options: {
@@ -101,13 +105,45 @@ const materialGrid = new tui.Grid({
 // 변경하기 전 값
 const beforeEditValues = {};
 
-materialGrid.on("editingStart", ev => {
+materialGrid.on("editingStart", async (ev) => {
     const { rowKey, columnName } = ev;
+	
+	if (columnName === "matCode") {
+		const rowData = materialGrid.getRow(rowKey);
+		const matCode = rowData.matCode;
+		const canEdit = await checkmatCode(matCode);
+		
+		if (!canEdit.allowed) {
+			alert(canEdit.message);
+			ev.stop();
+			return;
+		}
+	}
 
     beforeEditValues[rowKey] ??= {};
     beforeEditValues[rowKey][columnName] =
         materialGrid.getValue(rowKey, columnName);
 });
+
+// 원재료 코드 수정 가능 여부 확인
+async function checkmatCode(matCode) {
+	try {
+		const CHECK_MAT_CODE_URL = `/masterData1/data/check?matCode=${matCode}`
+		
+		const res = await fetch(CHECK_MAT_CODE_URL);
+		const data = await res.json();
+		
+		return {
+			allowed: !data.isUsed,
+			message: data.isUsed 
+               ? "BOM에 등록 또는 재고가 있는 원재료는 코드를 변경할 수 없습니다."
+               : null
+		};
+	} catch (error) {
+		console.error(error);
+		alert("원재료 코드 검사에 실패했습니다.");
+	}
+}
 
 const validationRules = {
 	matCode: {
@@ -271,6 +307,7 @@ async function loadMaterial(useYn) {
 		}
 
 		materialGrid.resetData(data);
+		matDataList = data;
 		
 	} catch (error) {
 		console.error(error);
@@ -392,10 +429,7 @@ document.getElementById("matSaveBtn").addEventListener("click", async () => {
 	showSpinner();
 	
 	await saveMaterial(saveData);
-	alert("저장되었습니다.");
-	
-	await loadMaterial(); // 데이터 재조회
-	
+		
 	hideSpinner();
 });
 
@@ -414,15 +448,55 @@ async function saveMaterial(data) {
 		});
 		
 		if (!res.ok) {
-			   throw new Error(`등록 실패: ${res.status}`);
+		    let message = `등록 실패 (${res.status})`;
+
+		    try {
+		        const errorText = await res.text();
+				if (errorText) {
+				    message = errorText;
+				}
+		    } catch (_) {}
+
+		    throw new Error(message);
 		}
+		
+		await loadMaterial("all"); // 데이터 재조회
+		
+		alert("저장되었습니다.");
 		
 	} catch (e) {
 		console.error(e);
-		alert("저장에 실패했습니다.")
+		alert(e.message || "저장에 실패했습니다.");
+		await loadMaterial("all");  // 데이터 재조회
 	}
 }
 
+let searchMatKeyword = "";
+
+// 검색어 입력 이벤트
+document.getElementById("materialKeyword").addEventListener("input", (e) => {
+	searchMatKeyword = e.target.value;
+});
+
+// 검색 버튼 이벤트
+document.getElementById("searchbtn").addEventListener("click", () => {
+	const keyword = searchMatKeyword.trim().toLowerCase();
+	
+	// 검색어가 없으면 빈 화면 보여주기
+	if (!keyword) {
+		materialGrid.resetData([]);
+		return;
+	}
+	
+	const filterData = matDataList.filter(item => {
+		const matName = item.matName ? item.matName.toLowerCase() : "";
+		const matCode = item.matCode ? item.matCode.toLowerCase() : "";
+		
+		return matName.includes(keyword) || matCode.includes(keyword);
+	});
+	
+	materialGrid.resetData(filterData);
+});
 
 function showSpinner() {
 	document.getElementById('loading-overlay').style.display = 'flex';
