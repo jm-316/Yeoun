@@ -40,6 +40,14 @@ public class BomController {
 		return ResponseEntity.ok(bomList);
 	}
 	
+	// BOM 등록
+	@PostMapping("/data/bom/add")
+	public ResponseEntity<String> registBom(@RequestBody BomDTO bomDTO, @AuthenticationPrincipal LoginDTO loginDTO) {
+		bomService.createBom(bomDTO, loginDTO.getEmpId());
+		
+		return ResponseEntity.ok("등록 완료");
+	}
+	
 	// BOM Item 조회
 	@GetMapping("/bomItems/{bomId}")
 	public ResponseEntity<List<BomItemDTO>> bomItemList(@PathVariable("bomId") Long bomId) {
@@ -55,18 +63,12 @@ public class BomController {
 		List<BomItemDTO> createdRows = data.get("created");
 		List<BomItemDTO> updatedRows = data.get("updated");
 		
-		try {
-			if (createdRows != null && !createdRows.isEmpty()) {
-				bomService.createBomItem(createdRows, loginDTO.getEmpId());
-			} else if (updatedRows != null && !updatedRows.isEmpty()) {
-				bomService.updateMaterial(updatedRows);
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (createdRows != null && !createdRows.isEmpty()) {
+			bomService.createBomItem(createdRows, loginDTO.getEmpId());
+		} else if (updatedRows != null && !updatedRows.isEmpty()) {
+			bomService.updateMaterial(updatedRows);
 		}
-		
-		
+			
 		return ResponseEntity.ok("저장 완료");
 	}
 	

@@ -25,6 +25,8 @@ const bomGrid = new tui.Grid({
 			{
 				header: "BOM이름",
 				name: "bomName",
+				sortable: true,
+				sortingType: 'asc',
 				editor: "text"
 			},
 			{
@@ -234,6 +236,11 @@ const registBomItemGrid = new tui.Grid({
 			}
 		},
 		{
+			header: "사용량",
+			name: "bomQty",
+			editor: "text"
+		},
+		{
 			header: "단위",
 			name: "matUnit",
 		},
@@ -262,8 +269,6 @@ const registBomItemGrid = new tui.Grid({
 
 registBomItemGrid.on("click", async (ev) => {
 	const { columnName, rowKey } = ev;
-	
-	console.log(columnName);
 	
 	if (columnName === "matName" || columnName === "matCode") {
 		// 원재료 모달 열기
@@ -342,6 +347,115 @@ document.getElementById("deleteBtn").addEventListener("click", () => {
 	registBomItemGrid.removeCheckedRows();
 });
 
+// 저장 버튼 이벤트
+document.getElementById("svaeBomBtn").addEventListener("click", async (event) => {
+	registBomItemGrid.finishEditing();
+	
+	const bomName = document.getElementById("bomName").value;
+	const prdId = document.getElementById("prdId").value;
+	const modifiedData = registBomItemGrid.getModifiedRows() || {};
+	let createdRows = modifiedData.createdRows || [];
+	
+	const isEmptyRow = (row) => {
+		return !row.matId && !row.matCode && !row.matName && !row.bomQty
+	}
+	
+	if (bomName === null || bomName === "") {
+		alert("BOM 이름은 필수 작성합니다.");
+		return;
+	}
+	
+	const regexBomName = /^[가-힣a-zA-Z0-9\s~!@#$%^&*\(\)_+\-=\[\];:'",.<>/?]+$/;
+	const regexBomQty = /^\d+(\.\d{1,2})?$/;
+	
+	// 패턴 체크
+	if (!regexBomName.test(bomName)) {
+		alert("bom 이름은 한글, 영문, 숫자 2~50자만 가능합니다.");
+		return;
+	} 
+	
+	for (let i = 0; i < createdRows.length; i++) {
+		const row = createdRows[i];
+		const rowNum = i + 1;
+		
+		if (!row.bomQty || row.bomQty === "" || row.bomQty === null) {
+			alert(`${rowNum}번째 행 (${row.matName ?? ""}): 수량을 입력해주세요.`);
+			return;			
+		}
+		
+		// 유효성 검사
+		if (!regexBomQty.test(row.bomQty)) {
+		    alert(`${rowNum}번째 행 (${row.matName}): 수량은 숫자와 소숫점만 입력 가능합니다.`);
+		    return;
+		}
+		
+		// 수량 양수 체크
+		const qty = parseFloat(row.bomQty);
+		if (qty <= 0) {
+		    alert(`${rowNum}번째 행 (${row.matName}): 수량은 0보다 커야 합니다.`);
+		    return;
+		}
+	}
+	
+	createdRows = createdRows.filter(row => !isEmptyRow(row));
+	createdRows = createdRows.map(item => ({
+		...item,
+		bomUnit: item.matUnit
+	}));
+	
+	if (createdRows.length === 0) {
+		alert("원재료 등록은 필수입니다.");
+		return;
+	}
+	
+	const saveData = {
+		bomName,
+		prdId,
+		items: createdRows
+	}
+	
+	await saveBom(saveData);
+	
+	await loadBom();
+});
+
+async function saveBom(data) {
+	const BOM_ADD_URL = "/bomMst/data/bom/add";
+	
+	try {
+		const res = await fetch(apiUrl(BOM_ADD_URL), {
+			method: 'POST',
+			headers: {
+				[csrfHeader]: csrfToken,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if (!res.ok) {
+			throw new Error(`등록 실패: ${res.status}`);
+		}
+		
+		bomModal.hide();
+		
+		resetBomModal();
+		
+		alert("등록이 완료되었습니다.")
+	} catch (error) {
+		console.error(error);
+		alert("등록 실패했습니다.");
+	} 
+}
+
+function resetBomModal() {
+	document.getElementById("bomName").value = "";
+	document.getElementById("prdId").value = "";
+	document.getElementById("productName").value = "";
+	document.getElementById("bomNameFeedback").innerHTML = "";
+	registBomItemGrid.resetData([]);
+	
+}
+
 async function checkBomName(bomName) {
 	const feedbackElement = document.getElementById("bomNameFeedback");
 	
@@ -351,9 +465,14 @@ async function checkBomName(bomName) {
 		const res = await fetch(CHECK_BOM_NAME_URL);
 		const data = await res.json();
 		
-		if (data.isDuplicate) {
+		const regex = /^[가-힣a-zA-Z0-9\s~!@#$%^&*\(\)_+\-=\[\];:'",.<>/?]+$/;
+			
+		// 패턴 체크
+		if (!regex.test(bomName)) {
+			feedbackElement.innerHTML = '<span style="color: red;">bom 이름은 한글, 영문, 숫자 2~50자만 가능합니다.</span>';
+		} else if (data.isDuplicate) {
 			feedbackElement.innerHTML = '<span style="color: red;">이미 사용 중인 BOM 이름입니다.</span>';
-		} else {
+		} else if (!data.isDuplicate) {
 			feedbackElement.innerHTML = '<span style="color: green;">사용 가능한 BOM 이름입니다.</span>';
 		}
 		

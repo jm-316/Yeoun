@@ -17,5 +17,8 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
 	// 원재료Id로 원재료 조회
 	Optional<Material> findByMatId(Long matId);
 
+	// 원재료 ID로 원재료 목록 조회
+	List<Material> findByMatIdIn(List<Long> matIds);
+
 	
 }

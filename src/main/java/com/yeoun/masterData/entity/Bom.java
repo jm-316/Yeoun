@@ -29,8 +29,8 @@ import lombok.ToString;
 @Entity
 @Table(name = "BOM")
 @SequenceGenerator(
-		name = "BOM_SEQ_GENERATOR",
-		sequenceName = "BOM_SEQ", 
+		name = "BOM_MASTER_SEQ_GENERATOR",
+		sequenceName = "BOM_MASTER_SEQ", 
 		initialValue = 1,
 		allocationSize = 1
 )
@@ -41,7 +41,7 @@ import lombok.ToString;
 public class Bom {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "BOM_SEQ_GENERATOR")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "BOM_MASTER_SEQ_GENERATOR")
 	private Long bomId; 
 	
 	@Column(nullable = false)
