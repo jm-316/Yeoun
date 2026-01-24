@@ -104,9 +104,13 @@ bomItemGrid.on('click', async (ev) => {
 
 // 변경하기 전 값
 const beforeEditItemValues = {};
+// BOM_ITEM 수정 확인 변수
+let isBomItemEdited = false;
 
 bomItemGrid.on("editingStart", ev => {
     const { rowKey, columnName } = ev;
+	
+	isBomItemEdited = true;
 
     beforeEditItemValues[rowKey] ??= {};
     beforeEditItemValues[rowKey][columnName] =
@@ -158,8 +162,14 @@ function restoreValue(rowKey, columnName) {
 bomItemGrid.on("editingFinish", ev => {
     const { rowKey, columnName, value } = ev;
 	
+	const before = beforeEditItemValues[rowKey]?.[columnName];
+	
 	// 통합 검증
 	if (!validateItemField(rowKey, columnName, value)) return;
+	
+	if (before !== value) {
+		isBomItemEdited = true;
+	}
 });
 
 async function loadMaterial(useYn) {
@@ -206,7 +216,47 @@ document.getElementById("bomItemRegistBtn").addEventListener("click", () => {
 document.getElementById("bomItemSaveBtn").addEventListener("click", async () => {
 	// 편집 완료
 	bomItemGrid.finishEditing();
+	bomGrid.finishEditing();
 	
+	if (!isBomEdited && !isBomItemEdited) {
+		alert("수정된 내용이 없습니다.");
+		return;
+	}
+	
+	let successMessage = [];
+	
+	try {
+		if (isBomEdited) {
+			const bomData = collectBomData();
+			await modifyBom(bomData);
+			successMessage.push("BOM 정보");
+		}
+		
+		if (isBomItemEdited) {
+			const bomItemData = collectBomItemData();
+			await saveBomItem(bomItemData);
+			successMessage.push("BOM 원재료");
+		}
+		
+		if (successMessage.length > 0) {
+			alert(`${successMessage.join(", ")}가 성공적으로 저장되었습니다.`);
+		}
+		
+		if (isBomEdited) {
+			await loadBom();
+		}
+		
+		if (isBomItemEdited) {
+			await loadBomItem(selectedBomId);
+		}
+		
+	} catch (error) {
+		console.error(error);
+		alert(error.message || "저장에 실패했습니다.");
+	}
+});
+
+function collectBomItemData() {
 	const modifiedData = bomItemGrid.getModifiedRows() || {};
 	const updateRows = modifiedData.updatedRows || [];
 	let createdRows = modifiedData.createdRows || [];
@@ -217,20 +267,11 @@ document.getElementById("bomItemSaveBtn").addEventListener("click", async () => 
 	
 	createdRows = createdRows.filter(row => !isEmptyRow(row));
 	
-	if (updateRows.length === 0 && createdRows.length === 0) {
-		alert("수정된 내용이 없습니다.");
-		return;
-	}
-	
-	const saveData = {
+	return {
 		created: createdRows,
 		updated: updateRows
 	}
-	
-	await saveBomItem(saveData);
-	
-	await loadBomItem(selectedBomId);
-});
+}
 
 async function saveBomItem(data) {
 	const BOM_ITEM_ADD_URL = "/bomMst/data/bomItem/add";
@@ -246,13 +287,21 @@ async function saveBomItem(data) {
 		});
 		
 		if (!res.ok) {
-			throw new Error(`등록 실패: ${res.status}`);
+		    let message = `등록 실패 (${res.status})`;
+
+		    try {
+		        const errorText = await res.text();
+				if (errorText) {
+				    message = errorText;
+				}
+		    } catch (_) {}
+
+		    throw new Error(message);
 		}
 		
-		alert("저장되었습니다.");
 	} catch (error) {
 		console.error(error);
-		alert("저장에 실패했습니다.");
+		alert(error.message || "저장에 실패했습니다.");
 	}
 }
 
@@ -278,6 +327,7 @@ document.getElementById("bomItemDeleteBtn").addEventListener("click", async () =
 	if (!confirm(`${checkedRows.length}개의 항목을 삭제하시겠습니까?`)) {
 		return;
 	}
+	
 	if (validBomItemIds.length === 0) {
 		bomItemGrid.removeCheckedRows();
 		alert('삭제되었습니다.');
@@ -288,20 +338,30 @@ document.getElementById("bomItemDeleteBtn").addEventListener("click", async () =
 });
 
 async function deleteBomItem(bomItemIds) {
+	console.log(bomItemIds)
 	try {
 		const BOM_ITEM_DELETE_URL = "/bomMst/data/bomItem/delete";
 		
 		const res = await fetch(apiUrl(BOM_ITEM_DELETE_URL), {
-			method: 'DELETE',
+			method: 'POST',
 			headers: {
 				[csrfHeader]: csrfToken,
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ bomItemIds: bomItemIds })
+			body: JSON.stringify(bomItemIds)
 		});
 		
 		if (!res.ok) {
-			throw new Error("삭제 실패");
+		    let message = `등록 실패 (${res.status})`;
+
+		    try {
+		        const errorText = await res.text();
+				if (errorText) {
+				    message = errorText;
+				}
+		    } catch (_) {}
+
+		    throw new Error(message);
 		}
 		
 		bomItemGrid.removeCheckedRows();
@@ -310,6 +370,6 @@ async function deleteBomItem(bomItemIds) {
 		
 	} catch (error) {
 		console.error(error);
-		alert("삭제 중 오류가 발생했습니다.");
+		alert(error.message || "저장에 실패했습니다.");
 	}
 }

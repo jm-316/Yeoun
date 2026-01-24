@@ -32,7 +32,6 @@ const bomGrid = new tui.Grid({
 			{
 				header: "제품명",
 				name: "prdName",
-				editor: "text"
 			},
 			{
 				header: "사용여부",
@@ -61,9 +60,13 @@ const bomGrid = new tui.Grid({
 
 // 변경하기 전 값
 const beforeEditValues = {};
+// bom 수정 여부 확인 변수
+let isBomEdited = false;
 
 bomGrid.on("editingStart", ev => {
     const { rowKey, columnName } = ev;
+	
+	isBomEdited = true;
 
     beforeEditValues[rowKey] ??= {};
     beforeEditValues[rowKey][columnName] =
@@ -104,7 +107,7 @@ function validateField(rowKey, columnName, value) {
 
 	// 중복 체크
 	if (rule.checkDuplicate) {
-		const isDuplicate = materialGrid.getData().some((row) => {
+		const isDuplicate = bomGrid.getData().some((row) => {
 			return row[columnName] === stringValue && row.rowKey !== rowKey;
 		});
 	
@@ -132,15 +135,21 @@ bomGrid.on("editingFinish", ev => {
 	// 통합 검증
 	if (!validateField(rowKey, columnName, value)) return;
 	
+  	const beforeValue = beforeEditValues?.[rowKey]?.[columnName];
+	
+	if (beforeValue !== value) {
+		isBomEdited = true;
+	}
+	
 	// 기타 컬럼 (select 관련 로직)
   	if (value === null || value === undefined || value === '') {
-      const beforeValue = beforeEditValues?.[rowKey]?.[columnName];
 
       if (beforeValue !== undefined) {
           setTimeout(() => {
               bomGrid.setValue(rowKey, columnName, beforeValue);
           }, 0);
       }
+	  
   	}
 });
 
@@ -195,6 +204,46 @@ async function loadBom() {
 	} catch (error) {
 		console.error(error);
 	}
+}
+
+function collectBomData() {
+	const modifiedData = bomGrid.getModifiedRows() || {};
+	const updateRows = modifiedData.updatedRows || [];
+	
+	return updateRows
+}
+
+async function modifyBom(data) {
+	console.log(data);
+	const BOM_MODIFY_URL = "/bomMst/data/bom/modify";
+	
+	try {
+		const res = await fetch(apiUrl(BOM_MODIFY_URL), {
+			method: 'POST',
+			headers: {
+				[csrfHeader]: csrfToken,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if (!res.ok) {
+		    let message = `등록 실패 (${res.status})`;
+
+		    try {
+		        const errorText = await res.text();
+				if (errorText) {
+				    message = errorText;
+				}
+		    } catch (_) {}
+
+		    throw new Error(message);
+		}
+	} catch (error) {
+		console.error(error);
+		alert(error.message || "저장에 실패했습니다.");
+	}
+	
 }
 
 // =============================================

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.yeoun.auth.dto.LoginDTO;
 import com.yeoun.masterData.dto.BomDTO;
 import com.yeoun.masterData.dto.BomItemDTO;
+import com.yeoun.masterData.entity.Bom;
 import com.yeoun.masterData.entity.BomItem;
 import com.yeoun.masterData.service.BomService;
 
@@ -48,6 +50,13 @@ public class BomController {
 		return ResponseEntity.ok("등록 완료");
 	}
 	
+	// BOM 수정
+	@PostMapping("/data/bom/modify")
+	public ResponseEntity<String> modifyBom(@RequestBody List<BomDTO> data) {
+		bomService.modifyBom(data);
+		return ResponseEntity.ok("저장 완료");
+	}
+	
 	// BOM Item 조회
 	@GetMapping("/bomItems/{bomId}")
 	public ResponseEntity<List<BomItemDTO>> bomItemList(@PathVariable("bomId") Long bomId) {
@@ -63,26 +72,32 @@ public class BomController {
 		List<BomItemDTO> createdRows = data.get("created");
 		List<BomItemDTO> updatedRows = data.get("updated");
 		
-		if (createdRows != null && !createdRows.isEmpty()) {
-			bomService.createBomItem(createdRows, loginDTO.getEmpId());
-		} else if (updatedRows != null && !updatedRows.isEmpty()) {
-			bomService.updateMaterial(updatedRows);
-		}
 			
-		return ResponseEntity.ok("저장 완료");
+		try {
+			
+			if (createdRows != null && !createdRows.isEmpty()) {
+				bomService.createBomItem(createdRows, loginDTO.getEmpId());
+			} else if (updatedRows != null && !updatedRows.isEmpty()) {
+				bomService.updateMaterial(updatedRows);
+			}
+			return ResponseEntity.ok("저장 완료");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("시류ㅐ");
+		}
+		
 	}
 	
 	// BOM Item 삭제
-	@DeleteMapping("/data/bomItem/delete")
-	public ResponseEntity<String> deleteBomItem(@RequestBody Map<String, List<String>> data) {
-		List<String> bomItemIds = data.get("bomItemIds");
+	@PostMapping("/data/bomItem/delete")
+	public ResponseEntity<String> deleteBomItem(@RequestBody List<String> data) {
 		
-		if (bomItemIds == null || bomItemIds.isEmpty()) {
+		if (data == null || data.isEmpty()) {
 			return ResponseEntity.badRequest().body("삭제할 항목이 없습니다.");
 		}
-		
-		bomService.deleteBomItems(bomItemIds);
-		
+	
+		bomService.deleteBomItems(data);
 		return ResponseEntity.ok().body("삭제되었습니다.");
 	}
 	
