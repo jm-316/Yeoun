@@ -397,7 +397,7 @@ document.getElementById("deleteBtn").addEventListener("click", () => {
 });
 
 // 저장 버튼 이벤트
-document.getElementById("svaeBomBtn").addEventListener("click", async (event) => {
+document.getElementById("svaeBomBtn").addEventListener("click", async () => {
 	registBomItemGrid.finishEditing();
 	
 	const bomName = document.getElementById("bomName").value;

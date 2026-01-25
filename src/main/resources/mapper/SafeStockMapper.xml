@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yeoun.masterData.mapper.SafeStockMapper">
+	<select id="findAllSafeStock" resultType="com.yeoun.masterData.dto.SafeStockDTO">
+		SELECT
+			ss.safe_id          AS safeId
+			, ss.item_id        AS itemId
+			, ss.item_type      AS itemType
+			, ss.item_unit      AS itemUnit
+			, ss.daily_capa     AS dailyCapa
+			, ss.daily_req_qty  AS dailyReqQty
+            , ss.target_days    AS targetDays
+            , ss.total_safe_qty AS totalSafeQty
+            , ss.use_yn         AS useYn
+            , ss.remark         AS remark
+            , COALESCE(p.prd_name, m.mat_name) AS itemName
+            , COALESCE(p.prd_code, m.mat_code) AS itemCode
+            FROM
+            	SAFE_STOCK ss
+            LEFT JOIN
+            	MATERIAL m
+            ON
+            	ss.item_type = 'MAT'
+            AND
+            	ss.item_id = m.mat_id
+            LEFT JOIN
+            	PRODUCT p
+            ON
+            	ss.item_type = 'PRD'
+            AND
+            	ss.item_id = p.prd_id
+	</select>
+	
+	<!-- 원재료 및 완제품 활성화된 내역만 조회 -->
+	<select id="findAllItem" resultType="com.yeoun.masterData.dto.SafeStockDTO">
+		SELECT
+			prd_id     as itemId
+			, prd_code as itemCode
+			, prd_name as itemName
+			, 'PRD'    as itemType
+			, prd_unit as itemUnit
+		FROM
+			PRODUCT
+		WHERE 
+			use_Yn = 'Y'
+		UNION ALL
+		SELECT
+			mat_id     as itemId
+			, mat_code as itemCode
+			, mat_name as itemName
+			, mat_type as itemType
+			, mat_unit as itemUnit
+		FROM
+			MATERIAL
+		WHERE
+			use_Yn = 'Y'
+	</select>
+
+</mapper>
+
+
+
+
+

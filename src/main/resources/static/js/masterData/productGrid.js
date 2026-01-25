@@ -105,28 +105,16 @@ const productGrid = new tui.Grid({
 // 변경하기 전 값
 const beforeEditPrdValues = {};
 
-productGrid.on("editingStart", async (ev) => {
+productGrid.on("editingStart", ev => {
     const { rowKey, columnName } = ev;
 	
-	if (columnName === "prdCode") {
-		const rowData = productGrid.getRow(rowKey);
-		const prdCode = rowData.prdCode;
-		const canEdit = await checkPrdCode(prdCode);
-		
-		if (!canEdit.allowed) {
-			alert(canEdit.message);
-			ev.stop();
-			return;
-		}
-	}
-
     beforeEditPrdValues[rowKey] ??= {};
     beforeEditPrdValues[rowKey][columnName] =
         productGrid.getValue(rowKey, columnName);
 });
 
 // 완제품 코드 수정 가능 여부 확인
-async function checkmatCode(prdCode) {
+async function checkPrdCode(prdCode) {
 	try {
 		const CHECK_PRD_CODE_URL = `/masterData1/data/check/prd?prdCode=${prdCode}`
 		
@@ -233,11 +221,23 @@ function restoreValue(rowKey, columnName) {
 }
 
 
-productGrid.on("editingFinish", ev => {
+productGrid.on("editingFinish", async (ev) => {
     const { rowKey, columnName, value } = ev;
 	
 	// 통합 검증
 	if (!validatePrdField(rowKey, columnName, value)) return;
+	
+	if (columnName === "prdCode") {
+		const rowData = productGrid.getRow(rowKey);
+		const prdCode = rowData.prdCode;
+		const canEdit = await checkPrdCode(prdCode);
+		
+		if (!canEdit.allowed) {
+			alert(canEdit.message);
+			ev.stop();
+			return;
+		}
+	}
 	
 	// 기타 컬럼 (select 관련 로직)
   	if (value === null || value === undefined || value === '') {

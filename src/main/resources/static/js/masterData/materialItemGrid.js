@@ -66,10 +66,10 @@ const materialItemGrid = new tui.Grid({
 	]
 });
 
-const selectMaterial = {}
+const selectMaterial = {};
 
 // 클릭 동작
-materialItemGrid.on('click', ev => {
+materialItemGrid.on("click", ev => {
 	const rowData = materialItemGrid.getRow(ev.rowKey);
 	
 	selectMaterial.matId = rowData.matId;
@@ -81,17 +81,17 @@ materialItemGrid.on('click', ev => {
 	
 	// BOMItemGird에 선택한 원재료 정보 적용
 	if (window.selectedBomRowKey !== undefined && targetGrid === "bomItem") {
-		bomItemGrid.setValue(window.selectedBomRowKey, 'matId', selectMaterial.matId);
-        bomItemGrid.setValue(window.selectedBomRowKey, 'matCode', selectMaterial.matCode);
-        bomItemGrid.setValue(window.selectedBomRowKey, 'matName', selectMaterial.matName);
-        bomItemGrid.setValue(window.selectedBomRowKey, 'bomUnit', selectMaterial.matUnit);
+		bomItemGrid.setValue(window.selectedBomRowKey, "matId", selectMaterial.matId);
+        bomItemGrid.setValue(window.selectedBomRowKey, "matCode", selectMaterial.matCode);
+        bomItemGrid.setValue(window.selectedBomRowKey, "matName", selectMaterial.matName);
+        bomItemGrid.setValue(window.selectedBomRowKey, "bomUnit", selectMaterial.matUnit);
 	} else if (window.selectedBomRowKey !== undefined && targetGrid === "registBom") {
-		registBomItemGrid.setValue(window.selectedBomRowKey, 'matId', selectMaterial.matId);
-		registBomItemGrid.setValue(window.selectedBomRowKey, 'matCode', selectMaterial.matCode);
-		registBomItemGrid.setValue(window.selectedBomRowKey, 'matName', selectMaterial.matName);
-		registBomItemGrid.setValue(window.selectedBomRowKey, 'matType', selectMaterial.matType);
-		registBomItemGrid.setValue(window.selectedBomRowKey, 'matUnit', selectMaterial.matUnit);
-		registBomItemGrid.setValue(window.selectedBomRowKey, 'effectiveDate', selectMaterial.effectiveDate);
+		registBomItemGrid.setValue(window.selectedBomRowKey, "matId", selectMaterial.matId);
+		registBomItemGrid.setValue(window.selectedBomRowKey, "matCode", selectMaterial.matCode);
+		registBomItemGrid.setValue(window.selectedBomRowKey, "matName", selectMaterial.matName);
+		registBomItemGrid.setValue(window.selectedBomRowKey, "matType", selectMaterial.matType);
+		registBomItemGrid.setValue(window.selectedBomRowKey, "matUnit", selectMaterial.matUnit);
+		registBomItemGrid.setValue(window.selectedBomRowKey, "effectiveDate", selectMaterial.effectiveDate);
 	}
 	
 	// 모달 닫기

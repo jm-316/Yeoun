@@ -74,7 +74,7 @@ async function loadBomItem(bomId) {
 bomItemGrid.on('click', async (ev) => {
 	const { columnName, rowKey } = ev;
 	
-	const rowData = bomItemGrid.getRow(ev.rowKey);
+	const rowData = bomItemGrid.getRow(rowKey);
 	
 	if (columnName === "matName" && rowData.bomItemId === null) {
 		try {
@@ -338,7 +338,6 @@ document.getElementById("bomItemDeleteBtn").addEventListener("click", async () =
 });
 
 async function deleteBomItem(bomItemIds) {
-	console.log(bomItemIds)
 	try {
 		const BOM_ITEM_DELETE_URL = "/bomMst/data/bomItem/delete";
 		
@@ -352,7 +351,7 @@ async function deleteBomItem(bomItemIds) {
 		});
 		
 		if (!res.ok) {
-		    let message = `등록 실패 (${res.status})`;
+		    let message = `삭제 실패 (${res.status})`;
 
 		    try {
 		        const errorText = await res.text();
@@ -370,6 +369,6 @@ async function deleteBomItem(bomItemIds) {
 		
 	} catch (error) {
 		console.error(error);
-		alert(error.message || "저장에 실패했습니다.");
+		alert(error.message || "삭제에 실패했습니다.");
 	}
 }

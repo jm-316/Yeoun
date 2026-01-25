@@ -105,21 +105,9 @@ const materialGrid = new tui.Grid({
 // 변경하기 전 값
 const beforeEditValues = {};
 
-materialGrid.on("editingStart", async (ev) => {
+materialGrid.on("editingStart", ev => {
     const { rowKey, columnName } = ev;
 	
-	if (columnName === "matCode") {
-		const rowData = materialGrid.getRow(rowKey);
-		const matCode = rowData.matCode;
-		const canEdit = await checkmatCode(matCode);
-		
-		if (!canEdit.allowed) {
-			alert(canEdit.message);
-			ev.stop();
-			return;
-		}
-	}
-
     beforeEditValues[rowKey] ??= {};
     beforeEditValues[rowKey][columnName] =
         materialGrid.getValue(rowKey, columnName);
@@ -233,11 +221,23 @@ function restoreValue(rowKey, columnName) {
 }
 
 
-materialGrid.on("editingFinish", ev => {
+materialGrid.on("editingFinish", async (ev) => {
     const { rowKey, columnName, value } = ev;
 	
 	// 통합 검증
 	if (!validateField(rowKey, columnName, value)) return;
+	
+	if (columnName === "matCode") {
+		const rowData = materialGrid.getRow(rowKey);
+		const matCode = rowData.matCode;
+		const canEdit = await checkmatCode(matCode);
+		
+		if (!canEdit.allowed) {
+			alert(canEdit.message);
+			ev.stop();
+			return;
+		}
+	}
 	
 	// 기타 컬럼 (select 관련 로직)
   	if (value === null || value === undefined || value === '') {
@@ -256,15 +256,6 @@ function getColumnHeader(columnName) {
 	const column = materialGrid.getColumns().find(col => col.name === columnName);
 	return column ? column.header : columnName;
 }
-
-// 데이터 변경 감지
-//materialGrid.on("afterChange", ev => {
-//	ev.changes.forEach(change => {
-//		const { rowKey, columnName, prevValue  } = change;
-//		
-////		materialGrid.setValue(rowKey, columnName, prevValue);
-//	});
-//});
 
 // 클릭 동작
 materialGrid.on('click', ev => {

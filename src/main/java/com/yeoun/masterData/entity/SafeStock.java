@@ -55,7 +55,7 @@ public class SafeStock {
 	private String remark; // 비고
 	
 	// 총 안전재고 계산
-	public void calcurateTotalSafeQty() {
+	private void calcurateTotalSafeQty() {
 		long reqQty = (this.dailyReqQty != null) ? this.dailyReqQty : 0L;
 		int days = (this.targetDays != null) ? this.targetDays : 0;
 		

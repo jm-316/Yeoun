@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.yeoun.auth.dto.LoginDTO;
 import com.yeoun.masterData.dto.MaterialDTO;
 import com.yeoun.masterData.dto.ProductDTO;
+import com.yeoun.masterData.dto.SafeStockDTO;
 import com.yeoun.masterData.service.ItemService;
 
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -142,5 +141,13 @@ public class ItemController {
 		data.put("isUsed", isUsed);
 		
 		return ResponseEntity.ok(data);
+	}
+	
+	// 원재료 및 완제품 모든 데이터 가져오기
+	@GetMapping("/items")
+	public ResponseEntity<List<SafeStockDTO>> itemList() {
+		List<SafeStockDTO> itemList = itemService.findAllItems();
+		
+		return ResponseEntity.ok(itemList);
 	}
 }

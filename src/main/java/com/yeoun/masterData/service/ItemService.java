@@ -1,27 +1,27 @@
 package com.yeoun.masterData.service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.yeoun.inventory.entity.Inventory;
 import com.yeoun.inventory.repository.InventoryRepository;
 import com.yeoun.masterData.dto.MaterialDTO;
 import com.yeoun.masterData.dto.ProductDTO;
+import com.yeoun.masterData.dto.SafeStockDTO;
 import com.yeoun.masterData.entity.Material;
 import com.yeoun.masterData.entity.Product;
+import com.yeoun.masterData.mapper.SafeStockMapper;
 import com.yeoun.masterData.repository.BomItemRepository;
 import com.yeoun.masterData.repository.BomRepository;
 import com.yeoun.masterData.repository.MaterialRepository;
 import com.yeoun.masterData.repository.ProductRepository;
+import com.yeoun.masterData.repository.SafeStockRepository;
 import com.yeoun.order.repository.WorkOrderRepository;
 import com.yeoun.production.enums.ProductionStatus;
 import com.yeoun.production.repository.ProductionPlanRepository;
 import com.yeoun.sales.enums.OrderItemStatus;
 import com.yeoun.sales.repository.OrderItemRepository;
-import com.yeoun.sales.repository.OrdersRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +40,8 @@ public class ItemService {
 	private final ProductionPlanRepository productionPlanRepository;
 	private final OrderItemRepository orderItemRepository;
 	private final WorkOrderRepository workOrderRepository;
+	private final SafeStockRepository safeStockRepository;
+	private final SafeStockMapper safeStockMapper;
 	
 	// 원재료 목록 조회
 	public List<MaterialDTO> getMaterialList() {
@@ -126,6 +128,8 @@ public class ItemService {
 						  throw new IllegalStateException("해당 자재를 사용하는 제품이 현재 생산 중(작업지시)입니다.");
 					}
 				}
+				
+				safeStockRepository.deleteByItemId(dto.getMatId());
 			}
 			material.updateMaterial(dto.getMatCode(), dto.getMatName(), dto.getMatUnit(), dto.getEffectiveDate(), dto.getMatUnit());
 			material.chageUseYn(dto.getUseYn());
@@ -212,6 +216,8 @@ public class ItemService {
 				if (usedInWorkOrdr) {
 					  throw new IllegalStateException("해당 제품이 현재 생산 중(작업지시)입니다.");
 				}
+				
+				safeStockRepository.deleteByItemId(dto.getPrdId());
 			}
 			product.updateProduct(dto.getPrdCode(),dto.getPrdType(), dto.getPrdName(), dto.getPrdUnit(), dto.getEffectiveDate());
 			product.chageUseYn(dto.getUseYn());
@@ -244,5 +250,10 @@ public class ItemService {
 		int stockCount = inventoryRepository.countByItemId(prdCode);
 		
 		return (bomCount > 0 || stockCount > 0);
+	}
+
+	// 원재료 및 완제품 조회(활성화된 품목들만)
+	public List<SafeStockDTO> findAllItems() {
+		return safeStockMapper.findAllItem();
 	}
 }

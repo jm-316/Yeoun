@@ -33,8 +33,8 @@
 	<h2>BOM 정보/안전재고</h2>
 	 <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="card-title mb-0"></h5>
-        <button class="btn btn-outline-primary btn-md-sm" style="margin-right: 45px;" data-bs-toggle="modal" data-bs-target="#safetyStock-modal">
-           안전재고 보기
+        <button class="btn btn-outline-primary btn-md-sm" style="margin-right: 45px;" id="safeStockBtn">
+           안전재고
         </button>
       </div>
 
@@ -66,7 +66,7 @@
        	</div>
       
 		<!-- 안전재고 모달 -->
-		<div class="modal fade" id="safetyStock-modal" tabindex="-1">
+		<div class="modal fade" id="safeStock-modal" tabindex="-1">
 		  <div class="modal-dialog modal-xl modal-dialog-centered">
 		    <div class="modal-content">
 		      <div class="modal-header">
@@ -74,21 +74,18 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 		      </div>
 		      <div class="modal-body small-text">
-				<div class="d-flex justify-content-start">
-					<div class="mb-6 mb-0" style="width: 200px;margin-right: 4px;">
-						<input type="text" id="itemId" name="itemId" class="form-control"  placeholder="품목코드">
+				<div class="d-flex g-2 align-items-center">
+					<div class="col-12 col-lg d-flex align-items-center gap-2">
+						<input type="text" class="form-control" placeholder="품명을 입력하세요" id="materialKeyword" style="width: 65%;">
+						<button class="btn btn-outline-primary" id="searchbtn">검색</button>
 					</div>
-					<div class="mb-6 mb-0" style="width: 200px;margin-right: 4px;">
-						<input type="text" id="itemName" name="itemName" class="form-control"  placeholder="품목명">
+			       	<div class="col-12 col-lg d-flex justify-content-end gap-2">
+				  		<button id="addSafetyStockRowBtn" class="btn btn-primary btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')" type="button" style="margin-right:5px;">추가</button>
+						<button id="saveSafetyStockRowBtn" class="btn btn-success btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')" type="button" style="margin-right:5px;">저장</button>
+				  		<button id="deleteSafetyStockRowBtn" class="btn btn-danger btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')"  type="button">삭제</button>
 					</div>
-					<button type="button" class="btn btn-primary" onclick="safetyStockGridAllSearch()" style="margin-left:5px;">조회</button>
 				</div>
-		       	<div class="d-flex justify-content-end" style="margin:10px;">
-			  		<button id="addSafetyStockRowBtn" class="btn btn-primary btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')" type="button" style="margin-right:5px;">추가</button>
-					<button id="saveSafetyStockRowBtn" class="btn btn-success btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')" type="button" style="margin-right:5px;">저장</button>
-			  		<button id="deleteSafetyStockRowBtn" class="btn btn-danger btn-md-sm" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')"  type="button">신규행 삭제</button>
-				 </div>
-		         <div id="safetyStockGrid" style="display: grid;margin-right:5px;"></div>
+		         <div id="safeStockGrid" style="margin-right:5px; margin-top: 1em;"></div>
 		      </div>
 		      <div class="modal-footer">
 		        <button class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -142,7 +139,7 @@
 					<input type="text" class="form-control" placeholder="원재료명을 입력하세요" id="materialKeyword" style="width: 220px;">
 					<button class="btn btn-outline-primary" id="searchbtn">검색</button>
 				</div>
-		       	<div id="matItemsGrid" style="display: grid;margin-right:5px;"></div>
+		       	<div id="matItemsGrid" style="margin-right:5px; margin-top: 1em;"></div>
 		      </div>
 		      <div class="modal-footer">
 		        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
@@ -164,7 +161,29 @@
 					<input type="text" class="form-control" placeholder="제품을 입력하세요" id="productKeyword" style="width: 220px;">
 					<button class="btn btn-outline-primary" id="searchProductBtn">검색</button>
 				</div>
-		       	<div id="productsGrid" style="display: grid;margin-right:5px;"></div>
+		       	<div id="productsGrid" style="margin-right:5px; margin-top: 1em;"></div>
+		      </div>
+		      <div class="modal-footer">
+		        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		
+		<!-- 원재료/완제품 조회용 모달 -->
+		<div class="modal fade" id="item-modal" tabindex="-1" style="display: none;" aria-hidden="true">
+		  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title">품목 조회</h5>
+		        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		      </div>
+		      <div class="modal-body">
+				<div class="d-flex gap-3">
+					<input type="text" class="form-control" placeholder="완제품 또는 원재료를 입력하세요" id="itemKeyword" style="width: 220px;">
+					<button class="btn btn-outline-primary" id="searchItemtBtn">검색</button>
+				</div>
+		       	<div id="itemGrid" style="display: grid;margin-right:5px;"></div>
 		      </div>
 		      <div class="modal-footer">
 		        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
@@ -184,4 +203,6 @@
 	<script th:src="@{/js/masterData/bomItemGrid.js}"></script>
 	<script th:src="@{/js/masterData/productItemGrid.js}"></script>
 	<script th:src="@{/js/masterData/materialItemGrid.js}"></script>
+	<script th:src="@{/js/masterData/safeStockGrid.js}"></script>
+	<script th:src="@{/js/masterData/itemGrid.js}"></script>
 </th:block>
