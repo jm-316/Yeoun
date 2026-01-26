@@ -129,126 +129,14 @@ public class HrActionService {
         }
 
         action.setCreatedUser(creator);  // 발령을 신청한 사람 (로그인 사원)
-        action.setStatus("대기");	  	 // 발령 상태 기본값 (요청 상태)
+        action.setStatus("승인완료");	  	 // 발령 상태 기본값 (요청 상태)
         action.setAppliedYn("N");     	 // 발령은 처음 생성될 때 EMP에 미적용
-        action.setAppliedDate(null);     // 적용일자 없음
+        action.setAppliedDate(hrActionRequestDTO.getEffectiveDate());     // 적용일자설정
 
         // 3) 발령(HR_ACTION) 저장
         HrAction saved = hrActionRepository.save(action);
         
-        // ==========================
-        // 4. 전자결재 문서(approval_doc) 생성
-        // ==========================
-        // 1) 문서 제목 자동 생성
-        String actionTypeName = getActionTypeName(actionType);
-        
-        String title;
-        
-        // 퇴직/휴직/복직일 경우
-        if ("RETIRE_ACT".equals(actionType) || "LEAVE_ACT".equals(actionType) || "RETURN_ACT".equals(actionType)) {
-        	title = String.format("[인사발령/%s] %s (%s %s)",
-        			actionTypeName,
-        			emp.getEmpName(),
-        			emp.getDept().getDeptName(),
-        			emp.getPosition().getPosName());
-        } else {
-        	// 그 외 경우
-        	title = String.format(
-    			"[인사발령/%s] %s %s %s → %s %s",
-    			actionTypeName,                      // 승진, 전보 등
-    			emp.getDept().getDeptName(),		 // 인사부
-    			emp.getPosition().getPosName(),      // 대리
-    			emp.getEmpName(),                    // 홍길동
-    			toDept.getDeptName(),                // 영업부
-    			toPos.getPosName()                   // 과장
-			);
-        }
-        
-        // ==========================
-        // 4. 결재선(approver) 생성
-        // ==========================
-        // 4-1. 신청자 소속 부서 기준으로 approval_form 가져오기
-        String formName = "인사발령신청서";
-        String deptIdForForm = emp.getDept().getDeptId(); 
-        
-        ApprovalForm form = approvalFormRepository
-                .findByFormNameAndDeptId(formName, deptIdForForm)
-                .orElseThrow(() -> new IllegalStateException(
-                        "해당 부서의 인사발령 결재양식이 없습니다. deptId=" + deptIdForForm));
-        
-        // 3-2. approval_doc 엔티티 생성
-        ApprovalDoc approvalDoc = new ApprovalDoc();
-        approvalDoc.setApprovalTitle(title);							// 문서제목
-        approvalDoc.setEmpId(creator.getEmpId());						// 사원번호
-        approvalDoc.setCreatedDate(LocalDate.now());					// 생성일자
-        approvalDoc.setDocStatus("1차대기");							// 문서상태
-        approvalDoc.setFormType("인사발령신청서");						// 양식종류
-        // 퇴직일 때는 현재 부서 or null 등 선택
-        if (!"RETIRE_ACT".equals(actionType) && toDept != null) {
-            approvalDoc.setToDeptId(toDept.getDeptId());
-        } else {
-            // 그냥 현재 소속부서를 넣고 싶으면:
-            approvalDoc.setToDeptId(emp.getDept().getDeptId());
-            // 아니면 컬럼이 nullable이면 setToDeptId(null) 도 가능
-        }
-        approvalDoc.setReason(hrActionRequestDTO.getActionReason());	// 발령사유
-        
-        // 3-3. 현재 결재자(1차 결재자) 세팅
-        if (form.getApprover1() != null) {
-            approvalDoc.setApprover(form.getApprover1());
-        }
-        
-        // 3-4. 전자결재 문서 저장
-        ApprovalDoc savedDoc = approvalDocRepository.save(approvalDoc);
-        Long approvalId = savedDoc.getApprovalId();
-
-        int order = 1;
-        
-        // ==========================
-        // 4-2. 결재선(Approver) 엔티티들 생성
-        // ==========================
-        
-        // APPROVER_1 (1차 결재자)
-        if (form.getApprover1() != null) {
-            Approver line1 = new Approver();
-            line1.setEmpId(form.getApprover1());				// 결재자 사번
-            line1.setApprovalId(approvalId);					// 결재문서 ID
-            line1.setApprovalStatus(false);      				// 승인 여부 (false = 대기)
-            line1.setOrderApprovers(String.valueOf(order++));	// 결재 순서: 1
-            line1.setDelegateStatus(null);  					// 대결자 여부
-            line1.setViewing("Y");								// 결재문서 목록에 보이도록
-            approverRepository.save(line1);
-        }
-
-        // APPROVER_2
-        if (form.getApprover2() != null) {
-            Approver line2 = new Approver();
-            line2.setEmpId(form.getApprover2());
-            line2.setApprovalId(approvalId);
-            line2.setApprovalStatus(false);
-            line2.setOrderApprovers(String.valueOf(order++));
-            line2.setDelegateStatus(null);
-            line2.setViewing(null);								// 아직 열람 대상 아님
-            approverRepository.save(line2);
-        }
-
-        // APPROVER_3
-        if (form.getApprover3() != null) {
-            Approver line3 = new Approver();
-            line3.setEmpId(form.getApprover3());
-            line3.setApprovalId(approvalId);
-            line3.setApprovalStatus(false);
-            line3.setOrderApprovers(String.valueOf(order++));
-            line3.setDelegateStatus(null);
-            line3.setViewing(null);
-            approverRepository.save(line3);
-        }
-
-        // ==========================
-        // 5. HR_ACTION에 approvalId 연결
-        // ==========================
-        saved.setApprovalId(approvalId);      // 발령(HR_ACTION) ← 결재문서 ID 매핑
-
+        // 발령ID 리턴
         return saved.getActionId();
     }
     

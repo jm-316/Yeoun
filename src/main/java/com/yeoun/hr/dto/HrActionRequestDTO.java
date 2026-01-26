@@ -7,9 +7,11 @@ import com.yeoun.hr.entity.HrAction;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class HrActionRequestDTO {
 	
 	// 대상 사원 ID 
