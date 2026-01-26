@@ -1270,6 +1270,11 @@ document.getElementById('file-input').addEventListener('change', function (e) {
     e.target.value = '';
 });
 
+// 결재선 불러오기 버튼 이벤트 - 결재선 관리모달 열기
+document.getElementById('open-approver-line-manage-btn').addEventListener('click', function() {
+	openApproverLineManageModal(); 
+})
+
 
 
 // 조직도에서 결재자 선택 버튼 - 추가

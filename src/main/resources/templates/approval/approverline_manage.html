@@ -1,0 +1,154 @@
+<th:block xmlns:th="http://www.thymeleaf.org"
+        layout:fragment="approver_line_manage_modal">
+	
+	<!-- 결재선 관리 모달 -->
+    <div class="modal fade" id="approver-line-manage-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">내 결재선 관리</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- 왼쪽: 템플릿 목록 / 오른쪽: 선택된 결재선 미리보기 -->
+                    <div class="row">
+                        <div class="col-4 border-end">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">결재선 목록</h6>
+                                <button type="button" id="add-approval-line-template-btn"
+                                        class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-circle"></i> 새 결재선
+                                </button>
+                            </div>
+                            <ul id="approval-line-template-list"
+                                class="list-group"
+                                style="max-height: 350px; overflow-y: auto;">
+                                <!-- 템플릿 항목들이 여기 렌더링됨 -->
+                            </ul>
+                        </div>
+
+                        <div class="col-8">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">선택한 결재선</h6>
+                                <div class="d-flex gap-2">
+                                    <button type="button" id="set-default-approval-line-btn"
+                                            class="btn btn-sm btn-outline-secondary">
+                                        기본값 설정
+                                    </button>
+                                    <button type="button" id="delete-approval-line-template-btn"
+                                            class="btn btn-sm btn-outline-danger">
+                                        삭제
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 선택된 템플릿의 결재선 미리보기 테이블 -->
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">순서</th>
+                                        <th style="width: 100px;">직급</th>
+                                        <th>이름(사번)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="approval-line-template-detail-body">
+                                    <!-- 선택한 템플릿의 결재선이 여기 렌더링됨 -->
+                                </tbody>
+                            </table>
+
+                            <div class="text-end">
+                                <button type="button" id="apply-approval-line-template-btn"
+                                        class="btn btn-sm btn-primary">
+                                    이 결재선 적용
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        닫기
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <!-- 새 결재선 등록 모달 -->
+    <div class="modal fade" id="approval-line-create-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">새 결재선 등록</h5>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- 결재선 이름 입력 -->
+                    <div class="mb-3">
+                        <label for="approval-line-name" class="form-label">결재선 이름</label>
+                        <input type="text" id="approval-line-name" class="form-control"
+                               placeholder="예: 일반 결재선, 휴가용 결재선">
+                    </div>
+
+                    <!-- 조직도 + 선택된 결재자 목록 -->
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="mb-2">조직도</h6>
+                            <div id="template-approver-org-grid"
+                                 style="width: 100%; border: 1px solid #dee2e6;">
+                            </div>
+                            <div class="text-end mt-2">
+						        <button type="button" id="add-template-approvers-btn"
+						                class="btn btn-sm btn-primary">
+						            선택 직원 추가
+						        </button>
+						    </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">선택된 결재자 (최대 3명)</h6>
+                                <small class="text-muted" id="template-approver-count">0 / 3</small>
+                            </div>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">순서</th>
+                                        <th style="width: 50px;">직급</th>
+                                        <th>이름(사번)</th>
+                                        <th style="width: 120px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="template-approver-list-body">
+                                    <!-- 선택된 결재자 목록 렌더링 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        닫기
+                    </button>
+                    <button type="button" id="save-approval-line-template-btn"
+                            class="btn btn-primary">
+                        저장
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</th:block>
