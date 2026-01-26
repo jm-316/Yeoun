@@ -31,7 +31,6 @@ const approvalModal   = new bootstrap.Modal(approvalModalEl);
 
 // 결재모달 열기 함수
 async function openApprovalModal(mode, options = {}) {
-	console.log("!@#!222@#");
     // 1) 항상 먼저 초기화
     resetApprovalForm();
 
@@ -149,6 +148,7 @@ function resetApprovalForm() {
         createDateEl.value = today;
     }
     if (finishDateEl) {
+		finishDateEl.readOnly = false;
         finishDateEl.value = '';
     }
 
@@ -1269,6 +1269,11 @@ document.getElementById('file-input').addEventListener('change', function (e) {
     // input 초기화 (같은 파일 다시 선택 가능하게)
     e.target.value = '';
 });
+
+// 결재선 불러오기 버튼 이벤트 - 결재선 관리모달 열기
+document.getElementById('open-approver-line-manage-btn').addEventListener('click', function() {
+	openApproverLineManageModal(); 
+})
 
 
 
