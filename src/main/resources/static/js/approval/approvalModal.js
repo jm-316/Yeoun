@@ -1085,11 +1085,13 @@ async function submitApprovalDocument() {
 	        body: formData
 	    })
 	
-		if (!res.ok) {
-		    throw new Error('서버 오류가 발생했습니다.');
-		}
 		
 		const result = await res.json();
+
+		if (!res.ok) {
+			alert(result.message || '등록 실패');
+			return;
+		}
 		
 		alert(result.message || '결재 문서가 등록되었습니다.');
 

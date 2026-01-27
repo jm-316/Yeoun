@@ -227,7 +227,7 @@ function applyApprovalLineTemplate() {
         empId: detail.approverId,
         empName: detail.approverName,
         posName: detail.posName,
-        stepOrder: detail.stepOrder
+//        stepOrder: detail.stepOrder
     }));
 
     // approvalModal.js의 전역 변수에 세팅
@@ -342,7 +342,7 @@ function convertApproverTreeNodesForTemplate(nodes) {
     });
 }
 
-// 조직도 그리드그리기
+// 조직도 그리드 그리기
 async function renderApproverOrgGridForTemplate() {
 	
     tui.Grid.setLanguage('ko', {

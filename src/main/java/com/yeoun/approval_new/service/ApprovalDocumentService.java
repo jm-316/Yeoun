@@ -39,6 +39,7 @@ import com.yeoun.common.entity.FileAttach;
 import com.yeoun.common.repository.FileAttachRepository;
 import com.yeoun.common.service.AlarmService;
 import com.yeoun.common.util.FileUtil;
+import com.yeoun.emp.entity.Emp;
 import com.yeoun.emp.repository.EmpRepository;
 import com.yeoun.leave.service.LeaveService;
 
@@ -71,9 +72,26 @@ public class ApprovalDocumentService {
 		, List<ApprovalLineDTO> approverDTOs
 		, List<MultipartFile> attachments) throws IOException {
 		
+		// 결재자 검증
+	    if (approverDTOs == null || approverDTOs.isEmpty()) {
+	        throw new IllegalArgumentException("최소 1명 이상의 결재자를 선택해주세요.");
+	    }
+	    
+	    // 결재라인에 등록된 사원이 재직중인 사원인지 체크
+	    for (ApprovalLineDTO approverDTO : approverDTOs) {
+	        Emp approver = empRepository.findById(approverDTO.getApproverId())
+	            .orElseThrow(() -> new IllegalArgumentException("결재자 정보를 찾을 수 없습니다."));
+
+	        // 재직중이 아니라면 메세지 추가
+	        if (!"ACTIVE".equals(approver.getStatus())) {
+	            throw new IllegalArgumentException(
+	                approver.getEmpName() + "은(는) 퇴사/휴직 상태입니다. 결재선을 수정해주세요."
+	            );
+	        }
+	    }
+		
 		// ApprovalDocument 생성
 		ApprovalDocument document = documentDTO.toEntity(empRepository);
-		log.info("Document : " + document);
         log.info("결재 문서 엔티티 생성: formType={}, title={}", 
                 document.getFormType(), document.getApprovalTitle());
         // 휴가
