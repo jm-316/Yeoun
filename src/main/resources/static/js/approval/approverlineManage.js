@@ -25,6 +25,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	    approvalLineCreateModal = new bootstrap.Modal(createModalEl);
 	}
 	
+	// 결재선 적용버튼
+	const applyBtn = document.getElementById('apply-approval-line-template-btn');
+	
+	if (applyBtn) {
+	    applyBtn.addEventListener('click', applyApprovalLineTemplate);
+	}
+	
 	// 새결재선 버튼
 	const addTemplateBtn = document.getElementById('add-approval-line-template-btn');
 	
@@ -45,6 +52,20 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (addTemplateApproversBtn) {
 	    addTemplateApproversBtn.addEventListener('click', addSelectedTemplateApprovers);
 	}
+	
+	// 기본값 설정 버튼
+	const setDefaultBtn = document.getElementById('set-default-approval-line-btn');
+	
+	if (setDefaultBtn) {
+	    setDefaultBtn.addEventListener('click', setDefaultApprovalLineTemplate);
+	}
+
+	// 삭제 버튼
+	const deleteBtn = document.getElementById('delete-approval-line-template-btn');
+	
+	if (deleteBtn) {
+	    deleteBtn.addEventListener('click', deleteApprovalLineTemplate);
+	}
 });
 
 // 결재선 관리 모달 열기 함수
@@ -52,10 +73,178 @@ function openApproverLineManageModal() {
     if (!approverLineManageModal) {
         return;
     }
-
+	// 결재선 목록 조회
+	loadMyApprovalLineTemplates();
     approverLineManageModal.show();
 }
 
+// 결재선 목록 조회 함수
+function loadMyApprovalLineTemplates() {
+
+	// 목록 초기화
+	document.getElementById('approval-line-template-list').innerHTML = '';
+	
+	// 선택 상태 초기화
+	document.querySelectorAll('#approval-line-template-list li').forEach(li => {
+	    li.classList.remove('active');
+	    li.style.backgroundColor = '';
+		currentSelectedTemplate = null;
+	});
+	
+	// 상세 정보 초기화
+	document.getElementById('approval-line-template-detail-body').innerHTML = 
+	    '<tr><td colspan="3" class="text-center text-muted">템플릿을 선택하세요.</td></tr>';
+		
+	// 버튼 비활성화
+	document.getElementById('set-default-approval-line-btn').disabled = true;
+	document.getElementById('delete-approval-line-template-btn').disabled = true;
+	document.getElementById('apply-approval-line-template-btn').disabled = true;
+	
+    fetch(apiUrl('/api/manage/approval/line-template/my'), {
+        method: 'GET',
+        headers: {
+            [csrfHeader]: csrfToken
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('목록 조회 실패');
+        }
+        return response.json();
+    })
+    .then(result => {
+        console.log('결재선 템플릿 목록:', result);
+        renderApprovalLineTemplateList(result);
+    })
+    .catch(error => {
+        console.error('목록 조회 중 에러:', error);
+        alert('결재선 목록을 불러올 수 없습니다.');
+    });
+}
+
+// 결재선 템플릿 목록 그리기
+function renderApprovalLineTemplateList(templates) {
+    const listEl = document.getElementById('approval-line-template-list');
+    listEl.innerHTML = '';
+    
+    if (!templates || templates.length === 0) {
+        listEl.innerHTML = '<li class="list-group-item text-muted">저장된 결재선이 없습니다.</li>';
+        return;
+    }
+    
+    templates.forEach((template, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item cursor-pointer';
+        li.style.cursor = 'pointer';
+        
+        const defaultBadge = template.isDefault === 'Y' 
+            ? '<span class="badge bg-primary ms-2">기본값</span>' 
+            : '';
+        
+        li.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${template.templateName}</strong>
+                    ${defaultBadge}
+                    <small class="text-muted d-block">
+                        ${template.details.length}명 
+                    </small>
+                </div>
+            </div>
+        `;
+        
+        // 템플릿 선택 시
+        li.addEventListener('click', function() {
+            selectApprovalLineTemplate(template, li);
+        });
+        
+        listEl.appendChild(li);
+    });
+}
+
+// 현재 선택된 템플릿 전역변수
+let currentSelectedTemplate = null;
+
+// 템플릿 선택
+function selectApprovalLineTemplate(template, liElement) {
+    // 기존 선택 해제
+    document.querySelectorAll('#approval-line-template-list li').forEach(li => {
+        li.classList.remove('active');
+        li.style.backgroundColor = '';
+    });
+    
+    // 현재 선택 표시
+    liElement.classList.add('active');
+    liElement.style.backgroundColor = '#e7f3ff';
+	
+	// 현재 선택 템플릿 저장
+	currentSelectedTemplate = template;
+	
+	// 버튼 활성화
+	document.getElementById('set-default-approval-line-btn').disabled = false;
+	document.getElementById('delete-approval-line-template-btn').disabled = false;
+	document.getElementById('apply-approval-line-template-btn').disabled = false;
+
+	// 오른쪽 상세 정보 표시
+    renderApprovalLineTemplateDetail(template);
+}
+
+// 템플릿 상세 정보 렌더링
+function renderApprovalLineTemplateDetail(template) {
+    const tbody = document.getElementById('approval-line-template-detail-body');
+    tbody.innerHTML = '';
+    
+    if (!template.details || template.details.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">결재자 정보가 없습니다.</td></tr>';
+        return;
+    }
+    
+    template.details.forEach((detail) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${detail.stepOrder}차</td>
+            <td>${detail.posName || '-'}</td>
+            <td>${detail.approverName} (${detail.approverId})</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// 결재선 적용
+function applyApprovalLineTemplate() {
+    if (!currentSelectedTemplate) {
+        alert('적용할 결재선을 선택하세요.');
+        return;
+    }
+
+    if (!currentSelectedTemplate.details || currentSelectedTemplate.details.length === 0) {
+        alert('결재자가 없는 결재선입니다.');
+        return;
+    }
+
+    // 선택된 템플릿의 결재자들을 approvalModal.js의 approverList로 변환
+    const selectedApprovers = currentSelectedTemplate.details.map(detail => ({
+        empId: detail.approverId,
+        empName: detail.approverName,
+        posName: detail.posName,
+        stepOrder: detail.stepOrder
+    }));
+
+    // approvalModal.js의 전역 변수에 세팅
+    approverList = selectedApprovers;
+
+    console.log('결재선 적용:', approverList);
+
+    // 결재문서 모달의 결재선 테이블 업데이트
+    renderApproverList(false);
+
+    alert(`"${currentSelectedTemplate.templateName}" 결재선이 적용되었습니다.`);
+
+    // 결재선 관리 모달 닫기
+    approverLineManageModal.hide();
+}
+
+// ---------------------------------------------------------------------------
 // 새 결재선 등록 모달 함수
 async function openApprovalLineCreateModal() {
     if (!approvalLineCreateModal) {
@@ -97,7 +286,7 @@ async function getApproverOrganizationChartForTemplate() {
     }
 }
 
-// 조직도 데이터를 트리 구조로 변환 (approvalModal.js의 buildApproverTree 참고)
+// 조직도 데이터를 트리 구조로 변환
 async function buildApproverTreeForTemplate(flatList) {
     const deptMap = {};
 
@@ -122,9 +311,6 @@ async function buildApproverTreeForTemplate(flatList) {
 	    }
 	});
 
-	console.log("deptMap : ", deptMap);
-	console.log("deptMap.keys: ", Object.keys(deptMap));  // ← 이 줄 추가
-	
     const treeRoot = [];
 	
     Object.values(deptMap).forEach((dept) => {
@@ -138,7 +324,6 @@ async function buildApproverTreeForTemplate(flatList) {
         }
     });
 
-	console.log("treeRoot : ", treeRoot);  // ← 이 줄도 추가
     templateApproverTreeData = convertApproverTreeNodesForTemplate(treeRoot);
 }
 
@@ -157,10 +342,8 @@ function convertApproverTreeNodesForTemplate(nodes) {
     });
 }
 
-// 조직도 그리드 렌더링 (approvalModal.js의 renderApproverOrgGrid 참고)
+// 조직도 그리드그리기
 async function renderApproverOrgGridForTemplate() {
-	console.log('renderApproverOrgGridForTemplate 시작');
-	console.log('templateApproverTreeData :', templateApproverTreeData);
 	
     tui.Grid.setLanguage('ko', {
         display: {
@@ -204,7 +387,6 @@ async function renderApproverOrgGridForTemplate() {
 	        ]
 	    });
 	
-	    // ← 이 부분 추가
 	    setTimeout(() => {
 	        if (templateApproverTreeGrid) {
 	            templateApproverTreeGrid.refreshLayout();
@@ -349,12 +531,114 @@ function saveApprovalLineTemplate() {
         return;
     }
 
-    // TODO: 나중에 서버에 POST /new/approval/line-template로 저장
-    console.log('저장할 템플릿:', {
-        templateName: templateName,
-        approvers: templateApproverList
-    });
-
-    alert(`결재선 "${templateName}"이 저장되었습니다.`);
-    approvalLineCreateModal.hide();
+	// 요청 데이터 구성
+	const payload = {
+	    templateName: templateName,
+	    approvers: templateApproverList.map((approver, index) => ({
+	        empId: approver.empId,
+	        stepOrder: index + 1
+	    }))
+	};
+	
+//	console.log('저장 요청:', payload);
+	
+	// API 호출
+	fetch(apiUrl('/api/manage/approval/line-template'), {
+	    method: 'POST',
+	    headers: {
+	        [csrfHeader]: csrfToken,
+	        'Content-Type': 'application/json'
+	    },
+	    body: JSON.stringify(payload)
+	})
+	.then(response => {
+//	    console.log('응답 상태:', response.status);
+	    if (!response.ok) {
+	        throw new Error('저장 실패');
+	    }
+	    return response.json();
+	})
+	.then(result => {
+//	    console.log('저장 성공:', result);
+	    alert(`결재선 "${templateName}"이 저장되었습니다.`);
+	    approvalLineCreateModal.hide();
+		loadMyApprovalLineTemplates();
+	})
+	.catch(error => {
+	    console.error('저장 중 에러:', error);
+	    alert('결재선 저장 중 오류가 발생했습니다.');
+	});
 }
+
+// ================================================================
+// 기본값 설정
+function setDefaultApprovalLineTemplate() {
+    if (!currentSelectedTemplate) {
+        alert('기본값으로 설정할 결재선을 선택하세요.');
+        return;
+    }
+
+    if (!confirm(`"${currentSelectedTemplate.templateName}"을(를) 기본값으로 설정하시겠습니까?`)) {
+        return;
+    }
+
+    fetch(apiUrl(`/api/manage/approval/line-template/${currentSelectedTemplate.templateId}/default`), {
+        method: 'PATCH',
+        headers: {
+            [csrfHeader]: csrfToken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('기본값 설정 실패');
+        }
+        return response.text();
+    })
+    .then(result => {
+        console.log('기본값 설정 성공');
+        alert('기본값이 설정되었습니다.');
+        loadMyApprovalLineTemplates();  // 목록 새로고침
+    })
+    .catch(error => {
+        console.error('기본값 설정 중 에러:', error);
+        alert('기본값 설정 중 오류가 발생했습니다.');
+    });
+}
+
+// ---------------------------------------------------------------------
+
+// 삭제
+function deleteApprovalLineTemplate() {
+    if (!currentSelectedTemplate) {
+        alert('삭제할 결재선을 선택하세요.');
+        return;
+    }
+
+    if (!confirm(`"${currentSelectedTemplate.templateName}"을(를) 삭제하시겠습니까?\n(삭제 후 복구할 수 없습니다.)`)) {
+        return;
+    }
+
+    fetch(apiUrl(`/api/manage/approval/line-template/${currentSelectedTemplate.templateId}`), {
+        method: 'DELETE',
+        headers: {
+            [csrfHeader]: csrfToken
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('삭제 실패');
+        }
+        return response.text();
+    })
+    .then(result => {
+        console.log('결재선 삭제 성공');
+        alert('결재선이 삭제되었습니다.');
+        loadMyApprovalLineTemplates();  // 목록 새로고침
+    })
+    .catch(error => {
+        console.error('삭제 중 에러:', error);
+        alert('삭제 중 오류가 발생했습니다.');
+    });
+}
+

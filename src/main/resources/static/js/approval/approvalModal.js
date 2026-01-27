@@ -2,7 +2,6 @@
 // 전역 변수
 // ============================================
 
-
 let selectedFiles = [];  // 선택된 파일 배열
 const MAX_FILE_SIZE = 10 * 1024 * 1024;  // 10MB
 const MAX_FILE_COUNT_APPROVAL = 5;
@@ -63,7 +62,10 @@ async function openApprovalModal(mode, options = {}) {
 		if (reasonEl) reasonEl.readOnly = false;
 
 		// 결재선 추가 버튼 활성화
-		document.getElementById('open-approver-org-btn').style.display = '';		
+		document.getElementById('open-approver-org-btn').style.display = '';	
+		
+		// 기본값 설정 결재선 불러오기
+		await loadDefaultApprovalLineTemplate();	
     }
 
     if (mode === 'view') {
@@ -257,9 +259,57 @@ function resetApprovalForm() {
 	document.getElementById('file-input').value = '';
 }
 
+// 기본값 결재선 템플릿 로드
+async function loadDefaultApprovalLineTemplate() {
+    try {
+//        console.log('기본값 결재선 템플릿 로드 시작');
+        
+        const response = await fetch(apiUrl('/api/manage/approval/line-template/default'), {
+            method: 'GET',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        });
+		
+		// 기본값 템플릿이 없을때
+		if (response.status === 204) {
+		    console.log('기본값 템플릿이 없습니다.');
+		    return;
+		}
+		
+        if (!response.ok) {
+            console.log('기본값 템플릿이 없습니다.');
+            return;
+        }
+        
+        const defaultTemplate = await response.json();
+        
+		// 기본값 템플릿이 존재할 때 
+        if (defaultTemplate && defaultTemplate.details && defaultTemplate.details.length > 0) {
+//            console.log('기본값 템플릿 로드 성공:', defaultTemplate);
+            
+            // approverList에 세팅
+            approverList = defaultTemplate.details.map(detail => ({
+                empId: detail.approverId,
+                empName: detail.approverName,
+                posName: detail.posName
+            }));
+            
+            // 결재선 테이블 업데이트
+            await renderApproverList(false);
+            
+//            console.log('기본값 결재선 적용됨:', approverList);
+        } else {
+            console.log('기본값 템플릿 없음');
+        }
+    } catch (error) {
+        console.error('기본값 템플릿 로드 중 에러:', error);
+    }
+}
+
+
 // 양식별 필드 표시/숨김
 async function toggleFormFields(formType) {
-	console.log("toggleFormFields");
     // 휴가 관련 행
     const leaveTypeRow = document.getElementById('leave-type-row');
     const leavePeriodRow = document.getElementById('leave-period-row');
@@ -322,6 +372,7 @@ function calculateLeaveDays() {
     daysInput.value = diffDays;
 }
 
+// 결재문서 상세 열기
 async function loadApprovalDetail(approvalId) {
     try {
 		// 현재 여는 문서ID 저장
@@ -344,6 +395,7 @@ async function loadApprovalDetail(approvalId) {
         
         // ========== 결재 권한 확인 ==========
         const currentUserId = document.getElementById('currentUserId').value;
+		// 현재 내가 결재권자인지 체크
         const isApprover = checkApprovalPermission(data.approvers, currentUserId);
         
         const approveBtn = document.getElementById('approve-btn');
@@ -386,7 +438,6 @@ function checkApprovalPermission(approvers, currentUserId) {
 
 // 모달에 데이터 채우기
 async function fillModalData(data) {
-	console.log(data,"213213213");
     // 기본 정보
     document.getElementById('approval-title').value = data.document.approvalTitle;
     document.getElementById('reason-write').value = data.document.reason || '';
@@ -400,7 +451,7 @@ async function fillModalData(data) {
     
     // 휴가 정보
     if (data.leave) {
-		console.log("leave");
+//		console.log("leave");
         document.getElementById('leave-type').value = data.leave.leaveType;
         document.getElementById('leave-start-date').value = data.leave.leaveStartDate;
         document.getElementById('leave-end-date').value = data.leave.leaveEndDate;
@@ -409,7 +460,6 @@ async function fillModalData(data) {
     
     // 지출 정보
     if (data.expense) {
-		console.log("expense");
         document.getElementById('expense-type').value = data.expense.expenseType;
         document.getElementById('expense-date').value = data.expense.expenseDate;
         document.getElementById('expense-vendor').value = data.expense.expenseVendor;
@@ -764,7 +814,7 @@ async function renderApproverList(readOnly = false) {
         tbody.appendChild(row);
     });
 
-	if(readOnly) {
+	if(!readOnly) {
 	    // 위로 이동 버튼
 	    document.querySelectorAll('.move-up-btn').forEach(btn => {
 	        btn.addEventListener('click', function () {
@@ -1356,6 +1406,3 @@ document.getElementById('final-approve-btn').addEventListener('click', () => {
 document.getElementById('reject-btn').addEventListener('click', () => {
 	rejectDocument(); // 반려 처리
 });
-
-window.openApprovalModal = openApprovalModal;
-console.log('✅ openApprovalModal loaded');
