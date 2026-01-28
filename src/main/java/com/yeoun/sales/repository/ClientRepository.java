@@ -39,7 +39,7 @@ public interface ClientRepository extends JpaRepository<Client, String> {
     		SELECT DISTINCT c
     		FROM Client c
     		JOIN ClientItem ci ON c.clientId = ci.clientId
-    		JOIN MaterialMst m ON ci.materialId = m.matId
+    		JOIN Material m ON ci.materialId = m.matCode
     		WHERE c.clientType = 'SUPPLIER'
     		  AND m.useYn = 'Y'
     		  AND (

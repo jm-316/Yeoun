@@ -41,10 +41,10 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PRODUCT_SEQ_GENERATOR")
 	private Long prdId;
 	
-	@Column(nullable = false)
+	@Column(name = "PRD_CODE", nullable = false)
 	private String prdCode; // 제품코드 ex)BG100
 	
-	@Column(nullable = false)
+	@Column(unique = true, nullable = false)
 	private String prdType; // 제품타입
 	
 	@Column(nullable = false)
@@ -58,6 +58,9 @@ public class Product {
 	
 	@Column(nullable = false)
 	private char useYn; // 사용여부
+	
+	@Column(nullable = true)
+	private String prdSpec;
 	
 	@CreatedDate
 	private LocalDateTime createdDate;  // 생성일자

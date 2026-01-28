@@ -1,259 +1,164 @@
-window.onload = function () {	
-	qcItemGridAllSearch();//품질항목기준
-}
+let qcItemList = [];
+let targetTypeList = [];
+let isEdit = false;
 
+// 페이지 로딩 시 실행하는 함수들
+window.addEventListener("DOMContentLoaded", async () => {
+	await loadTargetType();
+	await qcItemGridAllSearch(); //품질항목기준
+});
 
-const Grid = tui.Grid;
-
-//g-grid1 품질항목기준
-const grid1 = new Grid({
-	  el: document.getElementById('qcItemGrid'), 
-      rowHeaders: ['rowNum','checkbox'],
-	  columns: [
-
-		{header: 'QC항목ID' ,name: 'qcItemId' ,align: 'center'}
-		,{header: '항목명' ,name: 'itemName' ,align: 'center'}
-		,{header: '대상구분' ,name: 'targetType' ,align: 'center',width: 110,filter: "select"
-			,renderer:{ type: StatusModifiedRenderer}
-		}
-		,{header: '단위' ,name: 'unit' ,align: 'center'
-			,renderer:{ type: StatusModifiedRenderer}
-		}
-		,{header: '기준 텍스트' ,name: 'stdText' ,align: 'center',width: 230}
-		,{header: 'MIN' ,name: 'minValue' ,align: 'center'}
-        ,{header: 'MAX' ,name: 'maxValue' ,align: 'center'}
-		,{header: '사용여부' ,name: 'useYn' ,align: 'center'
-			,renderer:{ type: StatusModifiedRenderer}
-		}  
-		,{header: '정렬순서' ,name: 'sortOrder' ,align: 'center',hidden: true}
-		,{header: '생성자id' ,name: 'createdId' ,align: 'center',hidden: true} 
-		,{header: '생성자이름' ,name: 'createdByName' ,align: 'center',hidden: true}
-		,{header: '생성일시' ,name: 'createdDate' ,align: 'center',hidden: true}  
-		,{header: '수정자id' ,name: 'updatedId' ,align: 'center',hidden: true}  
-		,{header: '수정자이름' ,name: 'updatedByName' ,align: 'center',hidden: true}
-		,{header: '수정일시' ,name: 'updatedDate' ,align: 'center',hidden: true}
-		,{
-			header: '상세보기', name: 'view_details', align: 'center', width: 100
-			, formatter: (rowInfo) => {
+// 품질항목기준
+const qcItemGrid = new tui.Grid({
+	el: document.getElementById('qcItemGrid'), 
+	rowHeaders: ['rowNum'],
+	pageOptions: {
+	    useClient: true,  // 클라이언트 사이드 페이징
+	    perPage: 20       // 페이지당 20개 행
+	},
+	columnOptions: {
+		resizable: true
+	},
+	columns: [
+		{
+			header: "QC항목ID",
+			name: "qcItemId"
+		},
+		{
+			header: "항목명",
+			name: "itemName"
+		},
+		{
+			header: "대상구분",
+			name: "targetType",
+			filter: "select",
+			formatter: ({value}) => {
+				const type = targetTypeList.find(item => item.value === value);
+				return type ? type.text : value;
+			}
+		},
+		{
+			header: "단위",
+			name: "unit"
+		},
+		{
+			header: "기준 텍스트",
+			name: "stdText"
+		},
+		{
+			header: "MIN",
+			name: "minValue"
+		},
+		{
+			header: "MAX",
+			name: "maxValue"
+		},
+		{
+			header: "사용여부",
+			name: "useYn",
+			filter: "select",
+			renderer:{ type: StatusModifiedRenderer},
+			formatter: ({value}) => {
+				const statusMap = {
+					"Y": "활성",
+					"N": "비활성"
+				};
+				return statusMap[value] || value;
+			}
+		},
+		{
+			header: "상세보기",
+			name: "view_details",
+			formatter: (rowInfo) => {
 				return `<button type='button' class='btn btn-primary btn-sm' data-row-key='${rowInfo.row.rowKey}'>상세</button>`;
 			}
-		}   
-	  ],
-	  data: []
-	  ,bodyHeight: 500 // 그리드 본문의 높이를 픽셀 단위로 지정. 스크롤이 생김.
-	  ,height:100
-	  ,columnOptions: {
-    		resizable: true
-  	  }
-	  ,pageOptions: {
-    		useClient: true,
-    		perPage: 20
-  	  }
-	});
+		},
+	]
+});
 
-//qcitem  품질항목관리 조회
-function qcItemGridAllSearch(){
-
-	const params = {
-		qcItemId: document.getElementById("qcItemId").value ?? "",
-	};
-	const queryString = new URLSearchParams(params).toString();
-	fetch(apiUrl(`masterData/qc_item/list?${queryString}`), {
-			method: 'GET',
-			headers: {
-				[csrfHeader]: csrfToken,
-				'Content-Type': 'application/json'
-			},
-			
-		})
-		.then(res => {
-		    if (!res.ok) {
-		        throw new Error(`HTTP error! status: ${res.status}`);
-		    }
-		    
-		    // 💡 추가된 로직: 응답 본문이 비어 있는지 확인
-		    const contentType = res.headers.get("content-type");
-		    if (!contentType || !contentType.includes("application/json")) {
-		        // Content-Type이 JSON이 아니거나, 200 OK인데 본문이 비어있다면 (Empty)
-		        if (res.status === 204 || res.headers.get("Content-Length") === "0") {
-		             return []; // 빈 배열 반환하여 grid 오류 방지
-		        }
-		        // JSON이 아닌 다른 데이터(HTML 오류 등)가 있다면 텍스트로 읽어 오류 발생
-		        return res.text().then(text => {
-		            throw new Error(`Expected JSON but received: ${text.substring(0, 100)}...`);
-		        });
-		    }
-
-		    return res.json(); // 유효한 JSON일 때만 파싱 시도
-		})
-			.then(data => {
-				
-				console.log("검색데이터:", data);
-				const camelCaseData = transformKeys(data);
-				console.log("camelCaseData",camelCaseData);
-				grid1.resetData(camelCaseData);
-			})
-			.catch(err => {
-				console.error("조회오류", err);
-				//grid1.resetData([]);
-			
-			});
-	 
+// qcItem 조회
+async function qcItemGridAllSearch() {
+	try {
+		const res = await fetch(`/masterData/qc_item/list`);
+		
+		if (!res.ok) {
+			throw new Error("데이터 로드 실패");
+		}
+		
+		const data = await res.json();
+		
+		// 데이터가 없을 경우 빈배열 반환
+		if (!data || data.length === 0) {
+			qcItemGrid.resetData([]);
+		} 
+		
+		qcItemGrid.resetData(data);
+		qcItemList = data;
+	} catch (error) {
+		console.log(error);
+	}
 }
 
-
-const toCamelCase = (snakeCaseString) => {
-  if (!snakeCaseString || typeof snakeCaseString !== 'string') {
-    return snakeCaseString;
-  }
-
-  // 1. 소문자로 변환
-  // 2. 언더스코어(_)를 기준으로 문자열을 분리
-  // 3. reduce를 사용하여 카멜 케이스로 조합
-  return snakeCaseString.toLowerCase().split('_').reduce((acc, part) => {
-    // 첫 번째 파트는 그대로 사용 (created)
-    if (acc === '') {
-      return part;
-    }
-    // 두 번째 파트부터는 첫 글자를 대문자로 변환 후 뒤에 붙임 (ByName)
-    return acc + part.charAt(0).toUpperCase() + part.slice(1);
-  }, '');
-};
-
-const transformKeys = (data) => {
-  if (Array.isArray(data)) {
-    // 배열이면 배열의 모든 요소에 대해 재귀 호출
-    return data.map(transformKeys);
-  }
-
-  if (data !== null && typeof data === 'object') {
-    // 객체이면 키를 순회하며 변환
-    const newObject = {};
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const newKey = toCamelCase(key);
-        // 값도 객체나 배열일 수 있으므로 재귀적으로 처리
-        newObject[newKey] = transformKeys(data[key]);
-      }
-    }
-    return newObject;
-  }
-
-  // 객체나 배열이 아니면 값 그대로 반환 (문자열, 숫자, null 등)
-  return data;
-};
-
-grid1.on("click", async (ev) => {
-
-	const target = ev.nativeEvent.target;
-	// const targetElement = ev.nativeEvent.target; 이 줄이 빠진 경우
-	if (ev.targetType === 'cell' && target.tagName === 'BUTTON') {
-		console.log('Button in cell clicked, rowKey:', ev.rowKey);
+qcItemGrid.on("click", async (ev) => {
+	const { targetType, columnName, rowKey } = ev;
+	
+	if (targetType === "cell" && columnName === "view_details") {
 		
-		const rowData = grid1.getRow(ev.rowKey);
-		console.log('rowData data:', rowData);
+		const rowData = qcItemGrid.getRow(rowKey);
+		
+		const qcItemId = rowData.qcItemId;
+		
+		const qcItem = await loadQcItemDetail(qcItemId);
 		
 		// 예: 모달 열기, 상세 정보 표시 등		
 		$('#qcItem-modal').modal('show');
-		document.getElementById('qcmodalTilte').innerText= 'QC 항목 상세';
-		document.getElementById('modalQcItemId').value = rowData.qcItemId;//QC 항목 ID
-		document.getElementById('itemName').value = rowData.itemName;//항목명
-		document.getElementById('targetType').value = rowData.targetType;//대상구분
-		document.getElementById('unit').value = rowData.unit;//단위
-		document.getElementById('stdText').value = rowData.stdText;//기준텍스트
-		document.getElementById('minValue').value = rowData.minValue;//최소값
-		document.getElementById('maxValue').value = rowData.maxValue;//최대값
-		document.getElementById('sortOrder').value = rowData.sortOrder;//정렬순서
-		document.getElementById('useYn').value = rowData.useYn;//사용여부
-		document.getElementById('createdId').value = rowData.createdByName;//생성자
-		document.getElementById('createdDate').value = rowData.createdDate;//생성일시
-		document.getElementById('updatedId').value = rowData.updatedByName;//수정자
-		document.getElementById('updatedDate').value = rowData.updatedDate;//수정일시
 		
-		document.getElementById('qcItemId').readOnly = true;
-		document.getElementById('userAndDate').style.display = 'flex';
+		isEdit = true;
+		fillModal(qcItem);
 
-		qcItemGridAllSearch();
+		await qcItemGridAllSearch();
 	}
-
 });
 
-// 모달 내 폼을 가로채서 AJAX로 전송하여 서버 에러 메시지를 alert로 표시
-const qcItemForm = document.querySelector('#qcItem-modal form');
-if (qcItemForm) {
-    qcItemForm.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        const form = ev.target;
-           // mode 값을 기존 input에 설정 (form에 name="mode"인 input이 있다면)
-        const modeValue = document.getElementById('qcmodalTilte').innerText == 'QC 항목 등록' ? 'new' : 'modify';
-        let modeInput = form.querySelector('input[name="mode"]');
-        
-        if (modeInput) {
-            modeInput.value = modeValue;
-        } else {
-            // mode input이 없으면 새로 생성
-            modeInput = document.createElement('input');
-            modeInput.type = 'hidden';
-            modeInput.name = 'mode';
-            modeInput.value = modeValue;
-            form.appendChild(modeInput);
-        }
-        
-        const formData = new FormData(form);
-        const params = new URLSearchParams(formData);
-        console.log('최종 params:', params.toString());
-
-        fetch(apiUrl(`${form.action}`), {
-            method: form.method || 'POST',
-            credentials: 'same-origin',
-            headers: {
-                [csrfHeader]: csrfToken,
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: params.toString()
-        })
-        .then(res => {
-            if (!res.ok) return res.text().then(t => { throw new Error(`HTTP ${res.status}: ${t || res.statusText}`); });
-            return res.text();
-        })
-        .then(result => {
-            console.log('서버 응답:', result);
-            
-            // 오류 응답 처리
-            if (result && result.toLowerCase().startsWith('error')) {
-                const errorMsg = result.replace(/^error:\s*/i, '').trim();
-                alert(errorMsg);
-                return;
-            }
-            
-            // 성공 응답 처리
-            if (result && result.toLowerCase().includes('success')) {
-                alert('저장되었습니다.');
-                // 성공 시 모달 닫고 그리드 갱신
-                document.querySelector('#qcItem-modal .modal-footer [data-bs-dismiss="modal"]').click();
-                qcModalreset();
-                qcItemGridAllSearch();
-            } else {
-                // 예상치 못한 응답도 일단 표시
-                alert(result || '알 수 없는 오류가 발생했습니다.');
-            }
-        })
-        .catch(err => {
-            console.error('QC 저장 오류', err);
-            alert(err.message || '저장 중 오류가 발생했습니다.');
-        });
-    });
+// qcItem 상세 조회
+async function loadQcItemDetail(qcItemId) {
+	try {
+		const res = await fetch(`/masterData/qc_item/${qcItemId}`);
+		
+		if (!res.ok) {
+			throw new Error("데이터 로드 실패");
+		}
+		
+		const data = await res.json();
+		
+		return data;
+	} catch (error) {
+		console.error(error);
+	}
 }
-// 항목 등록
-const qcItemRegistBtn = document.getElementById('qcItemRegistBtn');
-qcItemRegistBtn.addEventListener("click", function() {
+
+// 상세 모달 
+function fillModal(data) {
+	document.getElementById('qcmodalTilte').innerText= 'QC 항목 상세';
+	document.getElementById('modalQcItemId').value = data.qcItemId;//QC 항목 ID
+	document.getElementById('itemName').value = data.itemName;//항목명
+	document.getElementById('targetType').value = data.targetType;//대상구분
+	document.getElementById('unit').value = data.unit;//단위
+	document.getElementById('stdText').value = data.stdText;//기준텍스트
+	document.getElementById('minValue').value = data.minValue;//최소값
+	document.getElementById('maxValue').value = data.maxValue;//최대값
+	document.getElementById('sortOrder').value = data.sortOrder;//정렬순서
+	document.getElementById('useYn').value = data.useYn;//사용여부
+
+	document.getElementById('modalQcItemId').readOnly = true;
+}
+
+
+// QC 항목 등록 버튼 이벤트
+document.getElementById("qcItemRegistBtn").addEventListener("click", () => {
 	document.getElementById('qcmodalTilte').innerText= 'QC 항목 등록';
+	document.getElementById('modalQcItemId').readOnly = false;
 	qcModalreset();
-	document.getElementById('modalQcItemId').value = 'QC-';
-	document.getElementById('qcItemId').readOnly = false;
-	document.getElementById('userAndDate').style.display ='none';//생성자
-	
 });
 
 function qcModalreset() {
@@ -266,85 +171,227 @@ function qcModalreset() {
 	document.getElementById('maxValue').value = '';//최대값
 	document.getElementById('sortOrder').value = '';//정렬순서
 	document.getElementById('useYn').value = '';//사용여부
-	document.getElementById('createdId').value = '';//생성자
-	document.getElementById('createdDate').value = '';//생성일시
-	document.getElementById('updatedId').value = '';//수정자
-	document.getElementById('updatedDate').value = '';//수정일시
-	qcItemGridAllSearch();//공정코드 관리 그리드 조회
+	
+	document.getElementById('modalQcItemId').readOnly = false;
+	isEdit = false;
 }
 
-
-// 품질항목관리 삭제
-const deleteQcRowBtn = document.getElementById('deleteQcRowBtn');
-deleteQcRowBtn.addEventListener('click', async function() {
-
-	// 체크된 rowKey들 수집
-	let rowKeysToDelete = [];
-	try {
-		if (typeof grid1.getCheckedRowKeys === 'function') {
-			rowKeysToDelete = grid1.getCheckedRowKeys() || [];
-		} else if (typeof grid1.getCheckedRows === 'function') {
-			const checkedRows = grid1.getCheckedRows() || [];
-			rowKeysToDelete = checkedRows.map(r => r && (r.rowKey || r.qcItemId)).filter(Boolean);
-		}
-	} catch (e) {
-		console.warn('체크된 행 조회 실패', e);
+// 수정 또는 상세 모달의 저장 버튼 이벤트
+document.getElementById("saveQcItem").addEventListener("click", async () => {
+	const data = await getQcItemData();
+	
+	if (!data) return;
+	
+	if (isEdit) {
+		const qcItemId = document.getElementById('modalQcItemId').value;
+		await updateQcItem(qcItemId, data);
+	} else {
+		await insertQcItem(data);
 	}
-	if (!Array.isArray(rowKeysToDelete) || rowKeysToDelete.length === 0) {
-		alert('삭제할 행을 선택(체크)해주세요.');
-		return;
-	}
-	// 간결한 방식으로 각 rowKey로부터 qcItemId(또는 식별 가능한 ID)를 수집
-	const getAllData = () => (typeof grid1.getData === 'function' ? grid1.getData() : (grid1.data || []));
-	const qcItemIds = rowKeysToDelete.map(key => {
-		try {
-			const row = (typeof grid1.getRow === 'function' && grid1.getRow(key)) ||
-				getAllData().find(d => d && (String(d.rowKey) === String(key) || String(d.qcItemId) === String(key)));
-			return row && row.qcItemId ? String(row.qcItemId) : String(key);
-		}
-		catch (e) {
-			console.warn('삭제 ID 수집 중 오류', e);
-			return String(key);
-		}
-	}).filter(Boolean);
-
-	if (!confirm('선택한 항목을 삭제하시겠습니까?')) return;
-	fetch(apiUrl(`masterData/qcItem/delete`), {
-		method: 'POST',
-		credentials: 'same-origin',
-		headers: {
-			[csrfHeader]: csrfToken,
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify(qcItemIds)
-	})
-	.then(res => {
-		if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-		const ct = (res.headers.get('content-type') || '').toLowerCase();
-		if (ct.includes('application/json')) return res.json();
-		return res.text();
-	}
-	)
-	.then(parsed => {
-		console.log('삭제 응답:', parsed);
-		const okTexts = ['success','ok','true'];
-		if (typeof parsed === 'string') {
-			if (!okTexts.includes(parsed.trim().toLowerCase())) throw new Error('Unexpected response: ' + parsed);
-		}
-		else if (!(parsed && (parsed.status === 'success' || okTexts.includes((parsed.message||'').toString().toLowerCase())))) {
-			throw new Error('삭제 실패: ' + JSON.stringify(parsed));
-		}
-		// 서버 삭제 성공 시 그리드 재조회
-		qcItemGridAllSearch();
-	})
-	.catch(err => {
-		console.error('삭제 중 오류', err);
-		try { alert('삭제 중 오류가 발생했습니다. ' + (err && err.message ? err.message : '')); } catch (e) {}
-	});
+	
+	await qcItemGridAllSearch();
+	$('#qcItem-modal').modal('hide');
+	$('.modal-backdrop').remove();
+	$('body').removeClass('modal-open');
+	$('body').css('padding-right', '');
 });
 
+// qcItem 업데이트 함수 
+async function updateQcItem(qcItemId, data) {
+	try {
+		const res = await fetch(apiUrl(`/masterData/qcItem/${qcItemId}`), {
+			method: 'POST',
+			headers: {
+				[csrfHeader]: csrfToken,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if (!res.ok) {
+		    let message = `등록 실패 (${res.status})`;
 
+		    try {
+		        const errorText = await res.text();
+				if (errorText) {
+				    message = errorText;
+				}
+		    } catch (_) {}
 
+		    throw new Error(message);
+		}
+		
+		alert("저장되었습니다.");
+	} catch (error) {
+		console.log(error);
+		alert(error.message || "저장에 실패했습니다.");
+	}
+}
 
+async function getQcItemData() {
+	const qcItemId = document.getElementById('modalQcItemId').value;
+	const itemName = document.getElementById("itemName").value.trim();
+	const targetType = document.getElementById("targetType").value;
+	const unit = document.getElementById("unit").value;
+	const minValue = document.getElementById("minValue").value;
+	const maxValue = document.getElementById("maxValue").value;
+	const useYn = document.getElementById("useYn").value;
+	const sortOrder = document.getElementById("sortOrder").value;
+	
+	if (!isEdit && !qcItemId) {
+		alert("QC ITEM ID는 필수입니다.");
+		return null;
+	}
+	
+	// 필수값 검증
+	if (!itemName || !targetType || !unit || !useYn) {
+		alert("필수 항목을 입력해주세요.");
+		return null;
+	}
+	
+	// 숫자 검증
+	if (sortOrder === "" || isNaN(sortOrder)) {
+		alert("정렬 순서를 숫자여야 합니다.");
+		return;
+	}
+	
+	if (minValue !== "" && isNaN(minValue)) {
+		alert("최소값은 숫자여야 합니다.");
+		return null;
+	}
 
+	if (maxValue !== "" && isNaN(maxValue)) {
+		alert("최대값은 숫자여야 합니다.");
+		return null;
+	}
 
+	if (minValue !== "" && maxValue !== "" && Number(minValue) > Number(maxValue)) {
+		alert("최소값은 최대값보다 클 수 없습니다.");
+		return null;
+	}
+	
+	// sortOrder 중복 검증
+	if (isDuplicateSortOrder(sortOrder, qcItemId)) {
+		alert("이미 사용 중인 정렬 순서입니다.");
+		return null;
+	}
+	
+	if (!isEdit) {
+		const isDuplicate = await checkQcItemId(qcItemId);
+		if (isDuplicate) return null;
+	}
+	
+	return {
+		qcItemId,
+		itemName,
+		targetType,
+		unit,
+		minValue,
+		maxValue,
+		useYn,
+		sortOrder
+	}
+}
+
+function isDuplicateSortOrder(sortOrder, currentId) {
+	return qcItemList.some(item => {
+		if (currentId && item.qcItemId == currentId) {
+			return false; // 자기 자신 제외
+		}
+		return Number(item.sortOrder) === Number(sortOrder);
+	});
+}
+
+async function insertQcItem(data) {
+	try {
+		const res = await fetch(apiUrl(`/masterData/qcItem/add`), {
+			method: 'POST',
+			headers: {
+				[csrfHeader]: csrfToken,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if (!res.ok) {
+		    let message = `등록 실패 (${res.status})`;
+
+		    try {
+		        const errorText = await res.text();
+				if (errorText) {
+				    message = errorText;
+				}
+		    } catch (_) {}
+
+		    throw new Error(message);
+		}
+		
+		alert("등록이 완료되었습니다.");
+	} catch (error) {
+		console.log(error);
+		alert(error.message || "저장에 실패했습니다.");
+	}
+}
+
+// QC ITEM ID 중복 검사 관련 로직
+async function checkQcItemId(qcItemId) {
+	try {
+		const res = await fetch(`/masterData/qcItem/checkDuplicate?qcItemId=${qcItemId}`);
+		const data = await res.json();
+		
+		if (data.isDuplicate) {
+			alert("이미 사용 중인 ITEM ID 입니다.");
+			return true;
+		}
+		
+		return false;
+		
+	} catch (error) {
+		console.error(error);
+		alert("중복 검사에 실패했습니다.");
+		return true; 
+	}
+}
+
+// 대상 구분 조회
+async function loadTargetType() {
+	try {
+		const res = await fetch("/commomCode/matType");
+		const data = await res.json();
+		
+		// select에서 보여질 내용
+		targetTypeList = data.map(item => ({
+			value: item.codeId,
+			text: item.codeName
+		}));
+		
+	} catch (e) {
+		console.error(e);
+	}
+}
+
+let searchKeyword = "";
+// 검색 기능
+document.getElementById("qcItemKeyword").addEventListener("input", (e) => {
+	searchKeyword = e.target.value;
+});
+
+// 검색 버튼 이벤트
+document.getElementById("searchbtn").addEventListener("click", () => {
+	const keyword = searchKeyword.trim().toLowerCase();
+	
+	// 검색어가 없으면 빈 화면 보여주기
+	if (!keyword) {
+		qcItemGrid.resetData(qcItemList);
+		return;
+	}
+	
+	const filterData = qcItemList.filter(item => {
+		const qcItemId = item.qcItemId ? item.qcItemId.toLowerCase() : "";
+		const itemName = item.itemName ? item.itemName.toLowerCase() : "";
+		
+		return qcItemId.includes(keyword) || itemName.includes(keyword);
+	});
+
+	qcItemGrid.resetData(filterData);
+});

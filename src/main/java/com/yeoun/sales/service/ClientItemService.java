@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.yeoun.masterData.entity.MaterialMst;
-import com.yeoun.masterData.repository.MaterialMstRepository;
+import com.yeoun.masterData.entity.Material;
+import com.yeoun.masterData.repository.MaterialRepository;
 import com.yeoun.sales.dto.ClientItemDTO;
 import com.yeoun.sales.entity.ClientItem;
 import com.yeoun.sales.repository.ClientItemRepository;
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClientItemService {
   
-    private final MaterialMstRepository materialMstRepository;
+    private final MaterialRepository materialRepository;
     private final ClientItemRepository clientItemRepository;
     
 
@@ -53,7 +53,7 @@ public class ClientItemService {
     /**
      * 🔥 협력사에 아직 등록되지 않은 자재 목록
      */
-    public List<MaterialMst> getAvailableMaterials(
+    public List<Material> getAvailableMaterials(
             String clientId,
             String matType
     ) {
@@ -64,8 +64,8 @@ public class ClientItemService {
         
 
         // 2️⃣ 카테고리별 전체 자재
-        List<MaterialMst> allMaterials =
-                materialMstRepository.findByMatTypeAndUseYn(matType, "Y");
+        List<Material> allMaterials =
+        		materialRepository.findByMatTypeAndUseYn(matType, "Y");
 
         // 3️⃣ 이미 등록된 자재 제외
         return allMaterials.stream()

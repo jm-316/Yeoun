@@ -42,7 +42,7 @@ public class Material {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MATERIAL_SEQ_GENERATOR")
 	private Long matId;
 
-	@Column(nullable = false)
+	@Column(name="MAT_CODE", nullable = false)
 	private String matCode; // 원재료코드
 	
 	@Column(nullable = false)

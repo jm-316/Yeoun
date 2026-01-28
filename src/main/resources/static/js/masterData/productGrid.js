@@ -394,7 +394,7 @@ document.getElementById("productSearch").addEventListener("click", () => {
 	
 	// 검색어가 없으면 빈 화면 보여주기
 	if (!keyword) {
-		productGrid.resetData([]);
+		productGrid.resetData(productDataList);
 		return;
 	}
 	

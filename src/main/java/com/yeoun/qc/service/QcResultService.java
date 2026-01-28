@@ -386,7 +386,7 @@ public class QcResultService {
 	    if (workOrder != null) {
 	        view.setPlanQty(workOrder.getPlanQty());
 	        if (workOrder.getProduct() != null) {
-	            view.setProductCode(workOrder.getProduct().getPrdId());
+	            view.setProductCode(workOrder.getProduct().getPrdCode());
 	            view.setProductName(workOrder.getProduct().getPrdName());
 	        }
 	    }

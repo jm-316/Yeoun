@@ -19,7 +19,7 @@ import com.yeoun.sales.entity.Orders;
 import com.yeoun.sales.enums.OrderItemStatus;
 import com.yeoun.sales.enums.OrderStatus;
 import com.yeoun.emp.repository.EmpRepository;
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.sales.repository.OrderItemRepository;
 import com.yeoun.sales.repository.OrderQueryRepository;
 import com.yeoun.sales.repository.OrdersRepository;
@@ -96,11 +96,11 @@ public class OrdersService {
     /* ============================================================
        3) 제품 목록 조회
     ============================================================ */
-    public List<ProductMst> getProducts() {
+    public List<Product> getProducts() {
         return em.createQuery(
-                "SELECT p FROM ProductMst p " +
+                "SELECT p FROM Product p " +
                         "WHERE p.useYn = 'Y' " +
-                        "ORDER BY p.prdName", ProductMst.class
+                        "ORDER BY p.prdName", Product.class
         ).getResultList();
     }
 

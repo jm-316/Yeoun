@@ -2,7 +2,9 @@ package com.yeoun.masterData.dto;
 
 import java.time.LocalDate;
 
+import org.modelmapper.ModelMapper;
 
+import com.yeoun.masterData.entity.QcItem;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -50,5 +52,18 @@ public class QcItemDTO {
 	private String updateId; //수정자 id
 	
 	private LocalDate updateDate; //수정일시
+	
+	// ---------------------------------------------------
+	// DTO <-> Entity 변환
+	private static ModelMapper modelMapper = new ModelMapper();
+	
+	// 엔티티 타입으로 변환
+	public QcItem toEntity() {
+		return modelMapper.map(this, QcItem.class);
+	}
+	
+	public static QcItemDTO fromEntity(QcItem qcItem) {
+		return modelMapper.map(qcItem, QcItemDTO.class);
+	}
 	
 }

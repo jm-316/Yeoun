@@ -72,21 +72,12 @@ public class BomController {
 		List<BomItemDTO> createdRows = data.get("created");
 		List<BomItemDTO> updatedRows = data.get("updated");
 		
-			
-		try {
-			
-			if (createdRows != null && !createdRows.isEmpty()) {
-				bomService.createBomItem(createdRows, loginDTO.getEmpId());
-			} else if (updatedRows != null && !updatedRows.isEmpty()) {
-				bomService.updateMaterial(updatedRows);
-			}
-			return ResponseEntity.ok("저장 완료");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body("시류ㅐ");
+		if (createdRows != null && !createdRows.isEmpty()) {
+			bomService.createBomItem(createdRows, loginDTO.getEmpId());
+		} else if (updatedRows != null && !updatedRows.isEmpty()) {
+			bomService.updateMaterial(updatedRows);
 		}
-		
+		return ResponseEntity.ok("저장 완료");
 	}
 	
 	// BOM Item 삭제

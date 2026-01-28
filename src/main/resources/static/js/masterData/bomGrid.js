@@ -214,7 +214,6 @@ function collectBomData() {
 }
 
 async function modifyBom(data) {
-	console.log(data);
 	const BOM_MODIFY_URL = "/bomMst/data/bom/modify";
 	
 	try {

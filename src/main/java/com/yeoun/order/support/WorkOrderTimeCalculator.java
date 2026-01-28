@@ -1,9 +1,9 @@
 package com.yeoun.order.support;
 
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.masterData.entity.RouteHeader;
 import com.yeoun.masterData.entity.RouteStep;
-import com.yeoun.masterData.repository.ProductMstRepository;
+import com.yeoun.masterData.repository.ProductRepository;
 import com.yeoun.masterData.repository.RouteHeaderRepository;
 import com.yeoun.masterData.repository.RouteStepRepository;
 import com.yeoun.order.entity.WorkOrder;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkOrderTimeCalculator {
 
-    private final ProductMstRepository productMstRepository;
+    private final ProductRepository productRepository;
     private final RouteHeaderRepository routeHeaderRepository;
     private final RouteStepRepository routeStepRepository;
 
@@ -28,7 +28,7 @@ public class WorkOrderTimeCalculator {
     public long calcExpectedMinutes(String prdId, Integer planQty, String routeId) {
 
         // 1) 제품 조회
-        ProductMst product = productMstRepository.findById(prdId)
+        Product product = productRepository.findByPrdCode(prdId)
                 .orElseThrow(() -> new RuntimeException("품번 없음: " + prdId));
 
         // 2) 라우트 헤더 조회

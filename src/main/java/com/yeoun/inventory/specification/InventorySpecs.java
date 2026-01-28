@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.yeoun.inventory.entity.Inventory;
-import com.yeoun.masterData.entity.MaterialMst;
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Material;
+import com.yeoun.masterData.entity.Product;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -73,10 +73,10 @@ public class InventorySpecs {
         return (root, query, cb) -> {
             if (prodName == null || prodName.isBlank()) return null;
 
-            Join<Inventory, MaterialMst> matJoin =
-                root.join("materialMst", JoinType.LEFT);
-            Join<Inventory, ProductMst> prdJoin =
-                root.join("productMst", JoinType.LEFT);
+            Join<Inventory, Material> matJoin =
+                root.join("material", JoinType.LEFT);
+            Join<Inventory, Product> prdJoin =
+                root.join("product", JoinType.LEFT);
 
             return cb.or(
                 cb.like(matJoin.get("matName"), "%" + prodName + "%"),

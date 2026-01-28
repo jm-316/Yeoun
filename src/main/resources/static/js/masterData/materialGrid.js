@@ -42,6 +42,9 @@ const materialGrid = new tui.Grid({
 					listItems: []
 				}
 			},
+			editable: ({row}) => {
+				return !hasMatCode(row);
+			},
 			formatter: ({value}) => {
 				const type = matTypeList.find(item => item.value === value);
 				return type ? type.text : value;
@@ -102,11 +105,28 @@ const materialGrid = new tui.Grid({
 	]
 });
 
+// 기존 행 수정을 막을 때 사용
+function hasMatCode(row) {
+	return row.matCode !== null &&
+		   row.matCode !== undefined &&
+		   row.matCode !== "";
+}
+
 // 변경하기 전 값
 const beforeEditValues = {};
 
 materialGrid.on("editingStart", ev => {
     const { rowKey, columnName } = ev;
+	
+	const row = materialGrid.getRow(rowKey);
+	const isNewRow = !hasMatCode(row);
+
+	if (
+		(columnName === 'matType' || columnName === 'matUnit') &&
+		!isNewRow
+	) {
+		ev.stop();
+	}
 	
     beforeEditValues[rowKey] ??= {};
     beforeEditValues[rowKey][columnName] =
@@ -261,22 +281,20 @@ function getColumnHeader(columnName) {
 materialGrid.on('click', ev => {
 	
     if (!ev.rowKey) return;
+	
+	const row = materialGrid.getRow(ev.rowKey);
+	const isNewRow = !hasMatCode(row);
 
-    if (ev.columnName === "useYn") {
+	if (ev.columnName === "matUnit" || ev.columnName === "matType") {
+		if (isNewRow) {
+		    materialGrid.startEditing(ev.rowKey, ev.columnName);
+		}
+		
+		return;
+	}
+    if (ev.columnName === "useYn" || ev.columnName === "effectiveDate") {
         materialGrid.startEditing(ev.rowKey, ev.columnName);
     }
-	
-	if (ev.columnName === "matUnit") {
-	    materialGrid.startEditing(ev.rowKey, ev.columnName);
-	}
-	
-	if (ev.columnName === "matType") {
-	    materialGrid.startEditing(ev.rowKey, ev.columnName);
-	}
-	
-	if (ev.columnName === "effectiveDate") {
-	    materialGrid.startEditing(ev.rowKey, ev.columnName);
-	}
 });
 
 // 원재료 정보 불러오기
@@ -473,9 +491,8 @@ document.getElementById("materialKeyword").addEventListener("input", (e) => {
 document.getElementById("searchbtn").addEventListener("click", () => {
 	const keyword = searchMatKeyword.trim().toLowerCase();
 	
-	// 검색어가 없으면 빈 화면 보여주기
 	if (!keyword) {
-		materialGrid.resetData([]);
+		materialGrid.resetData(matDataList);
 		return;
 	}
 	

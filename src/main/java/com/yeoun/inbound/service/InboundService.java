@@ -39,10 +39,10 @@ import com.yeoun.inventory.util.InventoryIdUtil;
 import com.yeoun.lot.dto.LotHistoryDTO;
 import com.yeoun.lot.dto.LotMasterDTO;
 import com.yeoun.lot.service.LotTraceService;
-import com.yeoun.masterData.entity.MaterialMst;
-import com.yeoun.masterData.entity.ProductMst;
-import com.yeoun.masterData.repository.MaterialMstRepository;
-import com.yeoun.masterData.repository.ProductMstRepository;
+import com.yeoun.masterData.entity.Material;
+import com.yeoun.masterData.entity.Product;
+import com.yeoun.masterData.repository.MaterialRepository;
+import com.yeoun.masterData.repository.ProductRepository;
 import com.yeoun.order.entity.WorkOrder;
 import com.yeoun.order.repository.WorkOrderRepository;
 import com.yeoun.outbound.dto.OutboundItemDTO;
@@ -69,12 +69,12 @@ public class InboundService {
 	private final InboundRepository inboundRepository;
 	private final InboundItemRepository inboundItemRepository;
 	private final ClientItemRepository clientItemRepository;
-	private final MaterialMstRepository materialMstRepository;
+	private final MaterialRepository materialRepository;
 	private final MaterialOrderRepository materialOrderRepository;
 	private final WorkOrderProcessRepository workOrderProcessRepository;
 	private final InventoryRepository inventoryRepository;
 	private final WorkOrderRepository workOrderRepository;
-	private final ProductMstRepository productMstRepository;
+	private final ProductRepository productRepository;
 	private final InboundMapper inboundMapper;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final AlarmService alarmService;
@@ -107,10 +107,10 @@ public class InboundService {
 			ClientItem clientItem = clientItemRepository.findByItemId(item.getItemId())
 					.orElseThrow(() -> new NoSuchElementException("해당 품목 정보를 찾을 수 없습니다."));
 			// 원자재 조회
-			MaterialMst materialMst = materialMstRepository.findByMatId(clientItem.getMaterialId())
+			Material material = materialRepository.findByMatCode(clientItem.getMaterialId())
 					.orElseThrow(() -> new NoSuchElementException("해당 원재료 정보를 찾을 수 없습니다."));
 			
-			if ("PKG".equals(materialMst.getMatType()) || "SUB".equals(materialMst.getMatType())) {
+			if ("PKG".equals(material.getMatType()) || "SUB".equals(material.getMatType())) {
 				expirationDate = null;
 			}
 			
@@ -127,7 +127,7 @@ public class InboundService {
 					.requestAmount(convertedAmount)
 					.inboundAmount(0L)
 					.disposeAmount(0L)
-					.itemType(materialMst.getMatType())
+					.itemType(material.getMatType())
 					.locationId(null)
 					.manufactureDate(LocalDate.parse(materialOrder.getDueDate()).atStartOfDay())
 					.expirationDate(expirationDate)
@@ -175,10 +175,10 @@ public class InboundService {
 				.orElseThrow(() -> new NoSuchElementException("해당 작업지시 정보를 찾을 수 없습니다."));
 		
 		// 제품ID
-		String prdId = workOrder.getProduct().getPrdId();
+		String prdId = workOrder.getProduct().getPrdCode();
 		
 		// 제품 정보 조회
-		ProductMst productMst = productMstRepository.findByPrdId(prdId)
+		Product product = productRepository.findByPrdCode(prdId)
 				.orElseThrow(() -> new NoSuchElementException("해당 제품 정보를 찾을 수 없습니다."));
 		
 		// 입고 생성		
@@ -206,7 +206,7 @@ public class InboundService {
 		// -------------------------------------
 		// 입고 품목 등록
 		// 제품 기준정보의 유효일자(개월) 가져오기
-		int valiDays = productMst.getEffectiveDate();
+		int valiDays = product.getEffectiveDate();
 		
 		InboundItemDTO inboundItemDTO = InboundItemDTO.builder()
 				.lotNo(workOrderProcess.getLotNo())

@@ -249,13 +249,24 @@
 		        {header: "ID", name: "equipId", width: 160, align: "center"},
 		        {header: "이름(한)", name: "koName", align: "left"},
 		        {header: "이름(영)", name: "equipName", align: "left"},
-		        {
-		          header: "등록일자",
-		          name: "createdDate",
-		          align: "center",
-		          formatter: ({ value }) => formatTimeFull(value ? new Date(value) : undefined)
-		        },
-			    {header: "사용", name: "useYn", align: "center"},
+// 		        {
+// 		          header: "등록일자",
+// 		          name: "createdDate",
+// 		          align: "center",
+// 		          formatter: ({ value }) => formatTimeFull(value ? new Date(value) : undefined)
+// 		        },
+			    {
+					header: "사용", 
+					name: "useYn", 
+					align: "center",
+					filter: "select",
+			      	formatter: ({value}) => {
+						const statusMap = {
+								"Y": "활성",
+								"N": "비활성"
+							};
+							return statusMap[value] || value;
+						}},
 		        {
 		          header: "상세",
 		          name: "btn",
@@ -288,8 +299,24 @@
 		      columnOptions: {resizable: true, editor: null},
 		      columns: [
 		        {header: "ID", name: "lineId", width: 160, align: "center"},
-		        {header: "라인명", name: "lineName", align: "left"},
-			    {header: "사용", name: "useYn", align: "center"},
+		        {
+		        	header: "라인명", 
+		        	name: "lineName", 
+		        	align: "left", 				
+		        },
+			    {
+		        	header: "사용", 
+		        	name: "useYn", 
+		        	align: "center",
+		        	filter: "select",
+			      	formatter: ({value}) => {
+						const statusMap = {
+								"Y": "활성",
+								"N": "비활성"
+							};
+							return statusMap[value] || value;
+						}
+			      },
 		        {
 		          header: "상세",
 		          name: "btn",
@@ -334,8 +361,6 @@
                   const res = await fetch(url);
                   if (!res.ok) throw new Error("서버 오류");
                   const data = await res.json();
-
-                  console.log("서버응답 확인.... " , data);
 
                   grid.resetData(data); // 기존 데이터 지우고 새로 로드
                   grid.refreshLayout(); // 화면 갱신

@@ -35,7 +35,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 		        o.DUE_DATE AS dueDate
 		    FROM ORDER_ITEM oi
 		    JOIN ORDERS o ON o.ORDER_ID = oi.ORDER_ID
-		    JOIN PRODUCT_MST pm ON pm.PRD_ID = oi.PRD_ID
+		    JOIN PRODUCT pm ON pm.PRD_CODE = oi.PRD_ID
 		    WHERE o.ORDER_STATUS = 'CONFIRMED'
 		    ORDER BY o.DUE_DATE
 		    """, nativeQuery = true)
@@ -44,7 +44,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 	// 1) 확정된 수주를 제품별로 그룹화
 	@Query("""
 		    SELECT
-		        p.prdId AS prdId,
+		        p.prdCode AS prdId,
 		        p.prdName AS prdName,
 		        SUM(oi.orderQty) AS totalOrderQty,
 		        COUNT(oi) AS orderCount,
@@ -53,8 +53,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 		    JOIN oi.order o
 		    JOIN oi.product p
 		    WHERE oi.itemStatus = 'CONFIRMED'		     
-		      AND (:group IS NULL OR p.itemName = :group)
-		    GROUP BY p.prdId, p.prdName
+		      AND (:group IS NULL OR p.prdType = :group)
+		    GROUP BY p.prdCode, p.prdName
 		""")
 		List<Map<String, Object>> findConfirmedGrouped(@Param("group") String group);
 
@@ -76,7 +76,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 		    FROM ORDER_ITEM oi
 		    JOIN ORDERS o       ON o.ORDER_ID = oi.ORDER_ID
 		    JOIN CLIENT c       ON c.CLIENT_ID = o.CLIENT_ID
-		    JOIN PRODUCT_MST pm ON pm.PRD_ID = oi.PRD_ID
+		    JOIN PRODUCT pm     ON pm.PRD_CODE = oi.PRD_ID
 		    WHERE o.ORDER_STATUS = 'CONFIRMED'
 		      AND oi.ITEM_STATUS = 'CONFIRMED'   
 		      AND oi.PRD_ID = :prdId

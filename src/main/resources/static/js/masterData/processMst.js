@@ -255,8 +255,6 @@ grid2.on('beforeChange', (ev) => {
 			isNewRow = !processIdValue;
 		}
 
-		console.log("processId 값:", processIdValue, " | isNewRow:", isNewRow);
-
 		if (!isNewRow) {
 			ev.stop(); // 편집 모드 진입 차단
 			alert('기존 공정ID는 수정할 수 없습니다. 삭제후 새로추가(등록) 해주세요!'); 
@@ -309,8 +307,6 @@ grid4.on('dblclick', function(ev) {
         grid3.finishEditing(focusInfo.rowKey, 'processId');
         // 데이터 입력 실행
         grid3.setValue(focusInfo.rowKey, 'processId', rowData.processId);
-        console.log("입력 완료:", focusInfo.rowKey, rowData.processId);
-
         // 4. 모달 닫기
         let closeBtn = document.querySelector('#processLookup-modal .modal-footer [data-bs-dismiss="modal"]');
         if (closeBtn) closeBtn.click();
@@ -377,10 +373,7 @@ function productRouteSearch(){
 	    return res.json(); // 유효한 JSON일 때만 파싱 시도
 	})
 		.then(data => {
-			console.log("검색데이터 grid1:", data);
-			
 			const camelCaseData = transformKeys(data);
-			console.log("camelCaseData",camelCaseData);
 			grid1.resetData(camelCaseData);
 		})
 		.catch(err => {
@@ -414,9 +407,7 @@ function processCodeGridAllSearch() {
 			return res.json();
 		})
 		.then(data => {
-			console.log("검색데이터 grid2:", data);
 			const camelCaseData = transformKeys(data);
-			console.log("camelCaseData",camelCaseData);
 			grid2.resetData(camelCaseData);
 			grid4.resetData(camelCaseData);//신규라우트 모달 그리드 - 공정코드조회 모달
 			//공정코드 라우트 step id 자동생성 데이터 넣어주기

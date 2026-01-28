@@ -7,8 +7,8 @@ import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.yeoun.masterData.entity.MaterialMst;
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Material;
+import com.yeoun.masterData.entity.Product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,15 +54,15 @@ public class LotMaster {
 	
 	// 완제품(Product) 조인 - prdId가 제품 코드일 때만 매칭됨
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "PRD_ID", insertable = false, updatable = false)
+	@JoinColumn(name = "PRD_ID", referencedColumnName = "PRD_CODE", insertable = false, updatable = false)
 	@NotFound(action = NotFoundAction.IGNORE)
-	private ProductMst product;
+	private Product product;
 
 	// 원자재(Material) 조인 - prdId가 원자재 코드일 때만 매칭됨
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "PRD_ID", insertable = false, updatable = false)
+	@JoinColumn(name = "PRD_ID", referencedColumnName = "MAT_CODE", insertable = false, updatable = false)
 	@NotFound(action = NotFoundAction.IGNORE)
-	private MaterialMst material;
+	private Material material;
 	
 	// 현재수량
 	@Column(name = "QUANTITY", nullable = true)

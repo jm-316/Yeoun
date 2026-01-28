@@ -7,7 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.production.enums.BomStatus;
 import com.yeoun.production.enums.ProductionStatus;
 
@@ -72,8 +72,8 @@ public class ProductionPlanItem {
     private ProductionStatus status;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRD_ID", insertable = false, updatable = false)
-    private ProductMst product;
+    @JoinColumn(name = "PRD_ID", referencedColumnName = "PRD_CODE", insertable = false, updatable = false)
+    private Product product;
 
 
 }

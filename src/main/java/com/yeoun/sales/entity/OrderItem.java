@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Product;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -77,7 +77,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name="PRD_ID", insertable=false, updatable=false)
-    private ProductMst product;
+    private Product product;
 
     
  
