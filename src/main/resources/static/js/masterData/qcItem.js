@@ -79,7 +79,7 @@ const qcItemGrid = new tui.Grid({
 // qcItem 조회
 async function qcItemGridAllSearch() {
 	try {
-		const res = await fetch(`/masterData/qc_item/list`);
+		const res = await fetch(`/masterData/qcItem/list`);
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패");
@@ -123,7 +123,7 @@ qcItemGrid.on("click", async (ev) => {
 // qcItem 상세 조회
 async function loadQcItemDetail(qcItemId) {
 	try {
-		const res = await fetch(`/masterData/qc_item/${qcItemId}`);
+		const res = await fetch(`/masterData/qcItem/${qcItemId}`);
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패");

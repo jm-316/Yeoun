@@ -39,37 +39,13 @@ public class QcItemController {
   	public String qcItem(Model model, @AuthenticationPrincipal LoginDTO loginDTO) {
   		List<CommonCodeIdAndNameDTO> targetTypeList = qcItemService.targetTypeList();
   		
-		model.addAttribute("qcIdList", qcItemService.qcIdList());
 		model.addAttribute("targetTypeList", targetTypeList);
 		model.addAttribute("unitTypeList", qcItemService.unitTypeList());
 		return "masterData/qc_item";
  	}
 
-	// //대상구분 드롭다운
-	// @ResponseBody
-	// @GetMapping("/qcItem/targetTypeList")
-	// public List<Map<String, Object>> targetTypeList() {
-	// 	return qcItemService.targetTypeList();
-	// }
-
-	// //품질단위 드롭다운
-	// @ResponseBody
-	// @GetMapping("/qcItem/unitTypeList")
-	// public List<Map<String, Object>> unitTypeList() {
-	// 	return qcItemService.unitTypeList();
-	// }
-
-  	//품질의기준 조회
-//  	@ResponseBody
-//  	@GetMapping("/qc_item/list")
-//  	public List<Map<String, Object>> qcItemList(Model model, @AuthenticationPrincipal LoginDTO loginDTO
-//	  			,@RequestParam(value = "qcItemId", required = false) String qcItemId) {
-//			log.info("qc_item/list called with qcItemId={}", qcItemId);
-//			return qcItemService.qcItemList(qcItemId);
-//  	}
-  	
   	// QC ITEM 전체 조회
-  	@GetMapping("/qc_item/list")
+  	@GetMapping("/qcItem/list")
   	public ResponseEntity<List<QcItemDTO>> qcItemList() {
   		List<QcItemDTO> qcList = qcItemService.getAllQcItem();
   		
@@ -77,7 +53,7 @@ public class QcItemController {
   	}
   	
   	// QC ITEM 상세 조회
-  	@GetMapping("/qc_item/{qcItemId}")
+  	@GetMapping("/qcItem/{qcItemId}")
   	public ResponseEntity<QcItemDTO> qcItemInfo(@PathVariable("qcItemId") String qcItemId) {
   		QcItemDTO qcItemDTO = qcItemService.findQcItem(qcItemId);
   		
@@ -110,24 +86,4 @@ public class QcItemController {
   		
   		return ResponseEntity.ok(result);
   	}
-  	
-  	
-  	
-  	
-  	
-  	//품질기준 저장 (AJAX 전용)
-  	@ResponseBody
-  	@PostMapping("/qcItem/save")
-  	public String saveItem(@AuthenticationPrincipal LoginDTO loginDTO, @RequestParam Map<String,Object> params) {
-  		log.info("saveItem params: {}", params);
-  		return qcItemService.saveQcItem(loginDTO.getEmpId(), params);
-  	}
-	//품질기준 삭제 (AJAX 호출을 위한 응답: 텍스트 반환)
-	@ResponseBody
-	@PostMapping(value = "/qcItem/delete", consumes = "application/json")
-	public String deleteItem(@RequestBody List<String> param) {
-		return qcItemService.deleteQcItem(param);
-	}
-  	
-
 }

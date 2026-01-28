@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.yeoun.masterData.dto.QcItemDTO;
@@ -62,6 +63,7 @@ public class QcItem {
 	@Column(name="UPDATED_ID", length = 7)
 	private String updatedId; //수정자 id
 	
+	@LastModifiedDate
 	@Column(name="UPDATED_DATE")
 	private LocalDate updatedDate; //수정일시
 	
