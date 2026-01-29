@@ -107,9 +107,9 @@ const materialGrid = new tui.Grid({
 
 // 기존 행 수정을 막을 때 사용
 function hasMatCode(row) {
-	return row.matCode !== null &&
-		   row.matCode !== undefined &&
-		   row.matCode !== "";
+	return row.matId !== null &&
+		   row.matId !== undefined &&
+		   row.matId !== "";
 }
 
 // 변경하기 전 값
