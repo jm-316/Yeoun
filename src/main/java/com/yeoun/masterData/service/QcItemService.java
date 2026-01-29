@@ -110,6 +110,7 @@ public class QcItemService {
 		return qcItemRepository.existsByQcItemId(qcItemId);
 	}
 	
+	// QC ITEM 접두어 설정
 	private String normalizeQcItemId(String qcItemId) {
 		if (qcItemId == null || qcItemId.isBlank()) {
 			 throw new IllegalArgumentException("QC Item ID는 필수입니다.");

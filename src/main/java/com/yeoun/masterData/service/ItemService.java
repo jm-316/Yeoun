@@ -1,6 +1,7 @@
 package com.yeoun.masterData.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -227,8 +228,15 @@ public class ItemService {
 
 	// 원재료 코드 수정 가능 여부 확인
 	public boolean isMatCodeInUse(String matCode) {
-		Material material = materialRepository.findByMatCode(matCode)
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 원재료입니다."));
+		Optional<Material> optional = materialRepository.findByMatCode(matCode);
+		
+		// 신규 등록인 경우 사용 중일 수가 없어서 false 처리
+		if (optional.isEmpty()) {
+			return false;
+		}
+		
+		Material material = optional.get();
+		
 		// BOM Item에 등록되어 있는지
 		int bomCount = bomItemRepository.countByMaterialMatId(material.getMatId());
 		

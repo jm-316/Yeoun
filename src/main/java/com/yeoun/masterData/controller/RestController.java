@@ -42,4 +42,12 @@ public class RestController {
 	
 		return ResponseEntity.ok(prdTypeList);
 	}
+	
+	// 완제품 타입 공통코드 조회
+	@GetMapping("/processType")
+	public ResponseEntity<List<CommonCodeIdAndNameDTO>> processTypeList() {
+		List<CommonCodeIdAndNameDTO> processTypeList = commonCodeService.getType("PROCESS_TYPE");
+		
+		return ResponseEntity.ok(processTypeList);
+	}
 }

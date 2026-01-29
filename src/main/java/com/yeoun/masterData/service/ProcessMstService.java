@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yeoun.masterData.dto.ProcessMstDTO;
 import com.yeoun.masterData.entity.ProcessMst;
 import com.yeoun.masterData.entity.ProductMst;
 import com.yeoun.masterData.entity.RouteHeader;
@@ -357,5 +359,67 @@ public class ProcessMstService {
 			log.error("deleteMaterialMst error", e);
 			return "error: " + e.getMessage();
 		}
+	}
+	
+	// ======================================================
+	// 공정코드 전체 조회
+	public List<ProcessMstDTO> getProcessCodeList() {
+		return processMstRepository.findAll()
+				.stream()
+				.map(ProcessMstDTO::fromEntity)
+				.collect(Collectors.toList());
+	}
+	
+	// 공정 코드 활성화된 목록만 조회
+	public List<ProcessMstDTO> getProcessCodeListWithUseYn(String useYnStr) {
+		Character useYn = useYnStr.charAt(0);
+		
+		
+		return processMstRepository.findByUseYn(useYn)
+				.stream()
+				.map(ProcessMstDTO::fromEntity)
+				.collect(Collectors.toList());
+	}
+	
+	// 공정코드 신규 등록
+	public void createProcessCode(List<ProcessMstDTO> createdRows, String empId) {
+		List<ProcessMst> processes = createdRows
+				.stream()
+				.map(dto -> {
+					ProcessMst entity = dto.toEntity();
+					entity.setProcessId(normalizeProcessCodeId(dto.getProcessId()));
+					entity.setCreatedId(empId);
+					return entity;
+				})
+				.collect(Collectors.toList());
+		
+		processMstRepository.saveAll(processes);
+	}
+	
+	// 공정코드 수정
+	public void updateProcessCode(List<ProcessMstDTO> updatedRows, String empId) {
+		for (ProcessMstDTO dto : updatedRows) {
+			ProcessMst processMst = processMstRepository.findByProcessId(dto.getProcessId())
+					.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공정 코드입니다."));
+			
+			if ("N".equals(dto.getUseYn()) && "Y".equals(processMst.getUseYn())) {
+				// 활성화된 ROUTE_HEADER에 포함된 ROUTE_STEP이 있는지 확인
+				 boolean isUsedInActiveRoute = routeStepRepository.existsActiveRouteUsingProcess(dto.getProcessId());
+				 
+				 if (isUsedInActiveRoute) {
+		                throw new IllegalStateException("해당 공정은 현재 사용 중인 공정 라우트에 포함되어 있어 비활성화할 수 없습니다.");
+				 }
+			}
+			
+			processMst.updateProcess(dto.getProcessName(), dto.getDescription(), dto.getStepNo(), dto.getUseYn(), empId);
+		}
+	}
+	
+	private String normalizeProcessCodeId(String processId) {
+		if (processId == null || processId.isBlank()) {
+			throw new IllegalArgumentException("공정 ID는 필수입니다.");
+		}
+		
+		return "PRC-" + processId;
 	}
 }

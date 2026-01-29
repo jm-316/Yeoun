@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
@@ -67,6 +68,15 @@ public class ProcessMst implements Serializable{
 	
 	// 수정일시
 	@Column(name = "UPDATED_DATE")
+	@LastModifiedDate
 	private LocalDateTime updatedDate;
+	
+	public void updateProcess(String processName, String description, String stepNo, String useYn, String updatedId) {
+		this.processName = processName;
+		this.description = description;
+		this.stepNo = stepNo;
+		this.useYn = useYn;
+		this.updatedId = updatedId;
+	}
 
 }

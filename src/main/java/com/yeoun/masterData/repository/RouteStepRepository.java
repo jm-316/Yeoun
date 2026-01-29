@@ -33,5 +33,13 @@ public interface RouteStepRepository extends JpaRepository<RouteStep, String> {
 			""", nativeQuery = true)
 	List<Map<String, Object>> findRouteStepByRouteId(@Param("routeId") String routeId);
 
-
+	// 활성화된 ROUTE_HEADER에 포함된 ROUTE_STEP이 있는지 확인
+	@Query("""
+		    select count(rs) > 0
+		    from RouteStep rs
+		    join rs.routeHeader rh
+		    where rs.process.processId = :processId
+		      and rh.useYn = 'Y'
+		""")                 
+	boolean existsActiveRouteUsingProcess(@Param("processId") String processId);
 }

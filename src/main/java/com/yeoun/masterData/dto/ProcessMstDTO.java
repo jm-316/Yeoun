@@ -2,6 +2,9 @@ package com.yeoun.masterData.dto;
 
 import java.time.LocalDateTime;
 
+import org.modelmapper.ModelMapper;
+
+import com.yeoun.masterData.entity.ProcessMst;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -51,5 +54,18 @@ public class ProcessMstDTO {
 	
 	// 수정일시
 	private LocalDateTime updatedDate;
+	
+	// ---------------------------------------------------
+	// DTO <-> Entity 변환
+	private static ModelMapper modelMapper = new ModelMapper();
+	
+	// 엔티티 타입으로 변환
+	public ProcessMst toEntity() {
+		return modelMapper.map(this, ProcessMst.class);
+	}
+	
+	public static ProcessMstDTO fromEntity(ProcessMst processMst) {
+		return modelMapper.map(processMst, ProcessMstDTO.class);
+	}
 
 }
