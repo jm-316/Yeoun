@@ -11,16 +11,13 @@
 		</div>
 		<div class="col-12 col-lg d-flex justify-content-end gap-2">
 			<button type="button" class="btn btn-primary"
-				id="matRegistBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">추가
-			</button>
-			<button type="button" class="btn btn-success"
-				id="matSaveBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">저장
+				id="routeRegistBtn" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">신규 라우트
 			</button>
 		</div>
 	</div>
 	<br>
 	<div class="card-body p-0">
-		<div id="processGrid"></div>
+		<div id="routeGrid"></div>
 	</div>
 	
 	<!-- 신규라우트 등록 모달 -->
@@ -43,14 +40,15 @@
 	            </div>
 	            <div class="col-md-3">
 	              	<label class="form-label">제품코드</label>
-	              	<select  id="modalProcessprdId" class="form-select">
-						<option value="" selected>제품명(제품코드)</option>
+	              	<input id="modalProcessprdId" class="form-control"/>
+<!-- 	              	<select  id="modalProcessprdId" class="form-select"> -->
+<!-- 						<option value="" selected>제품명(제품코드)</option> -->
 <!-- 			    		 <option th:each="item, iterStat : ${prdMstList}"  -->
 <!-- 							 		th:value="${item.prdId}"  -->
 <!-- 							 		th:text="${item.prdName} +' (' + ${item.prdId} + ')'" -->
 <!-- 									name="prdId"> -->
 <!-- 						</option> -->
-					</select>
+<!-- 					</select> -->
 	            </div>
 	            <div class="col-md-4">
 	              <label class="form-label">라우트명</label>
@@ -69,24 +67,6 @@
 	              <input type="text" class="form-control" id="modalRouteRemark"
 	                     placeholder="예: 숙성 공정 제외, 액체향수 전용 라우트">
 	            </div>
-				<div id="userAndDate">
-					<div class="col-md-3 me-1">
-					<label class="form-label">생성자</label>
-					<input type="text" class="form-control" id="modalRouteCreatedId" readonly>
-					</div>
-					<div class="col-md-3 me-1">
-					<label class="form-label">생성일시</label>
-					<input type="text" class="form-control" id="modalRouteCreatedDate" readonly>
-					</div>
-					<div class="col-md-3 me-1">
-					<label class="form-label">수정자</label>
-					<input type="text" class="form-control" id="modalRouteUpdatedId" readonly>
-					</div>
-					<div class="col-md-3 me-1">
-					<label class="form-label">수정일시</label>
-					<input type="text" class="form-control" id="modalRouteUpdatedDate" readonly>
-					</div>
-				</div>
 	          </div>
 	        </div>
 	
@@ -110,7 +90,7 @@
 	            </button>
 	          </div>
 	        </div>
-	        <div id="processStepGrid" style="display: grid;margin-right:5px;"></div>
+	        <div id="routeStepGrid" style="display: grid;margin-right:5px;"></div>
 	      </div>
 	      <div class="modal-footer">
 	        <button id="saveRouteBtn" class="btn btn-primary btn-md-sm" type="button">저장</button>
@@ -147,5 +127,7 @@
 		<script type="text/javascript"
 			src="https://uicdn.toast.com/tui.pagination/v3.4.0/tui-pagination.js"></script>
 		<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+		<script th:inline="javascript" th:src="@{/js/masterData/routeGrid.js}"></script>
+		<script th:inline="javascript" th:src="@{/js/masterData/routeStepGrid.js}"></script>
 	</th:block>
 </th:block>

@@ -1,7 +1,9 @@
 package com.yeoun.masterData.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -44,4 +46,21 @@ public interface RouteHeaderRepository extends JpaRepository<RouteHeader, String
 	      AND (:routeName IS NULL OR :routeName = '' OR LOWER(rh.route_name) LIKE '%' || LOWER(:routeName) || '%')
 		    """, nativeQuery = true)
 	List<Map<String, Object>> findByPrdIdAndRouteName(@Param("prdId") String prdId, @Param("routeName") String routeName);
+
+	// routeHeader 조회
+	@Query("""
+			select r
+			from RouteHeader r
+			join fetch r.product
+			""")
+	List<RouteHeader> findAllWithProduct();
+
+
+	@Query("""
+			select r
+			from RouteHeader r
+			join fetch r.product
+			where r.routeId = :routeId
+			""")
+	Optional<RouteHeader> findByRouteId(@Param("routeId") String routeId);
 }

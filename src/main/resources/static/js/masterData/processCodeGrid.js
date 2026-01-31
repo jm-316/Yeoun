@@ -398,6 +398,6 @@ document.getElementById("processCodeSearch").addEventListener("click", () => {
 // 페이지 로딩 시 실행하는 함수들
 window.addEventListener("DOMContentLoaded", async (e) => {
 	await loadprocessTypeCode();
-	await loadProcessCode("all"); // 원재료 목록 조회
+	await loadProcessCode("all"); // 공정 코드 목록 조회
 	
 });

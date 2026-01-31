@@ -11,7 +11,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yeoun.masterData.dto.ProcessMstDTO;
+import com.yeoun.masterData.dto.RouteHeaderDTO;
+import com.yeoun.masterData.dto.RouteStepDTO;
 import com.yeoun.masterData.entity.ProcessMst;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.masterData.entity.ProductMst;
 import com.yeoun.masterData.entity.RouteHeader;
 import com.yeoun.masterData.entity.RouteStep;
@@ -169,46 +172,46 @@ public class ProcessMstService {
 	            }
 	            
 	            Optional<RouteHeader> existingHeaderOpt = routeHeaderRepository.findById(routeId);
-				Optional<ProductMst> pmPrdId = productMstRepository.findById(routeInfo.get("prdId").toString());
-				
-
-				if (pmPrdId.isEmpty()) {
-	                return "FAIL: ProductMst (prdId) not found.";
-	            }
-				
-				ProductMst productMst = pmPrdId.get(); // Optional에서 실제 엔티티 추출
-				//수정시 저장
-				if(existingHeaderOpt.isPresent()) {
-					RouteHeader existingHeader = existingHeaderOpt.get();
-					
-					routeHeader = RouteHeader.builder()
-							.routeId(routeInfo.get("routeId").toString())
-							.product(productMst)// Optional<ProductMst> 대신 ProductMst 객체 사용
-							.routeName(routeInfo.get("routeName").toString())
-							.useYn(routeInfo.get("useYn").toString())
-							.description(routeInfo.get("description").toString())
-							.createdId(existingHeader.getCreatedId())
-							.createdDate(existingHeader.getCreatedDate())
-							.updatedId(empId)
-							.updatedDate(LocalDateTime.now())
-							.build();
-					
-					
-				}else {
-					// --- 🅱️ 신규 등록 로직 (INSERT) ---
-	                routeHeader = RouteHeader.builder()
-	                        .routeId(routeId)
-	                        .product(productMst)
-	                        .routeName(routeInfo.get("routeName").toString())
-	                        .useYn(routeInfo.get("useYn").toString())
-	                        .description(routeInfo.get("description").toString())
-	                        
-	                        // 신규 등록 필드 설정
-	                        .createdId(empId)
-	                        .createdDate(LocalDateTime.now())
-	                        .build();
-					
-				}
+//				Optional<Product> pmPrdId = productMstRepository.findById(routeInfo.get("prdId").toString());
+//				
+//
+//				if (pmPrdId.isEmpty()) {
+//	                return "FAIL: ProductMst (prdId) not found.";
+//	            }
+//				
+//				Product product = pmPrdId.get(); // Optional에서 실제 엔티티 추출
+//				//수정시 저장
+//				if(existingHeaderOpt.isPresent()) {
+//					RouteHeader existingHeader = existingHeaderOpt.get();
+//					
+//					routeHeader = RouteHeader.builder()
+//							.routeId(routeInfo.get("routeId").toString())
+//							.product(product)// Optional<ProductMst> 대신 ProductMst 객체 사용
+//							.routeName(routeInfo.get("routeName").toString())
+//							.useYn(routeInfo.get("useYn").toString())
+//							.description(routeInfo.get("description").toString())
+//							.createdId(existingHeader.getCreatedId())
+//							.createdDate(existingHeader.getCreatedDate())
+//							.updatedId(empId)
+//							.updatedDate(LocalDateTime.now())
+//							.build();
+//					
+//					
+//				}else {
+//					// --- 🅱️ 신규 등록 로직 (INSERT) ---
+//	                routeHeader = RouteHeader.builder()
+//	                        .routeId(routeId)
+//	                        .product(productMst)
+//	                        .routeName(routeInfo.get("routeName").toString())
+//	                        .useYn(routeInfo.get("useYn").toString())
+//	                        .description(routeInfo.get("description").toString())
+//	                        
+//	                        // 신규 등록 필드 설정
+//	                        .createdId(empId)
+//	                        .createdDate(LocalDateTime.now())
+//	                        .build();
+//					
+//				}
 				routeHeaderRepository.save(routeHeader);
 			}
 
@@ -362,6 +365,51 @@ public class ProcessMstService {
 	}
 	
 	// ======================================================
+	// 라우트 조회
+	public List<RouteHeaderDTO> getRouteList() {
+		return routeHeaderRepository.findAllWithProduct()
+				.stream()
+				.map(RouteHeaderDTO::fromEntity)
+				.collect(Collectors.toList());
+	}
+	
+	// 라우트 상세 조회
+	public RouteHeaderDTO getRouteInfo(String routeId) {
+		RouteHeader routeHeader = routeHeaderRepository.findByRouteId(routeId)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 라우트 입니다."));
+		
+		RouteHeaderDTO headerDTO = RouteHeaderDTO.fromEntity(routeHeader);
+		
+		return headerDTO;
+	}
+	
+	// 라우트 단계 조회(전체)
+	public List<RouteStepDTO> getAllRouteStep(String routeId) {
+		RouteHeader routeHeader = routeHeaderRepository.findByRouteId(routeId)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 라우트 입니다."));
+		
+		List<RouteStep> routeSteps = routeStepRepository.findAllByRouteId(routeHeader.getRouteId());
+		
+		return routeSteps.stream()
+				.map(RouteStepDTO::fromEntity)
+				.collect(Collectors.toList());
+	}
+	
+	// 라우트 조회 (활성여부)
+	public List<RouteStepDTO> getRouteStepListWithUseYn(String routeId, String useYn) {
+		RouteHeader routeHeader = routeHeaderRepository.findByRouteId(routeId)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 라우트 입니다."));
+		
+		List<RouteStep> routeSteps = routeStepRepository.findByRouteIdAndUseYn(routeHeader.getRouteId(), useYn);
+		
+		return routeSteps.stream()
+				.map(RouteStepDTO::fromEntity)
+				.collect(Collectors.toList());
+	}
+	
+	// 라우트 활성 / 비활성화는 work_order에서 상태값과 routeHeaderId가 일치하는지 보고 가능 여부 판단
+	
+	// ---------------------------------------
 	// 공정코드 전체 조회
 	public List<ProcessMstDTO> getProcessCodeList() {
 		return processMstRepository.findAll()

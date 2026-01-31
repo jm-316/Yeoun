@@ -12,11 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.yeoun.auth.dto.LoginDTO;
 import com.yeoun.masterData.dto.ProcessMstDTO;
+import com.yeoun.masterData.dto.RouteHeaderDTO;
+import com.yeoun.masterData.dto.RouteStepDTO;
 import com.yeoun.masterData.service.ProcessMstService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +54,39 @@ public class ProcessController {
 		return "masterData/process_list";
 	}
 	
+	// 라우트 조회
+	@GetMapping("/routes")
+	public ResponseEntity<List<RouteHeaderDTO>> routeList() {
+		List<RouteHeaderDTO> routeHeaderList = processMstService.getRouteList();
+		
+		return ResponseEntity.ok(routeHeaderList);
+	}
+	
+	// 라우트 상세 조회
+	@GetMapping("route/{routeId}")
+	public ResponseEntity<RouteHeaderDTO> routeInto(@PathVariable("routeId") String routeId) {
+		RouteHeaderDTO routeHeaderDTO = processMstService.getRouteInfo(routeId);
+		
+		return ResponseEntity.ok(routeHeaderDTO);
+	}
+	
+	// 라우트 단계 조회
+	@GetMapping("routeStep")
+	public ResponseEntity<List<RouteStepDTO>> routeStepList(@RequestParam (value = "useYn", defaultValue = "all") String useYn,
+			@RequestParam (value = "routeId") String routeId) {
+		List<RouteStepDTO> routeStepDTOs = new ArrayList<>();
+		
+		if ("all".equals(useYn)) {
+			routeStepDTOs = processMstService.getAllRouteStep(routeId);
+		} else if ("Y".equals(useYn)) {
+			routeStepDTOs = processMstService.getRouteStepListWithUseYn(routeId, useYn);
+		}
+		
+		return ResponseEntity.ok(routeStepDTOs);
+	}
+	
+	
+	// ------------------------------------------------------------
 	// 공정코드 조회
 	@GetMapping("/processCodes")
 	public ResponseEntity<List<ProcessMstDTO>> processCodeList(@RequestParam (value = "useYn", defaultValue = "all") String useYn) {

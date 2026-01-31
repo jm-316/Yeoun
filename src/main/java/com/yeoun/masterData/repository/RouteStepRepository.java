@@ -42,4 +42,23 @@ public interface RouteStepRepository extends JpaRepository<RouteStep, String> {
 		      and rh.useYn = 'Y'
 		""")                 
 	boolean existsActiveRouteUsingProcess(@Param("processId") String processId);
+
+	// 활성여부에 따라 ROUTE_STEP 조회
+	@Query("""
+		    select rs
+		    from RouteStep rs
+		    where rs.routeHeader.routeId = :routeId
+		      and rs.useYn = :useYn
+		    order by rs.stepSeq asc
+		""")
+	List<RouteStep> findByRouteIdAndUseYn(@Param("routeId") String routeId, @Param("useYn") String useYn);
+
+	// ROUTE_STEP 조회
+	@Query("""
+		    select rs
+		    from RouteStep rs
+		    where rs.routeHeader.routeId = :routeId
+		    order by rs.stepSeq asc
+		""")
+	List<RouteStep> findAllByRouteId(@Param("routeId") String routeId);
 }

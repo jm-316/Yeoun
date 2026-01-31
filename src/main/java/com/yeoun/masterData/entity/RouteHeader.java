@@ -1,13 +1,9 @@
 package com.yeoun.masterData.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,7 +27,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class RouteHeader implements Serializable{
+public class RouteHeader {
 	
 	// 라우트ID
 	@Id
@@ -40,8 +36,8 @@ public class RouteHeader implements Serializable{
 	
 	// 제품코드
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "PRD_ID", nullable = false)
-	private ProductMst product;
+	@JoinColumn(name = "PRD_ID", referencedColumnName = "PRD_CODE", nullable = false)
+	private Product product;
 	
 	// 라우트명
 	@Column(name = "ROUTE_NAME", length = 100, nullable = false)
