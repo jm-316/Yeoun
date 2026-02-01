@@ -1,0 +1,29 @@
+<th:block xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:fragment="products_modal">
+
+<!-- 완제품 ID 조회용 모달 -->
+<div class="modal fade" id="products-modal" tabindex="-1" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">제품 조회</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+		<div class="d-flex gap-3">
+			<input type="text" class="form-control" placeholder="제품을 입력하세요" id="productKeyword" style="width: 220px;">
+			<button class="btn btn-outline-primary" id="searchProductBtn">검색</button>
+		</div>
+       	<div id="productsGrid" style="margin-right:5px; margin-top: 1em;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"
+		src="https://uicdn.toast.com/tui.pagination/v3.4.0/tui-pagination.js"></script>
+<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+<script th:src="@{/js/masterData/productItemGrid.js}"></script>

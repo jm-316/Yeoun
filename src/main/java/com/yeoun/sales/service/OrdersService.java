@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,9 @@ import com.yeoun.sales.entity.Orders;
 import com.yeoun.sales.enums.OrderItemStatus;
 import com.yeoun.sales.enums.OrderStatus;
 import com.yeoun.emp.repository.EmpRepository;
+import com.yeoun.masterData.dto.ProductDTO;
 import com.yeoun.masterData.entity.Product;
+import com.yeoun.masterData.repository.ProductRepository;
 import com.yeoun.sales.repository.OrderItemRepository;
 import com.yeoun.sales.repository.OrderQueryRepository;
 import com.yeoun.sales.repository.OrdersRepository;
@@ -38,6 +41,7 @@ public class OrdersService {
     private final OrderItemRepository orderItemRepository;
     private final EmpRepository empRepository;
     private final OrderQueryRepository orderQueryRepository;
+    private final ProductRepository productRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -96,12 +100,18 @@ public class OrdersService {
     /* ============================================================
        3) 제품 목록 조회
     ============================================================ */
-    public List<Product> getProducts() {
-        return em.createQuery(
-                "SELECT p FROM Product p " +
-                        "WHERE p.useYn = 'Y' " +
-                        "ORDER BY p.prdName", Product.class
-        ).getResultList();
+    public List<ProductDTO> getProducts() {
+    	
+    	
+//        return em.createQuery(
+//                "SELECT p FROM Product p " +
+//                        "WHERE p.useYn = 'Y' " +
+//                        "ORDER BY p.prdName", Product.class
+//        ).getResultList();
+		return productRepository.findByUseYn('Y')
+				.stream()
+				.map(ProductDTO::fromEntity)
+				.collect(Collectors.toList());
     }
 
     /* ============================================================
@@ -174,6 +184,7 @@ public class OrdersService {
                 .build();
 
         ordersRepository.save(order);
+        ordersRepository.flush();
 
         /* -----------------------------
            3) 아이템 저장
@@ -183,6 +194,7 @@ public class OrdersService {
         while (true) {
 
             String prdId = req.getParameter("items[" + idx + "][prdId]");
+            System.out.println("prdId = " + prdId);
             if (prdId == null) break;
 
             String qtyStr = req.getParameter("items[" + idx + "][qty]");

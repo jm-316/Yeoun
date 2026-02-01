@@ -55,6 +55,7 @@ const processCodeGrid = new tui.Grid({
 			header: "사용여부",
 			name: "useYn",
 			filter: "select",
+			renderer:{ type: StatusModifiedRenderer},
 			editor: {
 				type: 'select', // 드롭다운 사용
 				options: {

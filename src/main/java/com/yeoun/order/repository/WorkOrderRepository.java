@@ -93,4 +93,13 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, String> {
     	""")
 	boolean existsByPrdIdAndStatusIn(@Param("prdCode") String prdCode, @Param("statuses") List<String> statuses);
 
+    // 라우트 사용 여부
+    @Query("""
+    	    select case when count(wo) > 0 then true else false end
+    	    from WorkOrder wo
+    	    where wo.routeId = :routeId
+    	      and wo.status in :statuses
+    	""")
+	boolean existsByRouteIdAndStatusIn(@Param("routeId") String routeId, @Param("statuses") List<String> statuses);
+
 }

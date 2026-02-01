@@ -76,7 +76,7 @@ public class OrderItem {
     private Orders order;
 
     @ManyToOne
-    @JoinColumn(name="PRD_ID", insertable=false, updatable=false)
+    @JoinColumn(name="PRD_ID", referencedColumnName = "PRD_CODE", insertable=false, updatable=false)
     private Product product;
 
     

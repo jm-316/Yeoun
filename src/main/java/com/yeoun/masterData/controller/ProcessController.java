@@ -18,6 +18,8 @@ import com.yeoun.masterData.service.ProcessMstService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import oracle.jdbc.proxy.annotation.Post;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -85,7 +87,41 @@ public class ProcessController {
 		return ResponseEntity.ok(routeStepDTOs);
 	}
 	
+	// 라우트 신규 등록
+	@PostMapping("/route/add")
+	public ResponseEntity<String> createRoute(@RequestBody RouteHeaderDTO data, @AuthenticationPrincipal LoginDTO loginDTO) {
+		processMstService.saveRouteHeader(data, loginDTO.getEmpId());
+		
+		return ResponseEntity.ok("저장되었습니다.");
+	}
 	
+	// 라우트 헤더 수정
+	@PostMapping("/route/modify/{routeId}")
+	public ResponseEntity<String> modifyRoute(@PathVariable("routeId") String routeId, @RequestBody RouteHeaderDTO data, 
+			@AuthenticationPrincipal LoginDTO loginDTO) {
+		processMstService.modifyRouteHeader(routeId, data, loginDTO.getEmpId());
+		
+		return ResponseEntity.ok("저장되었습니다.");
+	}
+	
+	// 라우트 단계 수정
+	@PostMapping("/routeStep/modify/{routeId}")
+	public ResponseEntity<String> modifyRouteStep(@PathVariable("routeId") String routeId, @RequestBody Map<String, List<RouteStepDTO>> data, 
+			@AuthenticationPrincipal LoginDTO loginDTO) {
+		List<RouteStepDTO> createdRows = data.get("created");
+		List<RouteStepDTO> updatedRows = data.get("updated");
+		
+		if (createdRows != null && !createdRows.isEmpty()) {
+			processMstService.createReouteStep(routeId, createdRows, loginDTO.getEmpId());
+		}
+		
+		if (updatedRows != null && !updatedRows.isEmpty()) {
+			processMstService.modifyRouteStep(routeId, updatedRows, loginDTO.getEmpId());
+		}
+		
+		
+		return ResponseEntity.ok("저장되었습니다.");
+	} 
 	// ------------------------------------------------------------
 	// 공정코드 조회
 	@GetMapping("/processCodes")

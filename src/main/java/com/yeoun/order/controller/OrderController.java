@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -66,13 +67,21 @@ public class OrderController {
             Authentication auth){
 
         log.info("dto.... ::::::: here create...." + req);
-
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        
+        try {
+        	
+        	if (bindingResult.hasErrors()) {
+        		return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        	}
+        	
+        	orderCommandService.createWorkOrder(req, auth.getName());
+        	return ResponseEntity.ok().build();
+        	
+        } catch(Exception e) {
+        	e.printStackTrace();
+        	return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					 .body("실패");
         }
-
-        orderCommandService.createWorkOrder(req, auth.getName());
-        return ResponseEntity.ok().build();
     }
 
     // =====================================================

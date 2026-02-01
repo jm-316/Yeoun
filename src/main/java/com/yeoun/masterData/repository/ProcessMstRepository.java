@@ -44,6 +44,6 @@ public interface ProcessMstRepository extends JpaRepository<ProcessMst, String> 
 			""", nativeQuery = true)
 	List<Map<String, Object>> findByprocesslList(String processId, String processName);
 
-	List<ProcessMst> findByUseYn(Character useYn);
+	List<ProcessMst> findByUseYn(String useYn);
 	
 }

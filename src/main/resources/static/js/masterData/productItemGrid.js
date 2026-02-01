@@ -68,6 +68,13 @@ productItemGrid.on('click', ev => {
 	document.getElementById("prdId").value = rowData.prdId;
 	document.getElementById("productName").value = rowData.prdName;
 	
+	const prdCode = document.getElementById("prdCode");
+	
+	if (prdCode) {
+		prdCode.value = rowData.prdCode;
+	}
+	
+	
 	// 모달 닫기
 	productItemModal.hide();
 });

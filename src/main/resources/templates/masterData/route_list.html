@@ -21,7 +21,7 @@
 	</div>
 	
 	<!-- 신규라우트 등록 모달 -->
-	<div class="modal fade" id="route-modal" tabindex="-1">
+	<div class="modal fade" id="route-modal" tabindex="-1"  data-bs-focus="false">
 	  <div class="modal-dialog modal-xl modal-dialog-scrollable">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -33,29 +33,27 @@
 	        <!-- 라우트 기본정보 -->
 	        <div class="border rounded p-3 mb-3 bg-light">
 	          <div class="row g-3 small">
-	            <div class="col-md-3">
+	            <div class="col-md-6">
 	              <label class="form-label">라우트ID</label>
-	              <input type="text" class="form-control" id="modalRouteId" readonly
-	                     placeholder="저장 시 자동생성 (예: RT-FRUIT)">
+	              <input type="text" class="form-control" id="modalRouteId">
 	            </div>
-	            <div class="col-md-3">
+	            <div class="col-md-6">
 	              	<label class="form-label">제품코드</label>
-	              	<input id="modalProcessprdId" class="form-control"/>
-<!-- 	              	<select  id="modalProcessprdId" class="form-select"> -->
-<!-- 						<option value="" selected>제품명(제품코드)</option> -->
-<!-- 			    		 <option th:each="item, iterStat : ${prdMstList}"  -->
-<!-- 							 		th:value="${item.prdId}"  -->
-<!-- 							 		th:text="${item.prdName} +' (' + ${item.prdId} + ')'" -->
-<!-- 									name="prdId"> -->
-<!-- 						</option> -->
-<!-- 					</select> -->
+<!-- 	              	<input id="modalProcessprdId" class="form-control"/> -->
+					<div class="d-flex">
+						<input type="text" class="form-control" placeholder="생산할 제품"  style="width: 60%;" id="prdCode" disabled>
+						<input type="hidden" class="form-control" id="prdId" style="width: 40%;" disabled>
+						<input type="hidden" class="form-control" id="productName" style="width: 40%;" disabled>
+						<button class="btn btn-primary btn-md-sm" id="searchProduct" style="margin-left: 1em">제품 조회</button>
+					
+					</div>
 	            </div>
-	            <div class="col-md-4">
+	            <div class="col-md-9">
 	              <label class="form-label">라우트명</label>
 	              <input type="text" class="form-control" id="modalRouteName"
 	                     placeholder="예: 과일향수 공정 라우트">
 	            </div>
-	            <div class="col-md-2">
+	            <div class="col-md-3">
 	              <label class="form-label">사용여부</label>
 	              <select class="form-select" id="modalRouteUseYn">
 	                <option value="Y">활성</option>
@@ -77,16 +75,8 @@
 					* 라우트단계id는 라우트 id, 공정id을 입력하면 필요데이터가 있을경우 자동생성됩니다.
 				</p>
 	          <div>
-	            <button class="btn btn-outline-secondary btn-sm me-1" type="button" 
-	                    onclick="openProcessLookupModal()">
-	              공정코드 조회
-	            </button>
-	            <button class="btn btn-outline-primary btn-sm" type="button"
-	                    onclick="addRouteStepRow()">
+	            <button class="btn btn-outline-primary btn-sm" type="button" id="addRouteStepRow">
 	              + 단계 추가
-	            </button>
-				<button id = "deleteRouteStepRowBtn" class="btn btn-outline-primary btn-sm" type="button">
-	              - 단계 삭제
 	            </button>
 	          </div>
 	        </div>
@@ -121,13 +111,16 @@
 	    </div>
 	  </div>
 	</div>
-	
+	<th:block th:insert="~{masterData/modal/productItem}"></th:block>
 	
 	<th:block layout:fragment="myScript">
 		<script type="text/javascript"
-			src="https://uicdn.toast.com/tui.pagination/v3.4.0/tui-pagination.js"></script>
+				src="https://uicdn.toast.com/tui.pagination/v3.4.0/tui-pagination.js"></script>
 		<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-		<script th:inline="javascript" th:src="@{/js/masterData/routeGrid.js}"></script>
+		<script th:src="@{/js/masterData/gridCustomRenderers.js}"></script>
 		<script th:inline="javascript" th:src="@{/js/masterData/routeStepGrid.js}"></script>
+		<script th:inline="javascript" th:src="@{/js/masterData/routeGrid.js}"></script>
+		<script th:inline="javascript" th:src="@{/js/masterData/processCodeModalGrid.js}"></script>
+<!-- 		<script th:src="@{/js/masterData/productItemGrid.js}"></script> -->
 	</th:block>
 </th:block>

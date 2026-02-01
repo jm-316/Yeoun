@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yeoun.auth.dto.LoginDTO;
 import com.yeoun.masterData.dto.BomDTO;
@@ -22,6 +23,7 @@ import com.yeoun.masterData.dto.BomItemDTO;
 import com.yeoun.masterData.entity.Bom;
 import com.yeoun.masterData.entity.BomItem;
 import com.yeoun.masterData.service.BomService;
+import com.yeoun.outbound.dto.OutboundOrderItemDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -102,5 +104,23 @@ public class BomController {
 		
 		return ResponseEntity.ok(result);
 	}
+	
+ 	@GetMapping("/list/data/{prdId}")
+ 	@ResponseBody
+// 	public ResponseEntity<List<OutboundOrderItemDTO>> outboundBomList(@PathVariable("prdId") String prdId) {
+ 	public ResponseEntity<?> outboundBomList(@PathVariable("prdId") String prdId) {
+ 		
+ 		
+ 		try {
+ 			List<OutboundOrderItemDTO> bomList = bomService.getBomListByPrdId(prdId);
+ 			return ResponseEntity.ok(bomList);
+ 			
+ 		} catch (Exception e) {
+ 			e.printStackTrace();
+ 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					 .body(Map.of("message", e.getMessage()));
+ 		}
+ 		
+ 	}
 
 }

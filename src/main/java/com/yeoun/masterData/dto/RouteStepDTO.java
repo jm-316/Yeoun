@@ -46,7 +46,7 @@ public class RouteStepDTO {
     private String remark;
     
     // 사용여부
-    private char useYn;
+    private String useYn;
 
 	// 최초 등록자
 	private String createdId;

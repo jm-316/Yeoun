@@ -17,11 +17,13 @@ import com.yeoun.masterData.entity.Bom;
 import com.yeoun.masterData.entity.BomItem;
 import com.yeoun.masterData.entity.Material;
 import com.yeoun.masterData.entity.Product;
+import com.yeoun.masterData.mapper.BomMstMapper;
 import com.yeoun.masterData.repository.BomItemRepository;
 import com.yeoun.masterData.repository.BomRepository;
 import com.yeoun.masterData.repository.MaterialRepository;
 import com.yeoun.masterData.repository.ProductRepository;
 import com.yeoun.order.repository.WorkOrderRepository;
+import com.yeoun.outbound.dto.OutboundOrderItemDTO;
 import com.yeoun.production.enums.ProductionStatus;
 import com.yeoun.production.repository.ProductionPlanRepository;
 import com.yeoun.sales.enums.OrderItemStatus;
@@ -41,6 +43,7 @@ public class BomService {
 	private final ProductionPlanRepository productionPlanRepository;
 	private final OrderItemRepository orderItemRepository;
 	private final WorkOrderRepository workOrderRepository;
+	private final BomMstMapper bomMstMapper;
 	
 	// Bom 조회
 	public List<BomDTO> getBomList() {
@@ -292,5 +295,9 @@ public class BomService {
 	// BOM Name 중복 검사
 	public boolean existsByBomName(String bomName) {
 		return bomRepository.existsByBomName(bomName);
+	}
+	
+	public List<OutboundOrderItemDTO> getBomListByPrdId(String prdId) {
+		return bomMstMapper.findByPrdIdList(prdId);
 	}
 }

@@ -79,6 +79,7 @@ public class QcResultService {
     // 캡/펌프 공정 종료 시 호출되는 QC 결과 생성 메서드
     // - 이미 해당 작업지시의 QC_RESULT가 있으면 재생성하지 않고 그대로 반환
     // - 없으면 "검사대기(PENDING)" 상태의 헤더(및 필요시 디테일) 생성
+	@Transactional
     public QcResult createPendingQcResultForOrder(String orderId) {
     	
     	// 이미 생성된 QC 결과가 있으면 재사용

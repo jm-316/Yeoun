@@ -122,7 +122,7 @@
 	                <select th:field="*{prdId}" class="form-select" id="prdName">
 	                	<option value="" disabled th:selected="${prdId == null}">생산 계획을 선택해주세요.</option>
 	                	<th:block th:each="prod : ${prods}">
-	                		<option th:value="${prod.prdId}" th:text="${prod.prdName}"></option>
+	                		<option th:value="${prod.prdCode}" th:text="${prod.prdName}"></option>
 	                	</th:block>
 	                </select>
 	                  <div class="invalid-feedback"

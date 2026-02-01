@@ -324,7 +324,7 @@
       };
 
 
-      const res = await fetch(apiUrl(`order/create`), {
+      const res = await fetch(apiUrl(`/order/create`), {
           method: "POST",
           headers: {
               "Content-Type": "application/json",

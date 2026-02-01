@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     orderDateInput.value = todayStr;
     orderDateInput.min = todayStr;
-    orderDateInput.readOnly = true;
+//    orderDateInput.readOnly = true;
 
     const minDeliveryDate = addBusinessDays(today, 5);
     deliveryDateInput.min = minDeliveryDate.toISOString().split("T")[0];
@@ -404,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   name="items[${index}][prdId]" required>
             <option value="">-- 선택 --</option>
             ${productList.map(p =>
-              `<option value="${p.prdId}"
+              `<option value="${p.prdCode}"
                        data-price="${p.unitPrice}"
                        data-minqty="${p.minQty}"
                        data-unit="${p.prdUnit}">
@@ -415,12 +415,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <td>
           <input type="number" class="form-control price-input"
-                 name="items[${index}][unitPrice]" readonly>
+                 name="items[${index}][unitPrice]" required>
         </td>
 
         <td>
           <input type="number" class="form-control minqty-input"
-                 name="items[${index}][minQty]" readonly>
+                 name="items[${index}][minQty]" required>
         </td>
 
         <td>
@@ -462,14 +462,19 @@ document.addEventListener("DOMContentLoaded", () => {
       prdSelect.addEventListener("change", () => {
         const opt = prdSelect.selectedOptions[0];
 
-        const unitPrice = parseInt(opt.dataset.price) || 0;
-        const minQty = parseInt(opt.dataset.minqty) || 0;
+//        const unitPrice = parseInt(opt.dataset.price) || 0;
+//        const minQty = parseInt(opt.dataset.minqty) || 0;
         const unit = opt.dataset.unit ?? "";
 
-        priceInput.value = unitPrice;
-        minQtyInput.value = minQty;
+//        priceInput.value = unitPrice;
+//        minQtyInput.value = minQty;
         unitInput.value = unit;
 
+		priceInput.value = "";
+		minQtyInput.value = "";
+		qtyInput.value = "";
+		amountInput.value = "";
+		
         let qty = parseInt(qtyInput.value) || 0;
         if (qty < minQty) qty = minQty;
         if (qty % 10 !== 0) qty = Math.ceil(qty / 10) * 10;
