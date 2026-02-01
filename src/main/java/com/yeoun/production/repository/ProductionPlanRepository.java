@@ -2,6 +2,7 @@ package com.yeoun.production.repository;
 
 import com.yeoun.production.dto.ProductionPlanListDTO;
 import com.yeoun.production.entity.ProductionPlan;
+import com.yeoun.production.enums.ProductionStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,24 @@ public interface ProductionPlanRepository extends JpaRepository<ProductionPlan, 
     	    """,
     	    nativeQuery = true)
     	List<Map<String, Object>> findBomItems(@Param("prdId") String prdId);
+
+    // PRDCODE와 상태로 사용하고 있는지 확인
+    @Query("""
+    	    select case when count(pp) > 0 then true else false end
+    	    from ProductionPlan pp
+    	    where pp.prdId in :prdCodes
+    	      and pp.status in :statuses
+    	""")
+	boolean existsByPrdIdsInAndStatusIn(@Param("prdCodes") List<String> prdCodes, @Param("statuses") List<ProductionStatus> statuses);
+
+    
+    @Query("""
+    	    select case when count(pp) > 0 then true else false end
+    	    from ProductionPlan pp
+    	    where pp.prdId = :prdCode
+    	      and pp.status in :statuses
+    	""")
+	boolean existsByPrdIdAndStatusIn(@Param("prdCode") String prdCode, @Param("statuses") List<ProductionStatus> statuses);
 
 }
 

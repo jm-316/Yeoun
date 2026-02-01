@@ -3,7 +3,7 @@ package com.yeoun.order.service;
 import com.yeoun.emp.entity.Emp;
 import com.yeoun.emp.repository.EmpRepository;
 import com.yeoun.equipment.repository.ProdLineRepository;
-import com.yeoun.masterData.repository.ProductMstRepository;
+import com.yeoun.masterData.repository.ProductRepository;
 import com.yeoun.order.creator.ProcessListCreator;
 import com.yeoun.order.creator.WorkerProcessCreator;
 import com.yeoun.order.dto.WorkOrderRequest;
@@ -46,7 +46,7 @@ public class OrderCommandService {
     private final EmpRepository empRepository;
     private final OutboundService outboundService;
     private final ProdLineRepository prodLineRepository;
-    private final ProductMstRepository productMstRepository;
+    private final ProductRepository productRepository;
     private final ProductionPlanRepository productionPlanRepository;
     private final ProductionPlanItemRepository productionPlanItemRepository;
 
@@ -57,8 +57,6 @@ public class OrderCommandService {
     @Transactional
     public void createWorkOrder(WorkOrderRequest dto, String id) {
 
-        log.info("create dto!!!!! :::::::: " + dto);
-
         // 1) 새 작업지시 번호 생성
         String orderId = workOrderIdGenerator.generate();
 
@@ -66,7 +64,7 @@ public class OrderCommandService {
         WorkOrder order = WorkOrder.builder()
                 .orderId(orderId)
                 .planId(dto.getPlanId())
-                .product(productMstRepository.findById(dto.getPrdId())
+                .product(productRepository.findByPrdCode(dto.getPrdId())
                         .orElseThrow(() -> new RuntimeException("품번을 찾을 수 없음!")))
                 .planQty(dto.getPlanQty())
                 .planStartDate(dto.getPlanStartDate())

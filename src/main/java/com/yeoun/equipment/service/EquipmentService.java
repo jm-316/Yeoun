@@ -108,6 +108,8 @@ public class EquipmentService {
 	public void modifyYnEquipmentType(String id, String useYn) {
 		Equipment equipment = equipmentRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("해당하는 설비가 없습니다."));
+		
+		
 		equipment.setUseYn(useYn);
 	}
 	

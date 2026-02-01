@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.yeoun.masterData.dto.QcItemDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,7 +63,44 @@ public class QcItem {
 	@Column(name="UPDATED_ID", length = 7)
 	private String updatedId; //수정자 id
 	
+	@LastModifiedDate
 	@Column(name="UPDATED_DATE")
 	private LocalDate updatedDate; //수정일시
 	
+	/**
+	 * QC ITEM 업데이트 메서드<br>
+	 * minValue 및 maxValue의 타입 변환은 QcItem에서 변경
+	 * @param qcItemDTO
+	 */
+	public void updateQcItem(QcItemDTO qcItemDTO) {
+		this.itemName = qcItemDTO.getItemName();
+		this.targetType = qcItemDTO.getTargetType();
+		this.unit = qcItemDTO.getUnit();
+		this.stdText = qcItemDTO.getStdText();
+		this.minValue = toBigDecimal(qcItemDTO.getMinValue());
+		this.maxValue = toBigDecimal(qcItemDTO.getMaxValue());
+		this.sortOrder = Integer.parseInt(qcItemDTO.getSortOrder());
+		this.useYn = qcItemDTO.getUseYn();
+		this.updatedId = qcItemDTO.getUpdateId();
+	}
+	
+	/**
+	 * String 타입으로 받은 minValue와 maxValue를 BigDecimal로 변경
+	 * 
+	 * @param minValue
+	 * @param maxValue
+	 */
+	public void toBigDeciaml(String minValue, String maxValue) {
+		this.minValue = toBigDecimal(minValue);
+		this.maxValue = toBigDecimal(maxValue);
+	}
+	
+	// String으로 들어오는 값을 BigDecimal으로 변경
+	private BigDecimal toBigDecimal(String value) {
+		if (value == null || value.isBlank()) {
+			return null;
+		} 
+		
+		return new BigDecimal(value);
+	}
 }

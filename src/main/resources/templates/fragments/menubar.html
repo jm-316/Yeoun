@@ -177,7 +177,7 @@
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
-                        <a th:href="@{/masterData/product}" class="menu-link">
+                        <a th:href="@{/masterData1}" class="menu-link">
                             <div data-i18n="Product/BOM Information Management" class="menu-link-sub">완제품/원재료</div>
                         </a>
                     </li>
@@ -192,7 +192,7 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a th:href="@{/masterData/process_mst}" class="menu-link" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">
+                        <a th:href="@{/processMst}" class="menu-link" sec:authorize="hasAnyRole('MES_MANAGER','SYS_ADMIN')">
                             <div data-i18n="Process Route/Process Code Management" class="menu-link-sub">공정라우트/공정코드관리</div>
                         </a>
                     </li>

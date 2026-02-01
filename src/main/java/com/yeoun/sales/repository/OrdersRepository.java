@@ -39,8 +39,8 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
 		           ON e.empId = o.empId
 		    LEFT JOIN OrderItem oi
 		           ON oi.orderId = o.orderId
-		    LEFT JOIN ProductMst p
-		           ON p.prdId = oi.prdId
+		    LEFT JOIN Product p
+		           ON p.prdCode = oi.prdId
 		    WHERE (:status IS NULL OR o.orderStatus = :status)
 		      AND (:startDate IS NULL OR o.orderDate >= :startDate)
 		      AND (:endDate IS NULL OR o.orderDate <= :endDate)

@@ -48,7 +48,7 @@ public class WorkOrderDTO {
     
     public static WorkOrderDTO fromEntity(WorkOrder order) {
     	WorkOrderDTO workOrderDTO = modelMapper.map(order, WorkOrderDTO.class);
-    	workOrderDTO.setProductId(order.getProduct().getPrdId());
+    	workOrderDTO.setProductId(order.getProduct().getPrdCode());
     	workOrderDTO.setProductName(order.getProduct().getPrdName());
     	workOrderDTO.setLineId(order.getLine().getLineId());
     	workOrderDTO.setCreatedId(order.getCreatedEmp().getEmpId());

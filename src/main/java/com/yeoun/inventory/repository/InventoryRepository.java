@@ -158,5 +158,8 @@ public interface InventoryRepository
 	// 같은 로트번호의 재고 리스트
 	List<Inventory> findByLotNoAndIvIdNot(String lotNo, Long ivId);
 
+	// 원재료 코드 수정 가능 여부 확인
+	int countByItemId(String matCode);
+
 
 }

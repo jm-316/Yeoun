@@ -1,8 +1,8 @@
 package com.yeoun.sales.controller;
 
 import com.yeoun.auth.dto.LoginDTO;
-import com.yeoun.masterData.entity.MaterialMst;
-import com.yeoun.masterData.repository.MaterialMstRepository;
+import com.yeoun.masterData.entity.Material;
+import com.yeoun.masterData.repository.MaterialRepository;
 import com.yeoun.sales.dto.ClientItemDTO;
 import com.yeoun.sales.entity.Client;
 import com.yeoun.sales.entity.ClientItem;
@@ -30,7 +30,7 @@ public class ClientController {
 
     private final ClientService clientService;
     private final ClientItemService itemService;
-    private final MaterialMstRepository materialRepository;  
+    private final MaterialRepository materialRepository;
     private final ClientItemRepository itemRepository;  
 
 
@@ -172,7 +172,7 @@ public class ClientController {
     
     @GetMapping("/material/data")
     @ResponseBody
-    public List<MaterialMst> getMaterialList() {
+    public List<Material> getMaterialList() {
         return materialRepository.findAll();
     }
 
@@ -190,7 +190,7 @@ public class ClientController {
             Model model
     ){
         // 🔥 이미 등록된 품목 제외된 자재만 조회
-        List<MaterialMst> list =
+        List<Material> list =
                 itemService.getAvailableMaterials(clientId, category);
 
         model.addAttribute("clientId", clientId);
@@ -256,7 +256,7 @@ public class ClientController {
             return "redirect:/sales/client/" + clientId + "?tab=item";
         }
 
-        MaterialMst material = materialRepository.findById(item.getMaterialId())
+        Material material = materialRepository.findByMatCode(item.getMaterialId())
                 .orElse(null);
 
         model.addAttribute("clientId", clientId);

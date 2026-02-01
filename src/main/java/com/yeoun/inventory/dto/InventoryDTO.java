@@ -126,7 +126,7 @@ public class InventoryDTO {
 	    if (inventory.getIvStatus() == null) {
 	        inventory.setIvStatus("ok");
 	    }
-	    // 조회용 연관 필드(materialMst, productMst)는 굳이 여기서 세팅 안 함
+	    // 조회용 연관 필드(material, product)는 굳이 여기서 세팅 안 함
 	    return inventory;
 	}
 	

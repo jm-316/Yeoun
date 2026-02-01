@@ -269,8 +269,8 @@ function openQcRegModal(rowData) {
 
 // QC 항목 상세 리스트 가져오기
 function loadQcDetailRows(qcResultId) {
-
-  fetch(apiUrl(`qc/${qcResultId}/details`))
+console.log(qcResultId)
+  fetch(apiUrl(`/qc/${qcResultId}/details`))
     .then((res) => {
       if (!res.ok) {
         throw new Error("HTTP " + res.status);

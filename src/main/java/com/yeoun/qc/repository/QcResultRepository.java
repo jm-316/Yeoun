@@ -30,7 +30,7 @@ public interface QcResultRepository extends JpaRepository<QcResult, Long> {
         SELECT new com.yeoun.qc.dto.QcRegistDTO(
     		q.qcResultId,
             q.orderId,
-            w.product.prdId,
+            w.product.prdCode,
             w.product.prdName,
             w.planQty,
             q.overallResult,
@@ -52,7 +52,7 @@ public interface QcResultRepository extends JpaRepository<QcResult, Long> {
 		select new com.yeoun.qc.dto.QcResultListDTO(
 		    r.qcResultId,
 		    r.orderId,
-		    p.prdId,
+		    p.prdCode,
 		    p.prdName,
 		    r.inspectionDate,
 		    r.overallResult,

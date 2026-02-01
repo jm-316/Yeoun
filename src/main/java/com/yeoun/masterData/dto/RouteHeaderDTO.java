@@ -1,11 +1,13 @@
 package com.yeoun.masterData.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.RouteHeader;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +19,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class RouteHeaderDTO<updatedDate> {
+@Builder
+public class RouteHeaderDTO {
 	
 	// 라우트ID
 	@NotBlank(message = "라우트 ID는 필수 입력값입니다.")
@@ -25,7 +28,7 @@ public class RouteHeaderDTO<updatedDate> {
 	
 	// 제품코드
 	@NotBlank(message = "제품 코드는 필수 입력값입니다.")
-	private ProductMst product;
+	private String prdId;
 	
 	// 라우트명
 	@NotBlank(message = "라우트 명은 필수 입력값입니다.")
@@ -49,5 +52,18 @@ public class RouteHeaderDTO<updatedDate> {
 	
 	// 수정일
 	private LocalDateTime updatedDate;
-
+	
+	private List<RouteStepDTO> items;
+	
+	// ----------------------------------------
+	// DTO <-> Entity 변환
+	public static RouteHeaderDTO fromEntity(RouteHeader routeHeader) {
+		return RouteHeaderDTO.builder()
+				.routeId(routeHeader.getRouteId())
+				.prdId(routeHeader.getProduct().getPrdCode())
+				.routeName(routeHeader.getRouteName())
+				.description(routeHeader.getDescription())
+				.useYn(routeHeader.getUseYn())
+				.build();
+	}
 }

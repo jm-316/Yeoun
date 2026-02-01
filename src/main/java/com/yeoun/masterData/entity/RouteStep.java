@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
@@ -57,6 +58,10 @@ public class RouteStep implements Serializable{
 	// 비고
 	@Column(name = "REMARK", length = 200)
     private String remark;
+	
+	// 사용여부
+	@Column(nullable = false)
+	private String useYn;
 
 	// 최초 등록자
 	@Column(name = "CREATED_ID", length = 7, nullable = false)
@@ -73,5 +78,14 @@ public class RouteStep implements Serializable{
 	
 	// 수정일
 	@Column(name = "UPDATED_DATE")
+	@LastModifiedDate
 	private LocalDateTime updatedDate;
+	
+	public void changeQcPointYn(String qcPointYn) {
+		this.qcPointYn = qcPointYn;
+	}
+	
+	public void changeUseYn(String useYn) {
+		this.useYn = useYn;
+	}
 }

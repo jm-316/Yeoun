@@ -76,4 +76,30 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, String> {
     """)
     long countTodayOrders(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
+    // prdCode와 상태값으로 제품 사용 중인지 확인
+    @Query("""
+    	    select case when count(wo) > 0 then true else false end
+    	    from WorkOrder wo
+    	    where wo.product.prdId in :prdCodes
+    	      and wo.status in :statuses
+    	""")
+	boolean existsByPrdIdsInAndStatusIn(@Param("prdCodes") List<String> prdCodes, @Param("statuses") List<String> statuses);
+
+    @Query("""
+    	    select case when count(wo) > 0 then true else false end
+    	    from WorkOrder wo
+    	    where wo.product.prdId = :prdCode
+    	      and wo.status in :statuses
+    	""")
+	boolean existsByPrdIdAndStatusIn(@Param("prdCode") String prdCode, @Param("statuses") List<String> statuses);
+
+    // 라우트 사용 여부
+    @Query("""
+    	    select case when count(wo) > 0 then true else false end
+    	    from WorkOrder wo
+    	    where wo.routeId = :routeId
+    	      and wo.status in :statuses
+    	""")
+	boolean existsByRouteIdAndStatusIn(@Param("routeId") String routeId, @Param("statuses") List<String> statuses);
+
 }

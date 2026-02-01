@@ -19,23 +19,15 @@ import com.yeoun.order.repository.WorkScheduleRepository;
 import com.yeoun.order.repository.WorkerProcessRepository;
 import com.yeoun.process.entity.WorkOrderProcess;
 import com.yeoun.process.repository.WorkOrderProcessRepository;
-import com.yeoun.process.service.ProcessTimeCalculator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yeoun.emp.entity.Emp;
 import com.yeoun.equipment.entity.ProdLine;
-import com.yeoun.masterData.entity.ProductMst;
-import com.yeoun.masterData.entity.RouteHeader;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.equipment.repository.ProdLineRepository;
 import com.yeoun.leave.repository.LeaveHistoryRepository;
-import com.yeoun.masterData.repository.ProductMstRepository;
 import com.yeoun.order.mapper.OrderMapper;
-import com.yeoun.outbound.service.OutboundService;
 import com.yeoun.production.dto.ProductionPlanListDTO;
-import com.yeoun.production.repository.ProductionPlanItemRepository;
 import com.yeoun.production.repository.ProductionPlanRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -49,7 +41,7 @@ public class OrderQueryService {
 	
 	private final OrderMapper orderMapper;
 	private final ProdLineRepository prodLineRepository;
-	private final ProductMstRepository productMstRepository;
+	private final ProductRepository productRepository;
 	private final ProductionPlanRepository productionPlanRepository;
 	private final WorkOrderRepository workOrderRepository;
 
@@ -105,8 +97,8 @@ public class OrderQueryService {
 	
 	// =======================================================
 	// 품목 조회
-	public List<ProductMst> loadAllProducts () {
-		return productMstRepository.findAll();
+	public List<Product> loadAllProducts () {
+		return productRepository.findAll();
 	}
 	
 	// =======================================================
@@ -237,7 +229,7 @@ public class OrderQueryService {
 		return WorkOrderDetailDTO.builder()
 				.orderId(id)
 				.planId(order.getPlanId())
-				.prdId(order.getProduct().getPrdId())
+				.prdId(order.getProduct().getPrdCode())
 				.prdName(order.getProduct().getPrdName())
 				.status(order.getStatus())
 				.planQty(order.getPlanQty())

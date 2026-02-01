@@ -4,24 +4,31 @@
 
 	<select id="findByPrdIdList" resultType="com.yeoun.outbound.dto.OutboundOrderItemDTO">
 		SELECT
-			b.PRD_ID
-			, b.MAT_ID
-			, b.MAT_QTY
-			, b.MAT_UNIT
+			p.PRD_CODE AS prdId
+			, m.MAT_CODE AS matId
+			, bi.bom_QTY AS matQty
+			, bi.bom_UNIT AS matUnit
 			, p.PRD_NAME
 			, m.MAT_NAME
 		FROM
-			BOM_MST b
+			BOM_ITEM bi
 		LEFT JOIN
-			PRODUCT_MST p
+			MATERIAL m
+		ON
+			bi.MAT_ID = m.MAT_ID
+        LEFT JOIN
+            BOM b
+        ON
+            b.bom_id = bi.bom_id
+        LEFT JOIN
+			PRODUCT p
 		ON
 			b.PRD_ID = p.PRD_ID
-		LEFT JOIN
-			MATERIAL_MST m
-		ON
-			b.MAT_ID = m.MAT_ID
-		WHERE
-			b.PRD_ID = #{prdId}
+		WHERE b.PRD_ID = (
+		    SELECT p.PRD_ID
+		    FROM PRODUCT p
+		    WHERE p.PRD_CODE = #{prdCode}
+		)
 		AND 
 			b.USE_YN = 'Y'
 	</select>

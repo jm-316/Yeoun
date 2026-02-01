@@ -259,7 +259,7 @@ public class WorkOrderProcessService {
 
         WorkOrderProcessDTO dto = new WorkOrderProcessDTO();
         dto.setOrderId(workOrder.getOrderId());
-        dto.setPrdId(workOrder.getProduct().getPrdId());
+        dto.setPrdId(workOrder.getProduct().getPrdCode());
         dto.setPrdName(workOrder.getProduct().getPrdName());
         dto.setPlanQty(workOrder.getPlanQty());
         dto.setStatus(workOrder.getStatus());
@@ -432,7 +432,7 @@ public class WorkOrderProcessService {
         // 5) 상단 요약 DTO
         WorkOrderProcessDTO headerDto = new WorkOrderProcessDTO();
         headerDto.setOrderId(workOrder.getOrderId());
-        headerDto.setPrdId(workOrder.getProduct().getPrdId());
+        headerDto.setPrdId(workOrder.getProduct().getPrdCode());
         headerDto.setPrdName(workOrder.getProduct().getPrdName());
         headerDto.setPlanQty(workOrder.getPlanQty());
         headerDto.setStatus(workOrder.getStatus());
@@ -600,7 +600,7 @@ public class WorkOrderProcessService {
      */
     private Double calculateBlendStandardQty(WorkOrder workOrder) {
 
-        String prdId  = workOrder.getProduct().getPrdId();
+        String prdId  = workOrder.getProduct().getPrdCode();
         Integer planQty = workOrder.getPlanQty();
 
         // BOM + 필요수량 조회 (지금 handleLotOnFirstStepStart 에서 쓰는 쿼리 그대로 사용)
@@ -724,7 +724,7 @@ public class WorkOrderProcessService {
         // ==========================
         // BOM 기반 원자재 필요량 계산
         // ==========================
-        String prdId = workOrder.getProduct().getPrdId();
+        String prdId = workOrder.getProduct().getPrdCode();
         Integer planQty = workOrder.getPlanQty();
 
         // Mapper에서 BOM + 재고까지 계산
@@ -749,7 +749,7 @@ public class WorkOrderProcessService {
         LotMasterDTO lotMasterDTO = LotMasterDTO.builder()
                 .lotType("WIP")                         // 공정용 LOT
                 .orderId(orderId)
-                .prdId(workOrder.getProduct().getPrdId())
+                .prdId(workOrder.getProduct().getPrdCode())
                 .quantity(workOrder.getPlanQty())
                 .currentStatus("IN_PROCESS")           // LOT_STATUS
                 .currentLocType("LINE")                // LOCATION_TYPE

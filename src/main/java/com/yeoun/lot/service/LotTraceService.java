@@ -41,10 +41,10 @@ import com.yeoun.lot.repository.LotMasterRepository;
 import com.yeoun.lot.repository.LotRelationshipRepository;
 import com.yeoun.lot.repository.MaterialRootRow;
 import com.yeoun.equipment.entity.Equipment;
-import com.yeoun.masterData.entity.MaterialMst;
+import com.yeoun.masterData.entity.Material;
 import com.yeoun.masterData.entity.ProcessMst;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.equipment.entity.ProdLine;
-import com.yeoun.masterData.entity.ProductMst;
 import com.yeoun.masterData.repository.ProcessMstRepository;
 import com.yeoun.order.entity.WorkOrder;
 import com.yeoun.order.entity.WorkerProcess;
@@ -218,10 +218,10 @@ public class LotTraceService {
 	    String productName = null;
 	    String productType = null;
 	    if (wo != null && wo.getProduct() != null) {
-	        ProductMst p = wo.getProduct();
-	        productCode = p.getPrdId();
+	        Product p = wo.getProduct();
+	        productCode = p.getPrdCode();
 	        productName = p.getPrdName();
-	        productType = p.getPrdCat(); 
+	        productType = p.getPrdType(); 
 	    }
 
 	    // 4) LOT 상태 라벨
@@ -521,7 +521,7 @@ public class LotTraceService {
 		
 		// 2) 자재 LOT / 자재 마스터
 	    LotMaster lot = lr.getInputLot();          // inputLot == 원자재 LOT
-	    MaterialMst m = (lot != null) ? lot.getMaterial() : null;
+	    Material m = (lot != null) ? lot.getMaterial() : null;
 
 	    // 3) 입고/재고 최신 정보
 	    InboundItem ii = inboundItemRepository.findTopByLotNoOrderByInboundItemIdAsc(inputLotNo)
@@ -554,7 +554,7 @@ public class LotTraceService {
 	        .lotType(labelOf(lot.getLotType()))
 	        .lotStatus(labelOf(lot.getCurrentStatus()))
 	        .lotCreatedDate(resolveLotCreatedAt(lot))
-	        .matId(m != null ? m.getMatId() : null)
+	        .matId(m != null ? m.getMatCode() : null)
 	        .matName(m != null ? m.getMatName() : lot.getDisplayName())
 	        .matType(labelOf(m != null ? m.getMatType() : null))
 	        .matUnit(m != null ? m.getMatUnit() : null)
@@ -677,7 +677,7 @@ public class LotTraceService {
 	    LotMaster lot = lotMasterRepository.findByLotNo(lotNo)
 	        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 LOT : " + lotNo));
 
-	    MaterialMst m = lot.getMaterial();
+	    Material m = lot.getMaterial();
 
 	    InboundItem ii = inboundItemRepository.findTopByLotNoOrderByInboundItemIdAsc(lotNo).orElse(null);
 	    Inventory inv = inventoryRepository.findTopByLotNoOrderByIvIdDesc(lotNo).orElse(null);
@@ -693,7 +693,7 @@ public class LotTraceService {
 
 	    return LotMaterialDetailDTO.builder()
 	        // 마스터
-	        .matId(m != null ? m.getMatId() : null)
+	        .matId(m != null ? m.getMatCode() : null)
 	        .matName(m != null ? m.getMatName() : lot.getDisplayName())
 	        .matType(labelOf(m != null ? m.getMatType() : null))
 	        .matUnit(m != null ? m.getMatUnit() : null)

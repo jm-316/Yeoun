@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yeoun.auth.dto.LoginDTO;
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.dto.ProductDTO;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.sales.dto.OrderDetailDTO;
 import com.yeoun.sales.dto.OrderItemDTO;
 import com.yeoun.sales.dto.OrderListDTO;
@@ -75,7 +76,7 @@ public class OrdersController {
             Model model,
             @AuthenticationPrincipal LoginDTO login
     ) {
-        List<ProductMst> products = ordersService.getProducts();
+        List<ProductDTO> products = ordersService.getProducts();
         
         
         // 🔥 디버깅: 로그 출력

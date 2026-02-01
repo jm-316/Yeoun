@@ -9,7 +9,7 @@ import java.util.List;
 import com.yeoun.process.util.EuConverter;
 import com.yeoun.process.util.ProductSpecParser;
 import com.yeoun.process.entity.WorkOrderProcess;
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.masterData.entity.RouteStep;
 import com.yeoun.order.entity.WorkOrder;
 
@@ -34,13 +34,13 @@ public class ProcessTimeCalculator {
 		// 작업지시가 없거나 계획수량이 없으면 계산 불가
 	    if (wo == null || wo.getPlanQty() == null) return 0;
 
-	    ProductMst p = wo.getProduct();
+	    Product p = wo.getProduct();
 	    if (p == null) return wo.getPlanQty();
 
 	    // 제품 스펙 문자열: 예) "용량 30ml - 과일향, 꽃향"
 	    String spec = p.getPrdSpec();      
 	    // 제품 형태(액체/고체) 판단에 쓰는 값: 예) "LIQUID" / "SOLID"
-	    String itemName = p.getItemName(); 
+	    String itemName = p.getPrdType(); 
 
 	    // spec에서 숫자만 뽑아서 용량(size)을 추출: 30, 50, 100
 	    int size = ProductSpecParser.extractSize(spec);

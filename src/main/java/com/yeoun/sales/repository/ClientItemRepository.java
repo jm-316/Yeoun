@@ -35,7 +35,7 @@ public interface ClientItemRepository extends JpaRepository<ClientItem, Long> {
 			        m.matType
 			    )
 			    FROM ClientItem ci 
-			    JOIN MaterialMst m ON ci.materialId = m.matId
+			    JOIN Material m ON ci.materialId = m.matCode
 			    WHERE ci.clientId = :clientId
 			    AND m.useYn='Y'
 			""")
@@ -46,7 +46,7 @@ public interface ClientItemRepository extends JpaRepository<ClientItem, Long> {
 	 @Query("""
 			    SELECT ci.materialId
 			    FROM ClientItem ci
-			    JOIN MaterialMst m ON ci.materialId = m.matId
+			    JOIN Material m ON ci.materialId = m.matCode
 			    WHERE ci.clientId = :clientId
 			      AND m.useYn = 'Y'
 			""")

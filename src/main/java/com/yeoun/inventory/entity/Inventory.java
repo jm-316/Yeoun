@@ -6,8 +6,8 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.yeoun.masterData.entity.MaterialMst;
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Material;
+import com.yeoun.masterData.entity.Product;
 import com.yeoun.warehouse.entity.WarehouseLocation;
 
 import jakarta.persistence.Column;
@@ -59,18 +59,18 @@ public class Inventory {
 	private String itemType; // 상품의타입 (RAW, SUB, FG)
 	
 	// -------------------------------------------------------------
-	// 조회용 객체 ItemId가 materialMst, productMst에 있는지 검색
+	// 조회용 객체 ItemId가 material, product에 있는지 검색
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemId", insertable = false, updatable = false)
+    @JoinColumn(name = "itemId", referencedColumnName = "MAT_CODE", insertable = false, updatable = false)
     @NotFound(action = NotFoundAction.IGNORE) 
     @ToString.Exclude
-    private MaterialMst materialMst;
+    private Material materialMst;
 	
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemId", insertable = false, updatable = false)
+    @JoinColumn(name = "itemId", referencedColumnName = "PRD_CODE", insertable = false, updatable = false)
     @NotFound(action = NotFoundAction.IGNORE) 
     @ToString.Exclude
-    private ProductMst productMst;
+    private Product productMst;
     
     // getItemName베서드를 통해 해당 재고의 이름 얻기
     public String getItemName() {

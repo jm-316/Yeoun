@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.yeoun.masterData.dto.ProcessMstDTO;
 import com.yeoun.masterData.entity.ProcessMst;
 
 public interface ProcessMstRepository extends JpaRepository<ProcessMst, String> {
@@ -42,5 +43,7 @@ public interface ProcessMstRepository extends JpaRepository<ProcessMst, String> 
 			ORDER BY USE_YN DESC,STEP_NO ASC
 			""", nativeQuery = true)
 	List<Map<String, Object>> findByprocesslList(String processId, String processName);
+
+	List<ProcessMst> findByUseYn(String useYn);
 	
 }

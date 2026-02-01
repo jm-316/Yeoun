@@ -286,7 +286,7 @@ document.querySelector("#matRegistBtn").addEventListener("click", () => {
 // BOM 조회
 async function loadBomList(productId, planQty) {
 	try {
-		const res = await fetch(apiUrl(`bom/list/data/${productId}`));
+		const res = await fetch(apiUrl(`/bomMst/list/data/${productId}`));
 		const bomList = await res.json();
 		
 		// bom 목록 초기화

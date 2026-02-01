@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.yeoun.emp.entity.Emp;
 import com.yeoun.equipment.entity.ProdLine;
-import com.yeoun.masterData.entity.ProductMst;
+import com.yeoun.masterData.entity.Product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,8 +40,8 @@ public class WorkOrder {
 	
 	// 제품 ID
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "PRD_ID", nullable = false)
-	private ProductMst product;
+    @JoinColumn(name = "PRD_ID", referencedColumnName = "PRD_CODE", nullable = false)
+	private Product product;
     
     // 계획수량
     @Column(nullable = false)
