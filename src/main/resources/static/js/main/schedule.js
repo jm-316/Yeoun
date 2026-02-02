@@ -168,7 +168,7 @@ document.getElementById('type-day').addEventListener('click', function() {
 
 // list 버튼 클릭시 페이지 이동
 document.getElementById('type-list').addEventListener('click', function() {
-	location.href = "/main/schedule"
+	location.href = apiUrl('/main/schedule');
 });
 
 // ------캘린더 위 버튼관련 함수 끝
