@@ -64,6 +64,9 @@ async function openApprovalModal(mode, options = {}) {
 		// 결재선 추가 버튼 활성화
 		document.getElementById('open-approver-org-btn').style.display = '';	
 		
+		//결재선 불러오기 버튼 활성화
+		document.getElementById('open-approver-line-manage-btn').style.display = '';	
+		
 		// 기본값 설정 결재선 불러오기
 		await loadDefaultApprovalLineTemplate();	
     }
@@ -101,7 +104,9 @@ async function openApprovalModal(mode, options = {}) {
 
 		// 결재선 추가 버튼 숨김
 		document.getElementById('open-approver-org-btn').style.display = 'none';
-
+		// 결재선 불러오기 버튼 숨김
+		document.getElementById('open-approver-line-manage-btn').style.display = 'none';
+		
 		// 첨부파일 업로드 버튼 숨김
 		document.getElementById('file-upload-btn').style.display = 'none';
 
