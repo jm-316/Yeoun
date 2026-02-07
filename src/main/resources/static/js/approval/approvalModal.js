@@ -597,7 +597,7 @@ async function openApproverOrgModal() {
 
 // 조직도 데이터 불러오기
 async function getApproverOrganizationChart() {
-    await fetch('/api/schedules/organizationChart', {method: 'GET'})
+    await fetch(apiUrl(`/api/schedules/organizationChart`), {method: 'GET'})
         .then(response => {
             if (!response.ok) throw new Error(response.text());
             return response.json();
