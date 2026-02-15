@@ -56,7 +56,7 @@ routeStepCodeGrid.on('click', ev => {
 // 공정코드 정보 불러오기
 async function loadProcessCode(useYn) {
 	try {
-		const res = await fetch(`/processMst/processCodes?useYn=${useYn}`);
+		const res = await fetch(apiUrl(`/processMst/processCodes?useYn=${useYn}`));
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패");

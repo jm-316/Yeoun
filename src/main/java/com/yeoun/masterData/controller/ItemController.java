@@ -26,7 +26,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("masterData1")
+@RequestMapping("masterData")
 @Log4j2
 public class ItemController {
 	

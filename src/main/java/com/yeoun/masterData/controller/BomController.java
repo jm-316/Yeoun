@@ -36,6 +36,12 @@ public class BomController {
 	
 	private final BomService bomService;
 	
+	//BOM 연결페이지
+	@GetMapping("/bomStock")
+	public String bomStock() {
+		return "masterData/bom_stock";
+	}
+	
 	// BOM 조회
 	@GetMapping("/bomList")
 	public ResponseEntity<List<BomDTO>> bomList() {

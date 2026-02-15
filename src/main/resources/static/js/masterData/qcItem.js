@@ -79,7 +79,7 @@ const qcItemGrid = new tui.Grid({
 // qcItem 조회
 async function qcItemGridAllSearch() {
 	try {
-		const res = await fetch(`/masterData/qcItem/list`);
+		const res = await fetch(apiUrl(`/masterData/qcItem/list`));
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패");
@@ -123,7 +123,7 @@ qcItemGrid.on("click", async (ev) => {
 // qcItem 상세 조회
 async function loadQcItemDetail(qcItemId) {
 	try {
-		const res = await fetch(`/masterData/qcItem/${qcItemId}`);
+		const res = await fetch(apiUrl(`/masterData/qcItem/${qcItemId}`));
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패");
@@ -336,7 +336,7 @@ async function insertQcItem(data) {
 // QC ITEM ID 중복 검사 관련 로직
 async function checkQcItemId(qcItemId) {
 	try {
-		const res = await fetch(`/masterData/qcItem/checkDuplicate?qcItemId=${qcItemId}`);
+		const res = await fetch(apiUrl(`/masterData/qcItem/checkDuplicate?qcItemId=${qcItemId}`));
 		const data = await res.json();
 		
 		if (data.isDuplicate) {
@@ -356,7 +356,7 @@ async function checkQcItemId(qcItemId) {
 // 대상 구분 조회
 async function loadTargetType() {
 	try {
-		const res = await fetch("/commomCode/matType");
+		const res = await fetch(apiUrl("/commomCode/matType"));
 		const data = await res.json();
 		
 		// select에서 보여질 내용

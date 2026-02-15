@@ -116,9 +116,9 @@ productGrid.on("editingStart", ev => {
 // 완제품 코드 수정 가능 여부 확인
 async function checkPrdCode(prdCode) {
 	try {
-		const CHECK_PRD_CODE_URL = `/masterData1/data/check/prd?prdCode=${prdCode}`
+		const CHECK_PRD_CODE_URL = `/masterData/data/check/prd?prdCode=${prdCode}`
 		
-		const res = await fetch(CHECK_PRD_CODE_URL);
+		const res = await fetch(apiUrl(CHECK_PRD_CODE_URL));
 		const data = await res.json();
 		
 		return {
@@ -281,10 +281,10 @@ productGrid.on('click', ev => {
 
 // 원재료 정보 불러오기
 async function loadProduct(useYn) {
-	const PRODUCT_LIST = `/masterData1/data/productList?useYn=${useYn}`;
+	const PRODUCT_LIST = `/masterData/data/productList?useYn=${useYn}`;
 			
 	try {
-		const res = await fetch(PRODUCT_LIST, {method: "GET"});
+		const res = await fetch(apiUrl(PRODUCT_LIST), {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");
@@ -310,7 +310,7 @@ async function loadPrdTypeCode() {
 	const PRODUCT_TYPE_URL = "/commomCode/prdType";
 	
 	try {
-		const res = await fetch(PRODUCT_TYPE_URL);
+		const res = await fetch(apiUrl(PRODUCT_TYPE_URL));
 		let data = await res.json();
 		
 		// select에서 보여질 내용
@@ -337,7 +337,7 @@ async function loadPrdUnit() {
 	const PRODUCT_UNIT_URL = "/commomCode/unit";
 	
 	try {
-		const res = await fetch(PRODUCT_UNIT_URL);
+		const res = await fetch(apiUrl(PRODUCT_UNIT_URL));
 		const data = await res.json();
 		
 		// select에서 보여질 내용
@@ -450,7 +450,7 @@ document.getElementById("prdSaveBtn").addEventListener("click", async () => {
 
 // 원재료 등록
 async function saveProduct(data) {
-	const PRODUCT_ADD_URL = "/masterData1/data/product/add";
+	const PRODUCT_ADD_URL = "/masterData/data/product/add";
 	
 	try {
 		const res = await fetch(apiUrl(PRODUCT_ADD_URL), {

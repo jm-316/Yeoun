@@ -154,7 +154,7 @@ public class QcResultService {
 
         // 1) QC 항목 마스터 조회
         List<QcItem> qcItems =
-                qcItemRepository.findByTargetTypeAndUseYnOrderBySortOrderAsc("FINISHED_QC", "Y");
+                qcItemRepository.findByTargetTypeAndUseYnOrderBySortOrderAsc("FIN", "Y");
 
         int seq = 1;
 

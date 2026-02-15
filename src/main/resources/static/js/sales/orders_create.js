@@ -420,7 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <td>
           <input type="number" class="form-control minqty-input"
-                 name="items[${index}][minQty]" required>
+                 name="items[${index}][minQty]" readonly>
         </td>
 
         <td>
@@ -471,7 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
         unitInput.value = unit;
 
 		priceInput.value = "";
-		minQtyInput.value = "";
+		minQtyInput.value = 10;
 		qtyInput.value = "";
 		amountInput.value = "";
 		

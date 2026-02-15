@@ -136,9 +136,9 @@ materialGrid.on("editingStart", ev => {
 // 원재료 코드 수정 가능 여부 확인
 async function checkmatCode(matCode) {
 	try {
-		const CHECK_MAT_CODE_URL = `/masterData1/data/check?matCode=${matCode}`
+		const CHECK_MAT_CODE_URL = `/masterData/data/check?matCode=${matCode}`
 		
-		const res = await fetch(CHECK_MAT_CODE_URL);
+		const res = await fetch(apiUrl(CHECK_MAT_CODE_URL));
 		const data = await res.json();
 		
 		return {
@@ -299,10 +299,10 @@ materialGrid.on('click', ev => {
 
 // 원재료 정보 불러오기
 async function loadMaterial(useYn) {
-	const MATERIAL_LIST = `/masterData1/data/materialList?useYn=${useYn}`;
+	const MATERIAL_LIST = `/masterData/data/materialList?useYn=${useYn}`;
 			
 	try {
-		const res = await fetch(MATERIAL_LIST, {method: "GET"});
+		const res = await fetch(apiUrl(MATERIAL_LIST), {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");
@@ -328,7 +328,7 @@ async function loadMatTypeCode() {
 	const MATERIAL_TYPE_URL = "/commomCode/matType";
 	
 	try {
-		const res = await fetch(MATERIAL_TYPE_URL);
+		const res = await fetch(apiUrl(MATERIAL_TYPE_URL));
 		let data = await res.json();
 		
 		data = data.filter(item => item.codeId !== "WIP" && item.codeId !== "FIN")
@@ -357,7 +357,7 @@ async function loadUnit() {
 	const MATERIAL_UNIT_URL = "/commomCode/unit";
 	
 	try {
-		const res = await fetch(MATERIAL_UNIT_URL);
+		const res = await fetch(apiUrl(MATERIAL_UNIT_URL));
 		const data = await res.json();
 		
 		// select에서 보여질 내용
@@ -444,7 +444,7 @@ document.getElementById("matSaveBtn").addEventListener("click", async () => {
 
 // 원재료 등록
 async function saveMaterial(data) {
-	const MATERIAL_ADD_URL = "/masterData1/data/material/add";
+	const MATERIAL_ADD_URL = "/masterData/data/material/add";
 	
 	try {
 		const res = await fetch(apiUrl(MATERIAL_ADD_URL), {

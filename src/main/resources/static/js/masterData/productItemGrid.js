@@ -120,7 +120,7 @@ async function loadPrdTypeCode() {
 	const PRODUCT_TYPE_URL = "/commomCode/prdType";
 	
 	try {
-		const res = await fetch(PRODUCT_TYPE_URL);
+		const res = await fetch(apiUrl(PRODUCT_TYPE_URL));
 		let data = await res.json();
 		
 		// select에서 보여질 내용
@@ -141,10 +141,10 @@ async function loadPrdTypeCode() {
 }
 
 async function loadProduct(useYn) {
-	const PRODUCT_LIST = `/masterData1/data/productList?useYn=${useYn}`;
+	const PRODUCT_LIST = `/masterData/data/productList?useYn=${useYn}`;
 			
 	try {
-		const res = await fetch(PRODUCT_LIST, {method: "GET"});
+		const res = await fetch(apiUrl(PRODUCT_LIST), {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");

@@ -184,7 +184,7 @@ async function loadBom() {
 	const BOM_LIST = "/bomMst/bomList";
 			
 	try {
-		const res = await fetch(BOM_LIST, {method: "GET"});
+		const res = await fetch(apiUrl(BOM_LIST), {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");
@@ -510,7 +510,7 @@ async function checkBomName(bomName) {
 	try {
 		const CHECK_BOM_NAME_URL = `/bomMst/data/checkDuplicate?bomName=${bomName}`;
 		
-		const res = await fetch(CHECK_BOM_NAME_URL);
+		const res = await fetch(apiUrl(CHECK_BOM_NAME_URL));
 		const data = await res.json();
 		
 		const regex = /^[가-힣a-zA-Z0-9\s~!@#$%^&*\(\)_+\-=\[\];:'",.<>/?]+$/;
@@ -541,7 +541,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 async function loadUnit(url) {
 	
 	try {
-		const res = await fetch(url);
+		const res = await fetch(apiUrl(url));
 		const data = await res.json();
 		
 		// select에서 보여질 내용

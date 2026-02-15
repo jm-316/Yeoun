@@ -118,10 +118,10 @@ document.getElementById("searchItemtBtn").addEventListener("click", () => {
 });
 
 async function loaditems() {
-	const ITEM_URL = "/masterData1/items";
+	const ITEM_URL = "/masterData/items";
 	
 	try {
-		const res = await fetch (ITEM_URL);
+		const res = await fetch (apiUrl(ITEM_URL));
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");

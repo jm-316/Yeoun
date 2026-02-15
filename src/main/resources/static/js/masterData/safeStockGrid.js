@@ -225,7 +225,7 @@ async function loadSafeStock() {
 	const SAFE_STOCK_URL = "/safeStock/list";
 			
 	try {
-		const res = await fetch(SAFE_STOCK_URL, {method: "GET"});
+		const res = await fetch(apiUrl(SAFE_STOCK_URL), {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");

@@ -85,7 +85,7 @@ public class ItemService {
 	@Transactional
 	public void updateMaterial(List<MaterialDTO> updatedRows) {
 		for (MaterialDTO dto : updatedRows) {
-			Material material = materialRepository.findByMatCode(dto.getMatCode())
+			Material material = materialRepository.findByMatId(dto.getMatId())
 					.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 원재료입니다."));
 			
 			if ('N' == dto.getUseYn() && 'Y' == material.getUseYn()) {

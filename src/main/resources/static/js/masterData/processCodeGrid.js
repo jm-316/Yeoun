@@ -233,7 +233,7 @@ processCodeGrid.on('click', ev => {
 // 공정코드 정보 불러오기
 async function loadProcessCode(useYn) {
 	try {
-		const res = await fetch(`/processMst/processCodes?useYn=${useYn}`);
+		const res = await fetch(apiUrl(`/processMst/processCodes?useYn=${useYn}`));
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패");
@@ -270,7 +270,7 @@ function updateGridColumnOptions() {
 // 공통코드에서 공정유형 가져오기
 async function loadprocessTypeCode() {
 	try {
-		const res = await fetch("/commomCode/processType");
+		const res = await fetch(apiUrl("/commomCode/processType"));
 		const data = await res.json();
 		
 		

@@ -120,7 +120,7 @@ routeStepGrid.on('click', async (ev) => {
 // ROUTE_STEP 조회
 async function loadRouteStep(useYn, routeId) {
 	try {
-		const res = await fetch(`/processMst/routeStep?useYn=${useYn}&routeId=${routeId}`);
+		const res = await fetch(apiUrl(`/processMst/routeStep?useYn=${useYn}&routeId=${routeId}`));
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패");

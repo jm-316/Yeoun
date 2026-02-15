@@ -142,7 +142,7 @@ async function loadMatTypeCode() {
 	const MATERIAL_TYPE_URL = "/commomCode/matType";
 	
 	try {
-		const res = await fetch(MATERIAL_TYPE_URL);
+		const res = await fetch(apiUrl(MATERIAL_TYPE_URL));
 		let data = await res.json();
 		
 		data = data.filter(item => item.codeId !== "WIP" && item.codeId !== "FIN")

@@ -51,7 +51,7 @@ async function loadBomItem(bomId) {
 	try {
 		bomItemGrid.resetData([]); // 기존 데이터 초기화
 		
-		const res = await fetch(BOM_ITEM_LIST, {method: "GET"});
+		const res = await fetch(apiUrl(BOM_ITEM_LIST), {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");
@@ -173,10 +173,10 @@ bomItemGrid.on("editingFinish", ev => {
 });
 
 async function loadMaterial(useYn) {
-	const MATERIAL_LIST = `/masterData1/data/materialList?useYn=${useYn}`;
+	const MATERIAL_LIST = `/masterData/data/materialList?useYn=${useYn}`;
 			
 	try {
-		const res = await fetch(MATERIAL_LIST, {method: "GET"});
+		const res = await fetch(apiUrl(MATERIAL_LIST), {method: "GET"});
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패!");

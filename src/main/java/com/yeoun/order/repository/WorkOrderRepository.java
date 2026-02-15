@@ -80,7 +80,7 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, String> {
     @Query("""
     	    select case when count(wo) > 0 then true else false end
     	    from WorkOrder wo
-    	    where wo.product.prdId in :prdCodes
+    	    where wo.product.prdCode in :prdCodes
     	      and wo.status in :statuses
     	""")
 	boolean existsByPrdIdsInAndStatusIn(@Param("prdCodes") List<String> prdCodes, @Param("statuses") List<String> statuses);
@@ -88,7 +88,7 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, String> {
     @Query("""
     	    select case when count(wo) > 0 then true else false end
     	    from WorkOrder wo
-    	    where wo.product.prdId = :prdCode
+    	    where wo.product.prdCode = :prdCode
     	      and wo.status in :statuses
     	""")
 	boolean existsByPrdIdAndStatusIn(@Param("prdCode") String prdCode, @Param("statuses") List<String> statuses);

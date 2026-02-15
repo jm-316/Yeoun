@@ -69,7 +69,7 @@ const routeGrid = new tui.Grid({
 // 라우트 정보 불러오기
 async function loadRoute() {
 	try {
-		const res = await fetch("/processMst/routes");
+		const res = await fetch(apiUrl("/processMst/routes"));
 		
 		if (!res.ok) {
 			throw new Error("데이터 로드 실패");
@@ -134,7 +134,7 @@ routeGrid.on("click", async (ev) => {
 // route 상세 조회
 async function loadRouteDetail(routeId) {
 	try {
-		const res = await fetch(`/processMst/route/${routeId}`);
+		const res = await fetch(apiUrl(`/processMst/route/${routeId}`));
 		
 		if (!res.ok) {
 			throw new Error("상세 데이터 조회 실패");
@@ -401,7 +401,7 @@ async function saveHeader(data, routeId) {
 async function loadUnit(url) {
 	
 	try {
-		const res = await fetch(url);
+		const res = await fetch(apiUrl(url));
 		const data = await res.json();
 		
 		// select에서 보여질 내용
