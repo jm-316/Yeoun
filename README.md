@@ -1,90 +1,113 @@
-# Yeoun
-향수 제조 기업을 위한 전사적 자원 관리(ERP)와 제조 실행 시스템(MES)을 결합한 통합 웹 애플리케이션입니다.
+# 🏭 Yeoun – ERP & MES 통합 제조 관리 시스템
 
+> 향수 제조 기업을 위한 전사적 자원 관리(ERP)와 제조 실행 시스템(MES)을 하나의 웹 플랫폼에서 통합 관리할 수 있는 시스템입니다.  
+> 일반 사무 업무부터 생산·자재·재고 관리까지 제조 현장 프로세스를 반영해 구현했습니다.
+
+---
+
+## 📅 프로젝트 기간
+**2025.10.20 ~ 2025.12.24**
+
+---
+
+## 👥 팀 구성 및 역할
+- **구성:** 백엔드 / 프론트엔드 협업 팀 프로젝트 (6인)  
+- **담당 파트:**  
+  - ERP – 근태관리  
+  - MES – 입출고(재고) 관리
+
+---
+
+## 🎯 프로젝트 목적
+일반적인 사무 업무뿐만 아니라 향수 제조 산업의 특성을 반영한 생산 및 자재 관리까지 하나의 시스템에서 통합 처리할 수 있도록 개발했습니다.  
+ERP와 MES 데이터를 연계하여 업무 흐름의 단절 없이 관리할 수 있는 환경을 구축하는 것을 목표로 했습니다.
+
+---
+
+## 💡 프로젝트 개요
+- **프로젝트명:** Yeoun  
+- **설명:**  
+  향수 제조 기업의 업무 전반을 관리하기 위해 ERP와 MES를 통합한 웹 기반 시스템  
+- **특징:**  
+  인사·근태·전자결재 등 사무 업무와 생산·재고·공정 관리까지 하나의 플랫폼에서 처리
+
+---
+
+## 🛠 기술 스택
+
+<div align="center">
+
+<img src="https://img.shields.io/badge/Java-007396.svg?style=for-the-badge&logo=openjdk&logoColor=white" />
+<img src="https://img.shields.io/badge/Spring%20Boot-6DB33F.svg?style=for-the-badge&logo=springboot&logoColor=white" />&nbsp
+<img src="https://img.shields.io/badge/Oracle-F80000.svg?style=for-the-badge&logo=oracle&logoColor=white" />&nbsp
+<img src="https://img.shields.io/badge/MyBatis-000000.svg?style=for-the-badge&logo=databricks&logoColor=white" />&nbsp
+<img src="https://img.shields.io/badge/JPA-59666C.svg?style=for-the-badge&logo=hibernate&logoColor=white" />&nbsp
+<img src="https://img.shields.io/badge/Thymeleaf-005F0F.svg?style=for-the-badge&logo=thymeleaf&logoColor=white" />&nbsp
 <br>
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=black" />&nbsp
+<img src="https://img.shields.io/badge/AJAX-005571.svg?style=for-the-badge&logo=ajax&logoColor=white" />&nbsp
+<img src="https://img.shields.io/badge/Bootstrap-7952B3.svg?style=for-the-badge&logo=bootstrap&logoColor=white" />&nbsp
+<img src="https://img.shields.io/badge/Toast%20UI-FF6F00.svg?style=for-the-badge&logoColor=white" />&nbsp
 
-## 📅 프로젝트 개요
-*   **프로젝트명:** 여운 (Yeoun)
-*   **개발 기간:** 2025.10.20 ~ 2025.12.24
-*   **팀 구성:** 6명 (Full-stack 협업)
-*   **기획 의도:** 일반적인 사무 업무뿐만 아니라, 향수 제조 특성을 고려한 생산 및 자재 관리까지 하나의 시스템에서 처리할 수 있도록 개발하였습니다.
+</div>
 
-<br>
+---
 
-## 🛠️ 기술 스택 (Tech Stack)
+## 📌 주요 기능
 
-### Backend
-*   Language: Java
-*   Framework: Spring Boot
-*   Database: Oracle
-*   ORM: MyBatis, JPA
+### 🧾 ERP
+- 인사 관리 (사원, 조직, 인사발령)
+- 근태 관리 (출퇴근, 외근, 연차, 근무정책, 출입 기록)
+- 전자결재 (연차·지출·인사발령 등 결재 프로세스)
+- 급여 관리
+- 영업 관리 (거래처, 수주, 출하)
 
-### Frontend
-*   View Engine: Thymeleaf
-*   Library: JavaScript, jQuery, Bootstrap, Toast UI
-*   Chart: Chart.js / ApexCharts (대시보드 시각화용)
+---
 
-### Collaboration & DevOps
-*   VCS* Git, GitHub
-*   Communication: Notion, Discord
+### 🏭 MES
+- 기준정보 관리 (제품·자재·BOM·공정·설비)
+- 재고 관리 (입출고, 재고 조회, 창고 관리)
+- 생산 관리 (생산계획, 작업지시, 스케줄)
+- 공정 및 LOT 추적
+- 품질 관리 (QC)
+- 설비 이력 관리
+- 폐기 관리
 
-<br>
+---
 
-<br>
-## 👨‍💻 본인 담당 역할 (My Contribution)
-팀 내에서 ERP의 일정/결재 파트와 MES의 재고/대시보드 파트를 전담하여 개발했습니다.
+### 🔐 시스템
+- 권한 관리
 
-### 1️⃣ ERP (전사적 자원 관리)
-**📅 일정 관리 (Calendar)**
-*   **API 연동:** 공공데이터 포털 API를 활용하여 캘린더에 공휴일 자동 표시
-*   **일정 분류 시스템:**
-    *   **회사 일정:** 전 사원 공유
-    *   **공유 일정:** 조직도를 통해 선택된 특정 인원에게만 공유
-    *   **개인 일정:** 본인 캘린더에만 표시
-*   **복잡한 비즈니스 로직:** 매일/매주/매월/매년 등 **반복 일정(Recurrence) 등록** 알고리즘 구현
-*   **UX/UI:** Toast UI Calendar를 커스텀하여 월/주/일 뷰(View) 전환
+---
 
-**📑 전자 결재 (Approval System)**
-*   **양식 커스터마이징:** 자유양식, 휴가신청서, 지출결의서 등 템플릿별 동적 문서 작성 기능
-*   **결재선 지정:** 조직도와 연동하여 1차 → 2차 → 3차 결재권자를 직접 지정하는 로직 구현
-*   **프로세스 처리:** 승인/반려에 따른 문서 상태값 변경 및 다음 결재자에게 권한 이양 처리
+## ⚙️ 주요 업무 및 역할
 
-<br>
+### 🧾 ERP – 근태 관리
 
-### 2️⃣ MES (제조 실행 시스템)
-**📦 재고 관리 (Inventory)**
-*   **상세 조회 및 검색:** 동적 쿼리를 활용하여 다양한 조건(품목, 창고, 기간 등) 복합 검색 기능 구현
-*   **재고 실사(Physical Inventory):** 전산 재고와 실제 재고의 차이를 조정하고 기록하는 보정 기능 개발
-*   **이력 추적(Traceability):** 입고, 출고, 이동, 폐기, 실사 등 재고 수량이 변동되는 모든 트랜잭션 로깅
+- 출퇴근 등록 및 조회 기능 구현  
+- 외근 등록 및 확인 기능 구현  
+- 사원 출·퇴근 현황 조회 및 수기 등록 기능 구현  
+- 개인 연차 현황 조회 기능 구현  
+- 전 직원 연차 조회 및 수정 기능 구현  
+- 근무 정책 관리 기능 구현  
+  - 출퇴근 기준 시간 설정  
+  - 점심시간 설정  
+  - 지각 유예 시간 설정  
+  - 연차 기준 설정  
+- 건물 출입 기록 관리 기능 구현
 
-**📊 통합 대시보드 (Dashboard)**
-*   **데이터 시각화:**
-    *   Chart.js를 활용하여 지난 1년간의 재고 변동 추이 그래프 구현
-    *   창고 가동률(적재율) 실시간 게이지 차트 구현
-*   **위젯 시스템:**
-    *   금일 입/출고 현황(지시 vs 처리) 카운트
-    *   **Alert 기능:** 발주 필요 품목, 유통기한 임박/만료 재고 자동 필터링 및 알림 표시
-*   **Quick Action:** 대시보드 내에서 입/출고 등록, 발주 신청, 폐기 처리가 즉시 가능하도록 UX 최적화
+---
 
-<br>
+### 🏭 MES – 재고(입출고) 관리
 
-## 🔑 전체 주요 기능 (Key Features)
+- 원재료 발주 기능 구현  
+- 원재료 / 재입고 / 완제품 입고 등록 및 조회 기능 구현  
+- 원재료 / 완제품 출고 등록 및 조회 기능 구현  
+- 창고 등록 및 수정 기능 구현
 
-### 🏢 ERP (Office)
-| 기능 | 상세 설명 |
-| :--- | :--- |
-| **📑 전자 결재** | 기안서 작성, 결재 라인 지정, 승인/반려 처리, 진행 상태 조회 |
-| **👥 인사 관리** | 사원 정보 관리, 조직도 조회, 인사 이동 처리 |
-| **📅 일정 관리** | 개인/공유/회사 일정, 반복 일정, 알림 기능 |
-| **💬 메신저** | WebSocket 기반 실시간 채팅 및 파일 전송 |
-| **⏰ 근태 관리** | 출퇴근 기록, 연차 관리, 근무 시간 통계 |
-| **💼 영업 관리** | 수주/발주 및 거래처 관리 |
+---
 
-### 🏭 MES (Factory)
-| 기능 | 상세 설명 |
-| :--- | :--- |
-| **📋 기준 정보** | 품목(완제품/자재) 및 BOM(자재명세서) 관리 |
-| **🏭 생산 관리** | 생산 계획 수립, 작업 지시(Work Order), 공정 실적 등록 |
-| **📦 재고 관리** | 입출고 처리, 재고 실사, 유통기한 및 LOT 관리 |
+## 🌐 배포 주소
+http://c4d2510t1p1.itwillbs.com/Yeoun/main
 
-<br>
+---
